@@ -1,7 +1,7 @@
 # Appellation
 
 This is a Vue.js implementation of the game Monikers. The cards implemented are available for download on their [official website](http://www.monikersgame.com/).
-
+ 
 ## Project setup
 ```
 yarn install
