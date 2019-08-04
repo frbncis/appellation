@@ -131,7 +131,7 @@ export default class Guessing extends Vue {
   }
 
   private onStartClick() {
-    document.documentElement.requestFullscreen();
+    // document.documentElement.requestFullscreen();
     this.startButtonPressed = true;
   }
 
