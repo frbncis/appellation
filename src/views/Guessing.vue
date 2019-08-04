@@ -1,5 +1,5 @@
 <template>
-  <div class="about">
+  <div class="guessing">
     <h1>{{ cardsGuessed }}</h1>
     <CardDeck
       v-if="cards.length"
@@ -20,7 +20,7 @@ import CardDeck from '@/components/Card/CardDeck.vue';
     CardDeck,
   },
 })
-export default class About extends Vue {
+export default class Guessing extends Vue {
   
   private cardsGuessed: number = 0;
 
