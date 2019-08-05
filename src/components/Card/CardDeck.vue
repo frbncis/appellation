@@ -86,14 +86,10 @@ export default class CardDeck extends Vue {
     @Prop() private cards?: Array<CardData>;
 
     get renderableCards(): Array<CardDataView> {
-        console.log("Calculating renderableCards");
-
         if (!this.cards)
         {
             return [];
         }
-
-        console.log(`${this.cards.length} cards remaining...`);
 
         let topCardIndex;
 
@@ -119,10 +115,10 @@ export default class CardDeck extends Vue {
             renderableCardsCandidates = this.cards.slice(topCardIndex, topCardIndex + 2);
         }
         
-        const nextCard = renderableCardsCandidates[renderableCardsCandidates.length -1];
+        const nextCard = renderableCardsCandidates[renderableCardsCandidates.length - 1];
 
         if (nextCard != this.topCard) {
-            this.nextCard = renderableCardsCandidates[renderableCardsCandidates.length -1];
+            this.nextCard = renderableCardsCandidates[renderableCardsCandidates.length - 1];
         } else {
             this.nextCard = undefined;
         }
@@ -132,18 +128,15 @@ export default class CardDeck extends Vue {
 
             view.renderKey = this.keyCounter++;
 
-            accumulator.push(view);
+            accumulator.unshift(view);
 
             return accumulator;
-        }, []).reverse();
+        }, []);
     }
 
     private swingConfig = {
         throwOutConfidence: (xOffset: number, yOffset: number, element: HTMLElement) => {
             const xConfidence = Math.min(Math.abs(xOffset) / (0.55 * element.offsetWidth), 1);
-            // const yConfidence = Math.min(Math.abs(yOffset) / (0.25 * element.offsetHeight), 1);
-
-            // return Math.max(xConfidence, yConfidence);
             return xConfidence;
         },
         allowedDirections: [

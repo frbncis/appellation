@@ -1,7 +1,13 @@
 <template>
-    <div>
-        <h1>{{ timeRemainingSeconds }}</h1>
-    </div>
+    <!-- <h1>{{ timeRemainingSeconds }}</h1> -->
+    <v-progress-circular
+        class="timer"
+        size="75"
+        width="8"
+        rotate="-90"
+        :value="timeRemainingSeconds / timerStartValue * 100">
+        {{ timeRemainingSeconds }}
+    </v-progress-circular>
 </template>
 
 <script lang="ts">
@@ -64,3 +70,10 @@ export default class Timer extends Vue {
     }
 }
 </script>
+
+<style>
+.timer {
+    font-weight: bold;
+    font-size: x-large;
+}
+</style>

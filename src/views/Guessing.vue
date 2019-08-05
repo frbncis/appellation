@@ -1,48 +1,64 @@
 <template>
   <div class="guessing">
-    <div class="game-header">
-      <div class="team-game-header" :class="{ 'active-team': activeTeam == 1 }">
-        <p>Team 1</p>
-        <p>{{ scores[1] }}</p>
-      </div>
+    <v-content>
+      <v-container
+        grid-list-md
+        fluid
+        fill-height
+      >
+        <!-- Header -->
+        <v-layout wrap>
+            <v-flex xs4 text-left class="team-game-header" :class="{ 'active-team': activeTeam == 1 }">
+              <p>Team 1</p>
+              <p>{{ scores[1] }}</p>
+            </v-flex>
 
-      <div class="team-game-header">
-        <Timer
-          v-if="isRoundActive"
-          :timerRunning="isRoundActive"
-          :timerStartValue="timerStartValue"
-          :onTimerEnded="onTimerEnded"
-          
-        />
-      </div>
+            <v-flex xs4 text-center class="team-game-header">
+              <Timer
+                v-if="isRoundActive"
+                :timerRunning="isRoundActive"
+                :timerStartValue="timerStartValue"
+                :onTimerEnded="onTimerEnded"
+              />
+            </v-flex>
 
-      <div class="team-game-header" :class="{ 'active-team': activeTeam == 2 }">
-        <p>Team 2</p>
-        <p>{{ scores[2] }}</p>
-      </div>
-    </div>
+            <v-flex xs4 text-right class="team-game-header" :class="{ 'active-team': activeTeam == 2 }">
+              <p>Team 2</p>
+              <p>{{ scores[2] }}</p>
+            </v-flex>
+        </v-layout>
+      </v-container>
 
-    <div v-if="!isRoundActive">
-      <h1>Round {{ activeRound }}</h1>
-      <h3>{{ rounds[activeRound] }}</h3>
-    </div>
+      <v-container
+        grid-list-md
+        fluid
+        fill-height
+      >
+        <v-layout wrap>
+          <v-flex xs12 v-if="isRoundActive">
+            <CardDeck
+                :onDeckEmpty="onDeckEmpty"
+                :onCardGuessed="onCardGuess"
+                :cards="cards"
+            />
+          </v-flex>
 
-    <div class="game-footer">
-      <h1 v-if="!startButtonPressed" @click="onStartClick" >Start</h1>
-
-      <ProgressBar v-else :progress="(cardsGuessed) / cardsTotal * 100" />
-    </div>
-    <div
-      v-if="isRoundActive"
+          <v-flex xs12 v-else>
+            <h1>Round {{ activeRound }}</h1>
+            <h3>{{ rounds[activeRound] }}</h3>
+          </v-flex>
+        </v-layout>
+      </v-container>
+    </v-content>
+    
+    <v-footer
+      app
     >
-      <CardDeck
-        :onDeckEmpty="onDeckEmpty"
-        :onCardGuessed="onCardGuess"
-        :cards="cards"
-      />
-
-
-    </div>    
+      <Button v-if="!startButtonPressed" text="Start" @click="onStartClick" />
+      <v-progress-linear
+          v-else
+          :value="progress" />
+    </v-footer>
   </div>
 </template>
 
@@ -52,10 +68,14 @@ import CardDeck from '@/components/Card/CardDeck.vue';
 import Timer from '@/components/Timer.vue';
 import Cards from '@/data/Cards';
 import ProgressBar from '@/components/ProgressBar.vue';
+import Button from '@/components/Button.vue';
+import Footer from '@/components/Footer.vue';
 
 @Component({
   components: {
+    Button,
     CardDeck,
+    Footer,
     Timer,
     ProgressBar,
   },
@@ -90,6 +110,10 @@ export default class Guessing extends Vue {
 
   get isRoundActive(): boolean {
     return this.startButtonPressed == true && this.hasTimeRemaining == true && this.cards.length > 0;
+  }
+
+  get progress() {
+    return (this.cardsGuessed) / this.cardsTotal * 100
   }
 
   private onDeckEmpty() {
@@ -176,7 +200,6 @@ export default class Guessing extends Vue {
 
 .game-header {
   display: flex;
-  /* width: 100%; */
 }
 
 .game-header div {
@@ -184,16 +207,13 @@ export default class Guessing extends Vue {
 }
 
 .game-footer {
-  background: black;
-  color: white;
-  /* padding:0.01em 2em 0.1em 2em; */
-  font-size: 0.75em;
-  /* text-transform: uppercase; */
+  /* background: black; */
+  /* color: white; */
+  /* font-size: 0.75em; */
   display: table;
   margin-right: auto;
   margin-left: auto;
   width: 95%;
-  /* position: absolute; */
   bottom:0;
   left: 2.5%;
   position: fixed;
