@@ -1,56 +1,47 @@
 <template>
-<div style="{ display: block }">
-
     <vue-swing
-        @throwoutright="_onCardSkipped"
-        @throwoutleft="_onCardGuessed"
-        :config="swingConfig"
-        ref="stack"
-        v-if="renderableCards"
-    >
-        <div v-for="card in renderableCards" :key="card.renderKey" class="card">
-            <div class="card-content">
-                <div class="card-data">
-                    <h1 class="card-title">{{ card.title }}</h1>
+            @throwoutright="_onCardSkipped"
+            @throwoutleft="_onCardGuessed"
+            :config="swingConfig"
+            ref="stack"
+            v-if="renderableCards"
+        >
+        <!-- <div> -->
+        <div
+            v-for="card in renderableCards" :key="card.renderKey" class="card"
+        >
+            <v-layout column text-center>
+                <v-flex>
+                    <h1 class="card-title">
+                        {{ card.title }}
+                    </h1>
+
                     <p class="card-description">
                         {{ card.description }}
                     </p>
-                </div>
-                <hr />
-                <div
-                    class="card-meta"
-                    :class="{
-                        'points-1': card.points == 1,
-                        'points-2': card.points == 2,
-                        'points-3': card.points == 3,
-                        'points-4': card.points == 4,
-                    }"
-                >
-                    <h2
-                        class="card-category"
-                    >
-                        {{ card.category }}
-                    </h2>
+                </v-flex>
 
-                    <div class="card-points-container-shape">
-                        <div 
-                            class="card-points-container-cap"
-                        >
-                            <p class="card-points">
-                                {{ card.points }}
-                            </p>
-                        </div>
-                        <div
-                            class="card-points-container-bottom card-points-container-shape"
-                        >
-                            <p>Points</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <v-flex>
+                    <p>-----------------</p>
+                </v-flex>
+
+                <v-flex>
+                    <h2 class="card-category">
+                        {{ card.category }}
+                    </h2>                    
+                </v-flex>
+
+                <v-flex class="card-points-container-cap">
+                        {{ card.points }}
+                </v-flex>
+                    
+                <v-flex class="card-points-container-bottom card-points-container-shape">
+                    <p>Points</p>
+                </v-flex>
+            </v-layout>
         </div>
     </vue-swing>
-</div>
+        <!-- </div> -->
 </template>
 
 <script lang="ts">
@@ -181,21 +172,13 @@ export default class CardDeck extends Vue {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .card {
-    background-color: #FFF;
-    width: inherit;
-    max-width: 274px;
-    height: 435px;
-    margin: 20px auto;
-    padding-top: 30px;
-    padding-left: 25px;
-    padding-right: 25px;
-    border-radius: 15px;
-    border: 1px;
-    border-style: solid;
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     position: absolute;
-  
-    left: calc(50% - (326px / 2));
-    display: block;
+    height: inherit;
+    width: inherit;
+    padding: 1em;
 }
 
 hr {
@@ -205,8 +188,14 @@ hr {
     border-width: 1px;
 }
 
+.card-title {
+    text-align: center;
+    padding-bottom: 1em;
+}
+
 .card .card-data {
     min-height: 60%;
+    font-size: smaller;
 }
 
 .card-content {

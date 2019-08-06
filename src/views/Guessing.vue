@@ -1,49 +1,29 @@
 <template>
   <div class="guessing">
+    <v-app-bar>
+      <Scoreboard
+        :scores="scores"
+        :activeTeam="activeTeam"
+        :isRoundActive="isRoundActive"
+        :timerStartValue="timerStartValue"
+        :onTimerEnded="onTimerEnded"
+      />
+    </v-app-bar>
+
     <v-content>
-      <v-container
-        grid-list-md
-        fluid
-        fill-height
-      >
-        <!-- Header -->
-        <v-layout wrap>
-            <v-flex xs4 text-left class="team-game-header" :class="{ 'active-team': activeTeam == 1 }">
-              <p>Team 1</p>
-              <p>{{ scores[1] }}</p>
-            </v-flex>
-
-            <v-flex xs4 text-center class="team-game-header">
-              <Timer
-                v-if="isRoundActive"
-                :timerRunning="isRoundActive"
-                :timerStartValue="timerStartValue"
-                :onTimerEnded="onTimerEnded"
-              />
-            </v-flex>
-
-            <v-flex xs4 text-right class="team-game-header" :class="{ 'active-team': activeTeam == 2 }">
-              <p>Team 2</p>
-              <p>{{ scores[2] }}</p>
-            </v-flex>
-        </v-layout>
-      </v-container>
-
-      <v-container
-        grid-list-md
-        fluid
-        fill-height
-      >
-        <v-layout wrap>
-          <v-flex xs12 v-if="isRoundActive">
+      <v-container column>
+        <v-layout
+          justify-center column fill-height align-center
+        >
+          <v-flex v-if="isRoundActive">
             <CardDeck
-                :onDeckEmpty="onDeckEmpty"
-                :onCardGuessed="onCardGuess"
-                :cards="cards"
+              :onDeckEmpty="onDeckEmpty"
+              :onCardGuessed="onCardGuess"
+              :cards="cards"
+              class="card-deck"
             />
           </v-flex>
-
-          <v-flex xs12 v-else>
+          <v-flex v-else class="round-info" text-center xs12>
             <h1>Round {{ activeRound }}</h1>
             <h3>{{ rounds[activeRound] }}</h3>
           </v-flex>
@@ -65,19 +45,19 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import CardDeck from '@/components/Card/CardDeck.vue';
-import Timer from '@/components/Timer.vue';
 import Cards from '@/data/Cards';
 import ProgressBar from '@/components/ProgressBar.vue';
 import Button from '@/components/Button.vue';
 import Footer from '@/components/Footer.vue';
+import Scoreboard from '@/components/Scoreboard.vue';
 
 @Component({
   components: {
     Button,
     CardDeck,
     Footer,
-    Timer,
     ProgressBar,
+    Scoreboard,
   },
 })
 export default class Guessing extends Vue {
@@ -100,7 +80,7 @@ export default class Guessing extends Vue {
 
   private startButtonPressed = false;
   private hasTimeRemaining = true;
-  private timerStartValue = 60;
+  private timerStartValue = 9999;
 
   private cards: Array<any> = [];
 
@@ -196,6 +176,11 @@ export default class Guessing extends Vue {
 <style scoped>
 .active-team {
   font-weight: bold;
+}
+
+.card-deck { 
+  width: 360px !important;
+  height: 562px;
 }
 
 .game-header {
