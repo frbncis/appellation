@@ -179,7 +179,7 @@ export default class Guessing extends Vue {
 }
 
 .card-deck { 
-  width: 360px !important;
+  width: 351px;
   height: 562px;
 }
 

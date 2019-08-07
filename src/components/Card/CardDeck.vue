@@ -10,8 +10,8 @@
         <div
             v-for="card in renderableCards" :key="card.renderKey" class="card"
         >
-            <v-layout column text-center>
-                <v-flex>
+            <v-layout fill-height column text-center>
+                <v-flex class="card-details">
                     <h1 class="card-title">
                         {{ card.title }}
                     </h1>
@@ -21,22 +21,26 @@
                     </p>
                 </v-flex>
 
-                <v-flex>
-                    <p>-----------------</p>
-                </v-flex>
+                <!-- <v-flex justify-center> -->
+                <!-- </v-flex> -->
 
-                <v-flex>
-                    <h2 class="card-category">
-                        {{ card.category }}
-                    </h2>                    
-                </v-flex>
+                <v-flex class="card-meta">
+                                        <hr />
 
-                <v-flex class="card-points-container-cap">
-                        {{ card.points }}
-                </v-flex>
-                    
-                <v-flex class="card-points-container-bottom card-points-container-shape">
-                    <p>Points</p>
+                    <!-- <v-flex> -->
+                        <h2 class="card-category">
+                            {{ card.category }}
+                        </h2>                    
+                    <!-- </v-flex> -->
+
+                    <v-flex class="card-points card-points-container-cap">
+                            {{ card.points }}
+                    </v-flex>
+                        
+                    <!-- <v-flex> -->
+                         <!-- class="card-points-container-bottom card-points-container-shape"> -->
+                        <p>Points</p>
+                    <!-- </v-flex> -->
                 </v-flex>
             </v-layout>
         </div>
@@ -182,19 +186,30 @@ export default class CardDeck extends Vue {
 }
 
 hr {
+    margin: 0 33% 0 33%;
     width: 33%;
-    color: lightgray;
     border-style: dashed;
     border-width: 1px;
+    color: lightgray;
+}
+
+.card-details {
+    height: 75%;
+    font-family: 'Franklin Gothic Book', 'Arial', Arial, sans-serif;
+    padding-left: 7%;
+    padding-right: 7%
 }
 
 .card-title {
     text-align: center;
+    padding-top: 1em;
     padding-bottom: 1em;
+    height: 4.5em;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
-.card .card-data {
-    min-height: 60%;
+.card-data {
+    height: 60%;
     font-size: smaller;
 }
 
@@ -206,14 +221,24 @@ hr {
     text-align: left;
 }
 
-.card-content .card-meta {
-    height: 40%;
+.card-meta {
     bottom: 0;
+    /* position: absolute; */
+    width: inherit;
+    align-items: baseline;
+    justify-content: center;
+    flex-direction: column;
+    
+    /* align-items: center; */
+    /* justify-content: center; */
+    font-family: 'Franklin Gothic Heavy', 'Arial Black', Arial, sans-serif
 }
 
 .card-category {
     text-transform: uppercase;
     text-align: center;
+    margin-top: 2.5em;
+    margin-bottom: 2.5em;
 }
 
 .card-points-container-shape {
@@ -242,10 +267,7 @@ h2 {
 }
 
 .card-points {
-    font-weight: bold;
     font-size: 2em;
-    top: -0.75em;
-    position: relative;
 }
 
 .card-points-container-bottom p {
