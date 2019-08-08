@@ -26,16 +26,19 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import Timer from '@/components/Timer.vue';
 
 @Component({
-    components: {
-        Timer
-    }
+  components: {
+    Timer,
+  },
 })
-export default class Scoreboard extends Vue{
+export default class Scoreboard extends Vue {
     @Prop() private scores?: any;
+
     @Prop() private activeTeam?: number;
+
     @Prop() private isRoundActive?: boolean;
+
     @Prop() private timerStartValue?: number;
+
     @Prop() private onTimerEnded?: () => void;
 }
 </script>
-

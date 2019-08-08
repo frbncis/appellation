@@ -30,7 +30,7 @@
         </v-layout>
       </v-container>
     </v-content>
-    
+
     <v-footer
       app
     >
@@ -62,24 +62,28 @@ import Scoreboard from '@/components/Scoreboard.vue';
 })
 export default class Guessing extends Vue {
   private activeTeam = 1;
+
   private activeRound = 1;
 
   private cardsGuessed = 0;
+
   private cardsTotal = 0;
 
   private rounds = {
     1: 'Use any words, sounds, or gestures except the name itself.',
     2: 'Use only one word.',
-    3: 'Just charades - sound effects are OK.'
+    3: 'Just charades - sound effects are OK.',
   }
 
-  private scores = {
+  private scores: { [team: string]: number; } = {
     1: 0,
-    2: 0, 
+    2: 0,
   };
 
   private startButtonPressed = false;
+
   private hasTimeRemaining = true;
+
   private timerStartValue = 9999;
 
   private cards: Array<any> = [];
@@ -93,7 +97,7 @@ export default class Guessing extends Vue {
   }
 
   get progress() {
-    return (this.cardsGuessed) / this.cardsTotal * 100
+    return (this.cardsGuessed) / this.cardsTotal * 100;
   }
 
   private onDeckEmpty() {
@@ -118,20 +122,18 @@ export default class Guessing extends Vue {
 
   private resetRound() {
     this.activeRound++;
-    
+
     setTimeout(() => {
       this.resetDeck();
       this.setNextTeam(true);
     }, 300);
   }
-  
+
   private onCardGuess(guessedCard: any) {
     this.cardsGuessed++;
     this.scores[this.activeTeam] += guessedCard.points;
 
-    this.cards = this.cards.filter((card) => {
-      return card.id != guessedCard.id;
-    });
+    this.cards = this.cards.filter(card => card.id != guessedCard.id);
   }
 
   private onStartClick() {
@@ -149,26 +151,24 @@ export default class Guessing extends Vue {
   private setNextTeam(setByLowestScore: boolean = false) {
     if (setByLowestScore) {
       const teams = Object.keys(this.scores);
-      const lowest = Math.min.apply(null, teams.map((team) => { return this.scores[team] }))
+      const lowest = Math.min.apply(null, teams.map(team => this.scores[team]));
 
-      this.activeTeam = parseInt(teams.filter((y) => { return this.scores[y] === lowest })[0]);
-    }
-    else
-    {
+      this.activeTeam = parseInt(teams.filter(y => this.scores[y] === lowest)[0]);
+    } else {
       this.activeTeam = this.activeTeam == 1 ? 2 : 1;
     }
   }
 
-    /**
+  /**
    * Shuffles array in place. ES6 version
    * @param {Array} a items An array containing the items.
    */
   private shuffle(a: Array<any>) {
-      for (let i = a.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
   }
 }
 </script>
@@ -178,7 +178,7 @@ export default class Guessing extends Vue {
   font-weight: bold;
 }
 
-.card-deck { 
+.card-deck {
   width: 351px;
   height: 562px;
 }

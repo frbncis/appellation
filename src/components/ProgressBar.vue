@@ -9,20 +9,20 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 @Component
 export default class ProgressBar extends Vue {
-    get progressWidth() {
-        if (this.progress) {
-            return `${this.progress}%`;
-        }
-
-        return '0%';
+  get progressWidth() {
+    if (this.progress) {
+      return `${this.progress}%`;
     }
+
+    return '0%';
+  }
 
     @Prop() private progress?: number;
 }
 </script>
 
 <style scoped>
-.progress-bar { 
+.progress-bar {
 	height: 0.25em;  /* Can be anything */
 	position: relative;
 	/* background: #555; */
@@ -46,7 +46,7 @@ export default class ProgressBar extends Vue {
     rgb(43,194,83) 37%,
     rgb(84,240,84) 69%
   ); */
-  /* box-shadow: 
+  /* box-shadow:
     inset 0 2px 9px  rgba(255,255,255,0.3),
     inset 0 -2px 6px rgba(0,0,0,0.4); */
   position: relative;

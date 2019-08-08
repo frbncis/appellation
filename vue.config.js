@@ -1,3 +1,3 @@
 module.exports = {
-    publicPath: 'appellation'
-}
+  publicPath: 'appellation',
+};
