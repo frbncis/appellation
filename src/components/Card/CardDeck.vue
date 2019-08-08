@@ -24,23 +24,26 @@
                 <!-- <v-flex justify-center> -->
                 <!-- </v-flex> -->
 
-                <v-flex class="card-meta">
-                                        <hr />
+                <v-flex class="card-meta"
+                    :class="{
+                        'points-1': card.points == 1,
+                        'points-2': card.points == 2,
+                        'points-3': card.points == 3,
+                        'points-4': card.points == 4,
+                    }"
+                >
+                    <hr />
 
-                    <!-- <v-flex> -->
-                        <h2 class="card-category">
-                            {{ card.category }}
-                        </h2>                    
-                    <!-- </v-flex> -->
+                    <h2 class="card-category">
+                        {{ card.category }}
+                    </h2>
 
-                    <v-flex class="card-points card-points-container-cap">
-                            {{ card.points }}
-                    </v-flex>
-                        
-                    <!-- <v-flex> -->
-                         <!-- class="card-points-container-bottom card-points-container-shape"> -->
+                    <div class="semicircle" />             
+
+                    <v-flex class="card-points-container-shape">
+                        <h3>{{ card.points }}</h3>
                         <p>Points</p>
-                    <!-- </v-flex> -->
+                    </v-flex>
                 </v-flex>
             </v-layout>
         </div>
@@ -189,12 +192,13 @@ hr {
     margin: 0 33% 0 33%;
     width: 33%;
     border-style: dashed;
-    border-width: 1px;
+    border-width: 0.09em;
     color: lightgray;
+    padding: 0;
 }
 
 .card-details {
-    height: 75%;
+    height: 60%;
     font-family: 'Franklin Gothic Book', 'Arial', Arial, sans-serif;
     padding-left: 7%;
     padding-right: 7%
@@ -223,63 +227,56 @@ hr {
 
 .card-meta {
     bottom: 0;
-    /* position: absolute; */
     width: inherit;
     align-items: baseline;
     justify-content: center;
     flex-direction: column;
-    
-    /* align-items: center; */
-    /* justify-content: center; */
-    font-family: 'Franklin Gothic Heavy', 'Arial Black', Arial, sans-serif
 }
 
 .card-category {
     text-transform: uppercase;
     text-align: center;
-    margin-top: 2.5em;
+    margin-top: 1em;
     margin-bottom: 2.5em;
+    font-family: 'Franklin Gothic Demi', 'Arial Black', Arial, sans-serif;
+    letter-spacing: 0.1em;
 }
 
 .card-points-container-shape {
     width: 100px;
     text-align: center;
     left: calc(50% - 50px);
+    bottom: 0;
     position: absolute;
-}
+    color: white;
+    padding-top: 1em;
 
-.card-points-container-cap {
-    /* width: 100px; */
-    height: 50px; /* as the half of the width */
-    border-top-left-radius: 110px;  /* 100px of height + 10px of border */
-    border-top-right-radius: 110px; /* 100px of height + 10px of border */
-    border: 1px solid rgba(0,0,0,0);
-    /* border-bottom: 0; */
+    border-top:black;
+    border-top-width: 100px;
+    border-top-left-radius: 50%;
+    border-top-right-radius: 50%;
 }
 
 .card-points-container-shape p {
-    color: white;
-    text-transform: uppercase
+    text-transform: uppercase;
+    font-family: 'Franklin Gothic Book', 'Arial Narrow', Arial, sans-serif;
+    font-size: 0.75em;
 }
 
 h2 {
     font-size: 1em;
 }
 
-.card-points {
+.card-points-container-shape h3 {
     font-size: 2em;
-}
-
-.card-points-container-bottom p {
-    font-size: 0.75em;
-    font-weight: lighter;
+    font-family: 'Franklin Gothic Demi', 'Arial Black', Arial, sans-serif;
 }
 
 .points-1 h2 {
     color: rgba(76, 189, 159, 1)
 }
 
-.points-1 > .card-points-container-shape > div {
+.points-1 > .card-points-container-shape {
     background-color: rgba(76, 189, 159, 1)
 }
 
@@ -287,7 +284,7 @@ h2 {
     color: #00B4EF
 }
 
-.points-2 > .card-points-container-shape > div {
+.points-2 > .card-points-container-shape {
     background-color: #00B4EF
 }
 
@@ -295,7 +292,7 @@ h2 {
     color: #866AAD
 }
 
-.points-3 > .card-points-container-shape > div {
+.points-3 > .card-points-container-shape {
     background-color: #866AAD
 }
 
@@ -303,7 +300,7 @@ h2 {
     color: rgba(239, 83, 63, 1)
 }
 
-.points-4 > .card-points-container-shape > div {
+.points-4 > .card-points-container-shape {
     background-color: rgba(239, 83, 63, 1)
 }
 
