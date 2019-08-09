@@ -183,6 +183,12 @@ export default class Guessing extends Vue {
   height: 562px;
 }
 
+@media only screen and (max-width: 400px) {
+  .card-deck {
+    width: 90vw;
+  }
+}
+
 .game-header {
   display: flex;
 }
