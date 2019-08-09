@@ -1,11 +1,11 @@
 <template>
-    <!-- <h1>{{ timeRemainingSeconds }}</h1> -->
     <v-progress-circular
-        class="timer"
+        :class="{ 'timer': true, 'scale-up': shouldScaleUp }"
         size="75"
         width="8"
         rotate="-90"
-        :value="timeRemainingSeconds / timerStartValue * 100">
+        :value="timeRemainingSeconds / timerStartValue * 100"
+        :color="color" >
         {{ timeRemainingSeconds }}
     </v-progress-circular>
 </template>
@@ -19,6 +19,8 @@ export default class Timer extends Vue {
 
     private timer?: number = undefined;
 
+    private shouldScaleUp: boolean = true;
+
     @Prop() private timerStartValue?: number;
 
     @Prop() private timerRunning?: boolean;
@@ -27,6 +29,16 @@ export default class Timer extends Vue {
 
     get timeSecondsRemaining() {
       return this.timeRemainingSeconds;
+    }
+
+    get color() {
+      if (this.timeRemainingSeconds < 10) {
+        return "error";
+      } else if (this.timeRemainingSeconds < 20) {
+        return "warning";
+      } else {
+        return "primary";
+      }
     }
 
     public beforeMount() {
@@ -40,6 +52,7 @@ export default class Timer extends Vue {
     public beforeDestroy() {
       this.stopTimer();
     }
+
 
     // public beforeUpdate() {
     //     if (this.timerRunning && this.timer) {
@@ -56,6 +69,12 @@ export default class Timer extends Vue {
 
     private updateTimer() {
       this.timeRemainingSeconds--;
+
+      if (this.timeRemainingSeconds <= 10) {
+        this.shouldScaleUp = !this.shouldScaleUp;
+
+        setTimeout(() => this.shouldScaleUp = !this.shouldScaleUp, 100);
+      }
 
       if (this.timeRemainingSeconds <= 0) {
         this.stopTimer();
@@ -76,5 +95,10 @@ export default class Timer extends Vue {
 .timer {
     font-weight: bold;
     font-size: x-large;
+    transition: all 0.005s ease-in-out;
+}
+
+.scale-up {
+  transform: scale(1.1);
 }
 </style>

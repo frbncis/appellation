@@ -1,23 +1,14 @@
 <template>
 
     <v-content>
-          <!-- <v-app-bar flat height="75px">
-        <Scoreboard
-          :scores="scores"
-          :activeTeam="activeTeam"
-          :isRoundActive="isRoundActive"
-          :timerStartValue="timerStartValue"
-          :onTimerEnded="onTimerEnded"
-        />
-    </v-app-bar> -->
+      <Scoreboard
+        :scores="scores"
+        :activeTeam="activeTeam"
+        :isRoundActive="isRoundActive"
+        :timerStartValue="timerStartValue"
+        :onTimerEnded="onTimerEnded"
+      />
 
-            <Scoreboard
-              :scores="scores"
-              :activeTeam="activeTeam"
-              :isRoundActive="isRoundActive"
-              :timerStartValue="timerStartValue"
-              :onTimerEnded="onTimerEnded"
-            />
       <v-container fluid>
 
         <v-layout
@@ -98,7 +89,7 @@ export default class Guessing extends Vue {
 
   private hasTimeRemaining = true;
 
-  private timerStartValue = 9999;
+  private timerStartValue = 60;
 
   private cards: Array<any> = [];
 
