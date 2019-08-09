@@ -1,6 +1,6 @@
 <template>
 
-    <v-content>
+    <v-content class="pb-0">
       <Scoreboard
         :scores="scores"
         :activeTeam="activeTeam"
@@ -197,14 +197,14 @@ export default class Guessing extends Vue {
     width: inherit;
     /* height: inherit; */
 
-    height: calc(100vh - 128px); 
+    height: calc(100vh - 159px); 
   }
 }
 
 @media only screen and (max-width: 360px) {
   .card-deck {
     width: 95vw;
-    height: calc(100vh - 128px); 
+    height: calc(100vh - 140px); 
   }
 }
 
