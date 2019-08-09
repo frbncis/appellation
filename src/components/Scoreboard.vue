@@ -1,24 +1,28 @@
 <template>
-    <v-layout justify-space-between row>
-        <v-flex xs4 text-left class="team-game-header" :class="{ 'active-team': activeTeam == 1 }">
+    <div class="scoreboard-container">
+        <div text-left class="team-game-header" :class="{ 'active-team': activeTeam == 1 }">
             <p>Team 1</p>
             <p>{{ scores[1] }}</p>
-        </v-flex>
+        </div>
 
-        <v-flex xs4 text-center class="team-game-header">
+        <v-spacer />
+
+        <div text-center class="team-game-header">
             <Timer
                 v-if="isRoundActive"
                 :timerRunning="isRoundActive"
                 :timerStartValue="timerStartValue"
                 :onTimerEnded="onTimerEnded"
             />
-        </v-flex>
+        </div>
 
-        <v-flex xs4 text-right class="team-game-header" :class="{ 'active-team': activeTeam == 2 }">
+        <v-spacer />
+
+        <div text-right class="team-game-header right-header" :class="{ 'active-team': activeTeam == 2 }">
             <p>Team 2</p>
             <p>{{ scores[2] }}</p>
-        </v-flex>
-    </v-layout>
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
@@ -42,3 +46,16 @@ export default class Scoreboard extends Vue {
     @Prop() private onTimerEnded?: () => void;
 }
 </script>
+
+<style scope>
+.scoreboard-container {
+    display: flex;
+    height: 104px;
+    padding: 12px;
+}
+
+.right-header {
+    text-align: right;
+}
+</style>
+

@@ -1,21 +1,31 @@
 <template>
-  <div class="guessing">
-    <v-app-bar>
-      <Scoreboard
-        :scores="scores"
-        :activeTeam="activeTeam"
-        :isRoundActive="isRoundActive"
-        :timerStartValue="timerStartValue"
-        :onTimerEnded="onTimerEnded"
-      />
-    </v-app-bar>
 
     <v-content>
-      <v-container column>
+          <!-- <v-app-bar flat height="75px">
+        <Scoreboard
+          :scores="scores"
+          :activeTeam="activeTeam"
+          :isRoundActive="isRoundActive"
+          :timerStartValue="timerStartValue"
+          :onTimerEnded="onTimerEnded"
+        />
+    </v-app-bar> -->
+
+            <Scoreboard
+              :scores="scores"
+              :activeTeam="activeTeam"
+              :isRoundActive="isRoundActive"
+              :timerStartValue="timerStartValue"
+              :onTimerEnded="onTimerEnded"
+            />
+      <v-container fluid>
+
         <v-layout
-          justify-center column fill-height align-center
+          column align-center
         >
-          <v-flex v-if="isRoundActive">
+
+
+          <v-flex class="card-deck-container" v-if="isRoundActive">
             <CardDeck
               :onDeckEmpty="onDeckEmpty"
               :onCardGuessed="onCardGuess"
@@ -23,23 +33,27 @@
               class="card-deck"
             />
           </v-flex>
-          <v-flex v-else class="round-info" text-center xs12>
+
+
+          <v-flex v-else>
             <h1>Round {{ activeRound }}</h1>
             <h3>{{ rounds[activeRound] }}</h3>
           </v-flex>
         </v-layout>
       </v-container>
-    </v-content>
 
-    <v-footer
-      app
-    >
-      <Button v-if="!startButtonPressed" text="Start" @click="onStartClick" />
-      <v-progress-linear
-          v-else
-          :value="progress" />
-    </v-footer>
-  </div>
+
+      <v-footer
+        app
+      >
+        <Button v-if="!startButtonPressed" text="Start" @click="onStartClick" />
+
+        <v-progress-linear
+            v-else
+            :value="progress" />
+      </v-footer>
+    </v-content>
+     
 </template>
 
 <script lang="ts">
@@ -179,13 +193,27 @@ export default class Guessing extends Vue {
 }
 
 .card-deck {
-  width: 351px;
-  height: 562px;
+  width: 340px;
+  /* max-height: calc(100vh - 100px); */
+  /* height: 100%; */
+  /* margin-bottom: 20%; */
+  height: 521px;
 }
 
-@media only screen and (max-width: 400px) {
+@media only screen and (max-width: 320px) {
   .card-deck {
-    width: 90vw;
+    /* width: 95vw; */
+    width: inherit;
+    /* height: inherit; */
+
+    height: calc(100vh - 128px); 
+  }
+}
+
+@media only screen and (max-width: 360px) {
+  .card-deck {
+    width: 95vw;
+    height: calc(100vh - 128px); 
   }
 }
 

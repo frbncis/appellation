@@ -6,7 +6,6 @@
             ref="stack"
             v-if="renderableCards"
         >
-        <!-- <div> -->
         <div
             v-for="card in renderableCards" :key="card.renderKey" class="card"
         >
@@ -20,9 +19,6 @@
                         {{ card.description }}
                     </p>
                 </v-flex>
-
-                <!-- <v-flex justify-center> -->
-                <!-- </v-flex> -->
 
                 <v-flex class="card-meta"
                     :class="{
@@ -48,7 +44,6 @@
             </v-layout>
         </div>
     </vue-swing>
-        <!-- </div> -->
 </template>
 
 <script lang="ts">
@@ -188,6 +183,13 @@ export default class CardDeck extends Vue {
     padding: 1em;
 }
 
+@media only screen and (max-width: 320px) {
+    .card-description {
+        height:60%;
+        font-size: smaller;
+    }
+}
+
 hr {
     margin: 0 33% 0 33%;
     width: 33%;
@@ -207,8 +209,7 @@ hr {
 .card-title {
     text-align: center;
     padding-top: 1em;
-    padding-bottom: 1em;
-    height: 4.5em;
+    padding-bottom: 1em;    
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
