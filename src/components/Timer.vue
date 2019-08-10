@@ -1,8 +1,8 @@
 <template>
     <v-progress-circular
         :class="{ 'timer': true, 'scale-up': shouldScaleUp }"
-        size="75"
-        width="8"
+        size="60"
+        width="4"
         rotate="-90"
         :value="timeRemainingSeconds / timerStartValue * 100"
         :color="color" >

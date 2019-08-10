@@ -50,7 +50,6 @@ export default class Scoreboard extends Vue {
 <style scope>
 .scoreboard-container {
     display: flex;
-    height: 104px;
     padding: 12px;
 }
 

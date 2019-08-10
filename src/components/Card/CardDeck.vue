@@ -28,8 +28,6 @@
                         'points-4': card.points == 4,
                     }"
                 >
-                    <hr />
-
                     <h2 class="card-category">
                         {{ card.category }}
                     </h2>
@@ -38,7 +36,7 @@
 
                     <v-flex class="card-points-container-shape">
                         <h3>{{ card.points }}</h3>
-                        <p>Points</p>
+                        <p class="points-text">Points</p>
                     </v-flex>
                 </v-flex>
             </v-layout>
@@ -190,15 +188,6 @@ export default class CardDeck extends Vue {
     }
 }
 
-hr {
-    margin: 0 33% 0 33%;
-    width: 33%;
-    border-style: dashed;
-    border-width: 0.09em;
-    color: lightgray;
-    padding: 0;
-}
-
 .card-details {
     height: 60%;
     font-family: 'Franklin Gothic Book', 'Arial', Arial, sans-serif;
@@ -208,8 +197,8 @@ hr {
 
 .card-title {
     text-align: center;
-    padding-top: 1em;
-    padding-bottom: 1em;    
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;    
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
@@ -234,26 +223,32 @@ hr {
     flex-direction: column;
 }
 
+.card-meta:before {
+    border-top: 0.09em dashed lightgray;
+    content: "";
+    display: block;
+    margin: 0 auto; 
+    width: 33%;
+}
+
 .card-category {
     text-transform: uppercase;
     text-align: center;
     margin-top: 1em;
-    margin-bottom: 2.5em;
+    margin-bottom: 1.5em;
     font-family: 'Franklin Gothic Demi', 'Arial Black', Arial, sans-serif;
     letter-spacing: 0.1em;
 }
 
 .card-points-container-shape {
-    width: 100px;
+    width: 80px;
     text-align: center;
-    left: calc(50% - 50px);
+    left: calc(50% - 40px);
     bottom: 0;
     position: absolute;
     color: white;
-    padding-top: 1em;
-
+    padding-top: 0.5em;
     border-top:black;
-    border-top-width: 100px;
     border-top-left-radius: 50%;
     border-top-right-radius: 50%;
 }
@@ -265,11 +260,11 @@ hr {
 }
 
 h2 {
-    font-size: 1em;
+    font-size: 0.9em;
 }
 
 .card-points-container-shape h3 {
-    font-size: 2em;
+    font-size: 1.5em;
     font-family: 'Franklin Gothic Demi', 'Arial Black', Arial, sans-serif;
 }
 

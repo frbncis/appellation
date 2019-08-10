@@ -15,7 +15,6 @@
           column align-center
         >
 
-
           <v-flex class="card-deck-container" v-if="isRoundActive">
             <CardDeck
               :onDeckEmpty="onDeckEmpty"
@@ -25,14 +24,12 @@
             />
           </v-flex>
 
-
           <v-flex v-else>
             <h1>Round {{ activeRound }}</h1>
             <h3>{{ rounds[activeRound] }}</h3>
           </v-flex>
         </v-layout>
       </v-container>
-
 
       <v-footer
         app
@@ -184,27 +181,14 @@ export default class Guessing extends Vue {
 }
 
 .card-deck {
-  width: 340px;
-  /* max-height: calc(100vh - 100px); */
-  /* height: 100%; */
-  /* margin-bottom: 20%; */
-  height: 521px;
+  width: 90vw;
+  height: calc(100vh - 159px); 
 }
 
-@media only screen and (max-width: 320px) {
+@media only screen and (min-width: 360px) {
   .card-deck {
-    /* width: 95vw; */
-    width: inherit;
-    /* height: inherit; */
-
-    height: calc(100vh - 159px); 
-  }
-}
-
-@media only screen and (max-width: 360px) {
-  .card-deck {
-    width: 95vw;
-    height: calc(100vh - 140px); 
+    width: 340px;
+    max-height: 351px;
   }
 }
 
@@ -217,9 +201,6 @@ export default class Guessing extends Vue {
 }
 
 .game-footer {
-  /* background: black; */
-  /* color: white; */
-  /* font-size: 0.75em; */
   display: table;
   margin-right: auto;
   margin-left: auto;
