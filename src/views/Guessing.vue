@@ -91,6 +91,7 @@ export default class Guessing extends Vue {
 
   private created() {
     this.resetDeck();
+    this.shuffle(this.cards);
   }
 
   get isRoundActive(): boolean {
@@ -187,7 +188,8 @@ export default class Guessing extends Vue {
 
 .card-deck {
   width: 90vw;
-  height: calc(100vh - 159px); 
+  /* height: calc(100vh - 159px);  */
+  height: 481px;
 }
 
 @media only screen and (min-width: 360px) {
