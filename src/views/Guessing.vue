@@ -91,6 +91,9 @@ export default class Guessing extends Vue {
 
   private created() {
     this.resetDeck();
+
+    let vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
   }
 
   get isRoundActive(): boolean {
@@ -177,8 +180,8 @@ export default class Guessing extends Vue {
 <style scoped>
 .viewport {
   position: fixed;
-  height: 99vh;
   width: 100%;
+  height: calc(var(--vh, 1vh) * 100);
 }
 
 .active-team {
