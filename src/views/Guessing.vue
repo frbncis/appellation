@@ -1,6 +1,5 @@
 <template>
-
-    <v-content class="pb-0">
+    <v-content class="pb-0 viewport">
       <Scoreboard
         :scores="scores"
         :activeTeam="activeTeam"
@@ -176,6 +175,12 @@ export default class Guessing extends Vue {
 </script>
 
 <style scoped>
+.viewport {
+  position: fixed;
+  height: 99vh;
+  width: 100%;
+}
+
 .active-team {
   font-weight: bold;
 }
