@@ -9,11 +9,9 @@
       />
 
       <v-container fluid>
-
         <v-layout
           column align-center
         >
-
           <v-flex class="card-deck-container" v-if="isRoundActive">
             <CardDeck
               :onDeckEmpty="onDeckEmpty"
@@ -25,7 +23,7 @@
 
           <v-flex v-else>
             <h1>Round {{ activeRound }}</h1>
-            <h3>{{ rounds[activeRound] }}</h3>
+            <h3>{{ rounds[activeRound] ? rounds[activeRound] : 'Make up your own rules.' }}</h3>
           </v-flex>
         </v-layout>
       </v-container>
@@ -33,7 +31,7 @@
       <v-footer
         app
       >
-        <Button v-if="!startButtonPressed" text="Start" @click="onStartClick" />
+        <Button v-if="showStartButton" text="Start" @click="onStartClick" />
 
         <v-progress-linear
             v-else
@@ -44,13 +42,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import CardDeck from '@/components/Card/CardDeck.vue';
+import { Component, Vue, Prop } from 'vue-property-decorator';
+import CardDeck,{ CardData } from '@/components/Card/CardDeck.vue';
 import Cards from '@/data/Cards';
 import ProgressBar from '@/components/ProgressBar.vue';
 import Button from '@/components/Button.vue';
 import Footer from '@/components/Footer.vue';
 import Scoreboard from '@/components/Scoreboard.vue';
+import { mapState, mapActions, mapGetters } from 'vuex'
 
 @Component({
   components: {
@@ -59,6 +58,11 @@ import Scoreboard from '@/components/Scoreboard.vue';
     Footer,
     ProgressBar,
     Scoreboard,
+  },
+  computed: {
+    ...mapState({
+        cardIds: state => state.room.decks.selected,
+    }),
   },
 })
 export default class Guessing extends Vue {
@@ -81,11 +85,13 @@ export default class Guessing extends Vue {
     2: 0,
   };
 
-  private startButtonPressed = false;
+  public startButtonPressed = false;
 
   private hasTimeRemaining = true;
 
   private timerStartValue = 60;
+
+  // @Prop() public cardIds: Array<number>;
 
   private cards: Array<any> = [];
 
@@ -98,11 +104,15 @@ export default class Guessing extends Vue {
     return this.startButtonPressed == true && this.hasTimeRemaining == true && this.cards.length > 0;
   }
 
+  get showStartButton(): boolean {
+    return !this.startButtonPressed;
+  }
   get progress() {
     return (this.cardsGuessed) / this.cardsTotal * 100;
   }
 
   private onDeckEmpty() {
+    console.log("Deck is empty, resetting for next round.");
     setTimeout(() => {
       this.resetRound();
       this.resetTurn();
@@ -110,7 +120,19 @@ export default class Guessing extends Vue {
   }
 
   private resetDeck() {
-    this.cards = JSON.parse(JSON.stringify(Cards));
+    const cardModels: Array<CardData> = (JSON.parse(JSON.stringify(Cards)) as Array<CardData>).map((cardModel, index) => {
+      return {
+        id: index,
+        ...cardModel
+      }
+    });
+
+    this.cardIds.forEach(cardId => {
+      this.cards.push(
+        cardModels[cardId]
+      )
+    });
+
     this.cardsGuessed = 0;
     this.cardsTotal = this.cards.length;
   }
@@ -139,7 +161,6 @@ export default class Guessing extends Vue {
   }
 
   private onStartClick() {
-    // document.documentElement.requestFullscreen();
     this.startButtonPressed = true;
   }
 

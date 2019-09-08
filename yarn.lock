@@ -8924,6 +8924,13 @@ vuex@^3.0.1:
   resolved "https://registry.yarnpkg.com/vuex/-/vuex-3.1.1.tgz#0c264bfe30cdbccf96ab9db3177d211828a5910e"
   integrity sha512-ER5moSbLZuNSMBFnEBVGhQ1uCBNJslH9W/Dw2W7GZN23UQA69uapP5GTT9Vm8Trc0PzBSVt6LzF3hGjmv41xcg==
 
+vuexfire@^3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/vuexfire/-/vuexfire-3.1.2.tgz#733dc23257e49499d4d1e89f249d9d2f8d0c7395"
+  integrity sha512-eqvBoDLTW4IJrutShVKADlkCkGbg/kXUKMTuUUYAaVV5JmuRGLnGX41ra1nfOc8Li48beXFDJN3ExEDT/daNlQ==
+  dependencies:
+    "@posva/vuefire-core" "^2.1.2"
+
 watchpack@^1.5.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/watchpack/-/watchpack-1.6.0.tgz#4bc12c2ebe8aa277a71f1d3f14d685c7b446cd00"

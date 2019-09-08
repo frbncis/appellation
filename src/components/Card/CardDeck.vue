@@ -48,7 +48,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import VueSwing from 'vue-swing';
 
-interface CardData {
+export interface CardData {
     id : number;
     title: string;
     description: string;
@@ -77,7 +77,7 @@ export default class CardDeck extends Vue {
     @Prop() private cards?: Array<CardData>;
 
     get renderableCards(): Array<CardDataView> {
-        if (!this.cards)
+        if (!this.cards || this.cards.length == 0)
         {
             return [];
         }

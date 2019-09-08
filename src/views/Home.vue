@@ -1,149 +1,79 @@
 <template>
-    <v-content class="pb-0 viewport">
-      <v-container fluid>
-
+    <v-container fluid v-if="!isReady">
         <v-layout
-          column align-center
+          align-center justify-center column fill-height
         >
-
-          <v-flex>
-            <div v-if="roomId == undefined">
-                <v-btn @click="onCreateGameClick">Create Game</v-btn>
-                <v-text-field
-                    v-model="roomIdTextField"
-                    label="Room ID"
-                    placeholder="asdfg"
+            <v-flex>
+                <v-progress-circular
+                    indeterminate
+                    :size="60"
+                    :width="5"
                 />
-                <v-btn @click="onJoinGameClick">Join Game</v-btn>
-            </div>
-
-            <div v-else>
-                <v-text-field
-                    v-model="playerName"
-                    label="Player Name"
-                    placeholder="Adam"
-                ></v-text-field>
-                <p>Room: {{ roomId }}</p>
-                <v-btn @click="onSetPlayerNameClick">Set Player Name</v-btn>
-
-            </div>
-
-            <ul id="players">
-                <li v-for="player in players" :key="player.name">
-                    {{ player.name }}
-                </li>
-            </ul>
-          </v-flex>
-
-          <v-flex>
-            <CardDeck
-              :onDeckEmpty="onDeckEmpty"
-              :onCardGuessed="onCardGuess"
-              :cards="cards"
-              class="card-deck"
-            />
-          </v-flex>
+            </v-flex>
         </v-layout>
-      </v-container>
-    </v-content>
-     
+    </v-container>
+
+    <div v-else>
+        <Setup v-if="isSetup" :roomId="roomId"/>
+        <Guessing v-else-if="isGuessing" />
+        <h1 v-else>Game Over.</h1>
+    </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import CardDeck from '@/components/Card/CardDeck.vue';
-import Cards from '@/data/Cards';
-import ProgressBar from '@/components/ProgressBar.vue';
-import Button from '@/components/Button.vue';
-import Footer from '@/components/Footer.vue';
-import Scoreboard from '@/components/Scoreboard.vue';
-import { db } from  '@/components/Firestore.ts';
-
-import {collections, KeyValueService } from '@/components/KeyValueService.ts';
+import Setup from '@/views/Setup.vue';
+import Guessing from '@/views/Guessing.vue';
+import { mapState, mapActions, mapGetters } from 'vuex'
+import { GamePhase } from '@/components/KeyValueService';
 
 @Component({
   components: {
-    Button,
-    CardDeck,
-    Footer,
-    ProgressBar,
-    Scoreboard,
+    Setup,
+    Guessing,
   },
-  watch: {
-      roomId: {
-          immediate: true,
-          handler(roomId) {
-              if (roomId == '') {
-                  return;
-              }
-
-              this.$bind('players', collections.players(roomId))
-          }
-      }
-  }
+  computed: {
+    ...mapState({
+        phase: state => state.room.data.phase,
+        isBound: state => state.room.isBound,
+    }),
+  },
+methods: {
+    ...mapActions([
+        'joinGame',
+    ])
+  },
 })
 export default class Home extends Vue {
-    private _kvService: KeyValueService | null = null;
-
     @Prop() private roomId?: string | null;
 
-    private roomIdTextField: string = '';
-
-    private players: string[] = [];
-
-    private playerName?: string | null = null;
-
-    private isMaster: boolean = false;
-
-    private cards: Array<any> = [];
-    private cardIds: Array<string> = [];
 
     public created() {
-        this._kvService = new KeyValueService();
-    }
-
-    public async onCreateGameClick() {
-        if (this._kvService) {
-            this.roomId = await this._kvService.createRoomAsync();
-
-            this.isMaster = true;
-
-            db.collection(`rooms/${this.roomId}/players`).onSnapshot((snapshot) => {
-                snapshot.docChanges().forEach((change) => {
-                    if (change.type === 'added') {
-                        const playerId = change.doc.id;
-                        console.log("New player: ", change.doc.data().name);
-
-                        db.collection(`rooms/${this.roomId}/players`)
-                            .doc(playerId)
-                            .update({
-                                candiateCards: [ 1, 2, 3, 4, 5]
-                            });
-                    }
-                })
-            })
-
-            this.$router.push(`/${this.roomId}`);
+        if (this.roomId) {
+            this.joinGame(this.roomId);
         }
     }
 
-    public async onJoinGameClick() {
-        if (this.roomIdTextField) {
-            this.$router.push(`/${this.roomIdTextField}`);
+    private get isReady() {
+        if (this.roomId == undefined) {
+            return true;
+        }
+        else
+        {
+            if (this.isBound == false) {
+                return false;
+            }
+            else {
+                return true;
+            }
         }
     }
-
-    public async onSetPlayerNameClick() {
-        if (this._kvService && this.playerName && this.roomId) {
-            this._kvService.setPlayerAsync(this.roomId, this.playerName);
-        }
+    private get isSetup() {
+        return this.phase == GamePhase.Setup;
     }
-
-
-    private onCardGuess(guessedCard: any) {
-        // this.scores[this.activeTeam] += guessedCard.points;
-
-        this.cards = this.cards.filter(card => card.id != guessedCard.id);
+    
+    private get isGuessing() {
+        return this.phase == GamePhase.Guessing;
     }
 }
 </script>
@@ -155,4 +85,16 @@ export default class Home extends Vue {
   width: 100%;
 }
 
+.card-deck {
+  width: 90vw;
+  /* height: calc(100vh - 159px);  */
+  height: 481px;
+}
+
+@media only screen and (min-width: 360px) {
+  .card-deck {
+    width: 340px;
+    max-height: 351px;
+  }
+}
 </style>

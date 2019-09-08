@@ -26,7 +26,7 @@ export default class Selecting extends Vue {
   private cards: Array<any> = Cards;
 
   get isFinishedSelecting() {
-    return this.selectedCards.length == 5;
+    return this.selectedCards.length == 1;
   }
 
   private onCardSelected(selectedCard: any) {
