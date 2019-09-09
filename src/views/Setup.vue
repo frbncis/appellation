@@ -82,6 +82,7 @@ import {collections, KeyValueService, PlayerData } from '@/components/KeyValueSe
 
 import { mapState, mapActions, mapGetters } from 'vuex'
 import player,{ PlayerDeck } from '@/store/modules/player';
+import { storeHelpers } from '../store';
 
 @Component({
   components: {
@@ -90,14 +91,10 @@ import player,{ PlayerDeck } from '@/store/modules/player';
   computed: {
     ...mapState({
         deckSelection: state => state.player.decks.selection,
-        phase: state => state.phase,
         player: state => state.player,
     }),
   },
   methods: {
-    ...mapActions('room', [
-        'bindRoomRef',
-    ]),
     ...mapActions('player', [
         'switchTeam',
     ]),
@@ -120,6 +117,8 @@ export default class Setup extends Vue {
     private playerName: string = '';
 
     private isFinishedCardSelection: boolean = false;
+
+    private phase = storeHelpers.room.data.data.phase;
 
     private get playersTeam1(): Array<any> {
         return this.playersByTeam(1);
@@ -179,10 +178,9 @@ export default class Setup extends Vue {
     }
 
     public async onCreateGameClick() {
-        this.roomId = await this.createGame();
-
+        this.roomId = await storeHelpers.createGame();
         this.$router.push(`/${this.roomId}`);
-        this.joinGame(this.roomId);
+        await storeHelpers.joinGame(this.roomId!);
     }
 
     public async onJoinGameClick() {

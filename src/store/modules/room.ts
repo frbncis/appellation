@@ -76,16 +76,24 @@ export const  getRandomIntInclusive = (min: number, max: number)  => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// interface RoomDecks {
-//     selected: Array<number>;
-//     activeRemaining: Array<number>;
-//     activeGuessed: Array<number>;
-//     discard: Array<number>;
-// }
+interface RoomDecks {
+    selected: Array<number>;
+    activeRemaining: Array<number>;
+    activeGuessed: Array<number>;
+    discard: Array<number>;
+}
+
+interface RoomState {
+    roomId?: string, 
+    isBound: boolean,
+    data: RoomData,
+    decks: RoomDecks,
+    players: Array<string>,
+}
 
 @Module({ name: 'room', namespaced: true })
 export class RoomModule extends VuexModule {
-    public data = {
+    public data: RoomState = {
         roomId: undefined,
         isBound: false,
         data: new RoomData(),
@@ -142,7 +150,7 @@ export class RoomModule extends VuexModule {
         const roomDocument = await collections.room(roomId);
 
         // const existingPlayers = (await roomDocument.get()).players;
-        const existingPlayers = this.players;
+        const existingPlayers = this.data.players;
 
         const allPlayers = existingPlayers.concat([ playerId ]);
 
@@ -151,7 +159,7 @@ export class RoomModule extends VuexModule {
 
     @Action
     public addToDeck(payload: { cards: Array<number>, deck: string }) {
-        if (!this.roomId) {
+        if (!this.data.roomId) {
             throw new Error("Room ID not set.");
         }
         
@@ -159,17 +167,17 @@ export class RoomModule extends VuexModule {
 
         console.log(`room.actions.addToDeck(): Adding to deck '${deck}`, cards);
 
-        console.log("Existing Deck", this.decks[deck]);
-        const newDeck = this.decks[deck].concat(cards);
+        console.log("Existing Deck", this.data.decks[deck]);
+        const newDeck = this.data.decks[deck].concat(cards);
         console.log("New Deck", newDeck);
         
-        const allDecks = Object.assign({}, this.decks, { [deck]: newDeck });
+        const allDecks = Object.assign({}, this.data.decks, { [deck]: newDeck });
 
-        return db.collection('rooms').doc(this.roomId.toString()).update({ decks: allDecks });
+        return db.collection('rooms').doc(this.data.roomId!.toString()).update({ decks: allDecks });
     }
 
     @Mutation
     public setRoomId(id: number) {
-        this.roomId = id;
+        this.data.roomId = id.toString();
     }
 }

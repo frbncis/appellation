@@ -39,7 +39,31 @@ export const storeHelpers = {
     const roomModule = getModule(RoomModule, store);
 
     await roomModule.bindReference(roomId);
-  }
+  },
+
+  async createGame() {
+    const roomId = await this.room.createRoom();
+
+    return roomId;
+  },
+
+  async startGame() {
+    console.log("Starting game...");
+    await this.room.setPhase({
+      roomId: this.room.data.roomId!,
+      phase: GamePhase.Guessing
+    });
+  },
+
+  async createPlayer(roomId: string, playerName: string) {
+    console.log(`Creating player ${playerName}`);
+
+    const playerId = await context.dispatch('player/createPlayer', { roomId, playerName });
+
+    await context.dispatch('room/addPlayer', { roomId, playerId });
+
+    return playerId;
+  },
 }
 
 export default store;
