@@ -24,33 +24,21 @@
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import Setup from '@/views/Setup.vue';
 import Guessing from '@/views/Guessing.vue';
-import { mapState, mapActions, mapGetters } from 'vuex'
 import { GamePhase } from '@/components/KeyValueService';
+import { storeHelpers } from '@/store';
 
 @Component({
-  components: {
-    Setup,
-    Guessing,
-  },
-  computed: {
-    ...mapState({
-        phase: state => state.room.data.phase,
-        isBound: state => state.room.isBound,
-    }),
-  },
-methods: {
-    ...mapActions([
-        'joinGame',
-    ])
-  },
+    components: {
+        Setup,
+        Guessing,
+    },
 })
 export default class Home extends Vue {
     @Prop() private roomId?: string | null;
 
-
-    public created() {
+    public async created() {
         if (this.roomId) {
-            this.joinGame(this.roomId);
+            await storeHelpers.joinGame(this.roomId);
         }
     }
 
@@ -60,20 +48,15 @@ export default class Home extends Vue {
         }
         else
         {
-            if (this.isBound == false) {
-                return false;
-            }
-            else {
-                return true;
-            }
+            return storeHelpers.room.data.isBound;
         }
     }
     private get isSetup() {
-        return this.phase == GamePhase.Setup;
+        return storeHelpers.room.data.data.phase == GamePhase.Setup;
     }
     
     private get isGuessing() {
-        return this.phase == GamePhase.Guessing;
+        return storeHelpers.room.data.data.phase == GamePhase.Guessing;
     }
 }
 </script>

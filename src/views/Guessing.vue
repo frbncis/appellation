@@ -50,6 +50,7 @@ import Button from '@/components/Button.vue';
 import Footer from '@/components/Footer.vue';
 import Scoreboard from '@/components/Scoreboard.vue';
 import { mapState, mapActions, mapGetters } from 'vuex'
+import { storeHelpers } from '../store';
 
 @Component({
   components: {
@@ -58,11 +59,6 @@ import { mapState, mapActions, mapGetters } from 'vuex'
     Footer,
     ProgressBar,
     Scoreboard,
-  },
-  computed: {
-    ...mapState({
-        cardIds: state => state.room.decks.selected,
-    }),
   },
 })
 export default class Guessing extends Vue {
@@ -91,7 +87,7 @@ export default class Guessing extends Vue {
 
   private timerStartValue = 60;
 
-  // @Prop() public cardIds: Array<number>;
+  public cardIds: Array<number> = storeHelpers.room.data.decks.selected;
 
   private cards: Array<any> = [];
 
