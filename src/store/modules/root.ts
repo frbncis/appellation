@@ -1,34 +1,36 @@
-import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators'
+import {
+  Module, VuexModule, Mutation, Action, getModule,
+} from 'vuex-module-decorators';
+import { Store } from 'vuex';
 import store from '@/store';
 import { db } from '@/components/Firestore';
 import { FirestoreAction, FirestoreVuexModule } from './FirebaseAction';
 import { collections } from '@/components/KeyValueService';
-import {RoomModule} from './room';
-import { Store } from 'vuex';
+import { RoomModule } from './room';
 
 // @Module({ name: 'appellation', namespaced: true })
 export default class AppellationRootModule extends VuexModule {
     public room: any = null;
-  // @State()
-  // public state: Array<any> = [];
- 
-  // @Module()
-//   public room = RoomModule;
+    // @State()
+    // public state: Array<any> = [];
+
+    // @Module()
+    //   public room = RoomModule;
 
   // @Module()
   // public player = new PlayerModule();
   @FirestoreAction
-  public async joinGame(roomId: string) {
-    const { bindFirestoreRef } = this.context;
-    console.log(`Joining room ${roomId}`);
-    const roomDocument = db.collection('rooms').doc(roomId);
-    await bindFirestoreRef('room', roomDocument);
+    public async joinGame(roomId: string) {
+      const { bindFirestoreRef } = this.context;
+      console.log(`Joining room ${roomId}`);
+      const roomDocument = db.collection('rooms').doc(roomId);
+      await bindFirestoreRef('room', roomDocument);
 
-    // const phase = this.room.data.phase;
-    // console.log(`Room ID ${roomId} is in phase ${phase}`);
+      // const phase = this.room.data.phase;
+      // console.log(`Room ID ${roomId} is in phase ${phase}`);
 
     // await bindFirestoreRef('phase', collections.phase(roomId, phase))
-  }
+    }
 
   // // @Action()
   // public internalJoinGame = firestoreAction(async (context, roomId: string) => {

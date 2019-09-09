@@ -33,12 +33,11 @@ export default class Timer extends Vue {
 
     get color() {
       if (this.timeRemainingSeconds < 10) {
-        return "error";
-      } else if (this.timeRemainingSeconds < 20) {
-        return "warning";
-      } else {
-        return "primary";
+        return 'error';
+      } if (this.timeRemainingSeconds < 20) {
+        return 'warning';
       }
+      return 'primary';
     }
 
     public beforeMount() {

@@ -38,18 +38,18 @@
             :value="progress" />
       </v-footer>
     </v-content>
-     
+
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import CardDeck,{ CardData } from '@/components/Card/CardDeck.vue';
+import { mapState, mapActions, mapGetters } from 'vuex';
+import CardDeck, { CardData } from '@/components/Card/CardDeck.vue';
 import Cards from '@/data/Cards';
 import ProgressBar from '@/components/ProgressBar.vue';
 import Button from '@/components/Button.vue';
 import Footer from '@/components/Footer.vue';
 import Scoreboard from '@/components/Scoreboard.vue';
-import { mapState, mapActions, mapGetters } from 'vuex'
 import { storeHelpers } from '../store';
 
 @Component({
@@ -103,12 +103,13 @@ export default class Guessing extends Vue {
   get showStartButton(): boolean {
     return !this.startButtonPressed;
   }
+
   get progress() {
     return (this.cardsGuessed) / this.cardsTotal * 100;
   }
 
   private onDeckEmpty() {
-    console.log("Deck is empty, resetting for next round.");
+    console.log('Deck is empty, resetting for next round.');
     setTimeout(() => {
       this.resetRound();
       this.resetTurn();
@@ -116,17 +117,15 @@ export default class Guessing extends Vue {
   }
 
   private resetDeck() {
-    const cardModels: Array<CardData> = (JSON.parse(JSON.stringify(Cards)) as Array<CardData>).map((cardModel, index) => {
-      return {
-        id: index,
-        ...cardModel
-      }
-    });
+    const cardModels: Array<CardData> = (JSON.parse(JSON.stringify(Cards)) as Array<CardData>).map((cardModel, index) => ({
+      id: index,
+      ...cardModel,
+    }));
 
-    this.cardIds.forEach(cardId => {
+    this.cardIds.forEach((cardId) => {
       this.cards.push(
-        cardModels[cardId]
-      )
+        cardModels[cardId],
+      );
     });
 
     this.cardsGuessed = 0;

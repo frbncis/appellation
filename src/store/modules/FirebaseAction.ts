@@ -1,5 +1,7 @@
-import { Action as Act, ActionContext, Module as Mod, Payload } from 'vuex'
-import { getModule, VuexModule } from 'vuex-module-decorators'
+import {
+  Action as Act, ActionContext, Module as Mod, Payload,
+} from 'vuex';
+import { getModule, VuexModule } from 'vuex-module-decorators';
 import { firestoreAction } from 'vuexfire';
 import { ActionDecoratorParams } from 'vuex-module-decorators/dist/types/action';
 import { firestore } from 'firebase';
@@ -14,49 +16,49 @@ interface FirestoreActionContext<S, R> extends ActionContext<S, R> {
 export declare class FirestoreVuexModule<S = ThisType<any>, R = any> extends VuexModule<S, R> {
     context: FirestoreActionContext<S, R>;
 
-    // constructor(m: any) {}
+  // constructor(m: any) {}
 }
 
 function firestoreActionDecoratorFactory<T>(params?: ActionDecoratorParams): MethodDecorator {
-  const { commit = undefined, rawError = false, root = false } = params || {}
-  return function(target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<any>) {
-    const module = target.constructor as Mod<T, any>
+  const { commit = undefined, rawError = false, root = false } = params || {};
+  return function (target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<any>) {
+    const module = target.constructor as Mod<T, any>;
     if (!module.actions) {
-      module.actions = {}
+      module.actions = {};
     }
-    const actionFunction: Function = descriptor.value
+    const actionFunction: Function = descriptor.value;
 
-    let action: Act<typeof target, any> = async function(
+    const action: Act<typeof target, any> = async function (
       context: ActionContext<typeof target, any>,
-      payload: Payload
+      payload: Payload,
     ) {
       try {
-        let actionPayload = null
+        let actionPayload = null;
 
         if ((module as any)._genStatic) {
-          const moduleAccessor = getModule(module as typeof VuexModule)
-          moduleAccessor.context = context
-          actionPayload = await actionFunction.call(moduleAccessor, payload)
+          const moduleAccessor = getModule(module as typeof VuexModule);
+          moduleAccessor.context = context;
+          actionPayload = await actionFunction.call(moduleAccessor, payload);
         } else {
-          const thisObj = { context }
-          actionPayload = await actionFunction.call(thisObj, payload)
+          const thisObj = { context };
+          actionPayload = await actionFunction.call(thisObj, payload);
         }
-        return actionPayload
+        return actionPayload;
       } catch (e) {
         throw rawError
           ? e
           : new Error(
-                new Error(`Could not perform action ${key.toString()}`).stack +
-                '\n' +
-                e.stack
-            )
+            `${new Error(`Could not perform action ${key.toString()}`).stack
+            }\n${
+              e.stack}`,
+          );
       }
-    }
+    };
 
     const fbindAction = firestoreAction(action);
-    
-    module.actions[key as string] = root ? { root, handler: action } : fbindAction
-  }
+
+    module.actions[key as string] = root ? { root, handler: action } : fbindAction;
+  };
 }
 
 export function FirestoreAction<T, R>(
@@ -77,7 +79,7 @@ export function FirestoreAction<T>(params: ActionDecoratorParams): MethodDecorat
 export function FirestoreAction<T, R>(
   targetOrParams: T | ActionDecoratorParams,
   key?: string | symbol,
-  descriptor?: TypedPropertyDescriptor<(...args: any[]) => R>
+  descriptor?: TypedPropertyDescriptor<(...args: any[]) => R>,
 ) {
   if (!key && !descriptor) {
     /*
@@ -90,9 +92,9 @@ export function FirestoreAction<T, R>(
         }
      * </pre>
      */
-    return firestoreActionDecoratorFactory(targetOrParams as ActionDecoratorParams)
-  } else {
-    /*
+    return firestoreActionDecoratorFactory(targetOrParams as ActionDecoratorParams);
+  }
+  /*
      * This is the case when @Action is called on action function
      * without any params
      * <pre>
@@ -102,6 +104,5 @@ export function FirestoreAction<T, R>(
      *   }
      * </pre>
      */
-    firestoreActionDecoratorFactory()(targetOrParams, key!, descriptor!)
-  }
+  firestoreActionDecoratorFactory()(targetOrParams, key!, descriptor!);
 }

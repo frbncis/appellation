@@ -28,35 +28,34 @@ import { GamePhase } from '@/components/KeyValueService';
 import { storeHelpers } from '@/store';
 
 @Component({
-    components: {
-        Setup,
-        Guessing,
-    },
+  components: {
+    Setup,
+    Guessing,
+  },
 })
 export default class Home extends Vue {
     @Prop() private roomId?: string | null;
 
     public async created() {
-        if (this.roomId) {
-            await storeHelpers.joinGame(this.roomId);
-        }
+      if (this.roomId) {
+        await storeHelpers.joinGame(this.roomId);
+      }
     }
 
     private get isReady() {
-        if (this.roomId == undefined) {
-            return true;
-        }
-        else
-        {
-            return storeHelpers.room.data.isBound;
-        }
+      if (this.roomId == undefined) {
+        return true;
+      }
+
+      return storeHelpers.room.data.isBound;
     }
+
     private get isSetup() {
-        return storeHelpers.room.data.data.phase == GamePhase.Setup;
+      return storeHelpers.room.data.data.phase == GamePhase.Setup;
     }
-    
+
     private get isGuessing() {
-        return storeHelpers.room.data.data.phase == GamePhase.Guessing;
+      return storeHelpers.room.data.data.phase == GamePhase.Guessing;
     }
 }
 </script>

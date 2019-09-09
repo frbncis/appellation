@@ -1,14 +1,16 @@
 import Vue from 'vue';
 import Vuex, { StoreOptions } from 'vuex';
-import {GamePhase, collections} from '@/components/KeyValueService'
-import {db} from '@/components/Firestore';
-import { vuexfireMutations, firestoreAction } from 'vuexfire'
+import { vuexfireMutations, firestoreAction } from 'vuexfire';
+import {
+  Module, VuexModule, Mutation, Action, getModule,
+} from 'vuex-module-decorators';
+import { GamePhase, collections } from '@/components/KeyValueService';
+import { db } from '@/components/Firestore';
 
-import { getRandomIntInclusive, RoomModule } from './modules/room'
+import { getRandomIntInclusive, RoomModule } from './modules/room';
 import player, { PlayerDeck } from './modules/player';
 import players from './modules/players';
 // import { State, Module, createVuexStore, Action } from 'vuex-simple';
-import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators'
 import AppellationRootModule from './modules/root';
 
 Vue.use(Vuex);
@@ -28,8 +30,8 @@ const store = new Vuex.Store({
   },
   actions: {
 
-  }
-})
+  },
+});
 
 export const storeHelpers = {
   room: getModule(RoomModule, store),
@@ -48,10 +50,10 @@ export const storeHelpers = {
   },
 
   async startGame() {
-    console.log("Starting game...");
+    console.log('Starting game...');
     await this.room.setPhase({
       roomId: this.room.data.roomId!,
-      phase: GamePhase.Guessing
+      phase: GamePhase.Guessing,
     });
   },
 
@@ -64,6 +66,6 @@ export const storeHelpers = {
 
     return playerId;
   },
-}
+};
 
 export default store;

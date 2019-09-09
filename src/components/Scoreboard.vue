@@ -57,4 +57,3 @@ export default class Scoreboard extends Vue {
     text-align: right;
 }
 </style>
-

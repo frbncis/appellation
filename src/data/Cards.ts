@@ -110,11 +110,11 @@ const Cards: Array<CardBase> = [
     points: 3,
   },
   {
-    title: "Heisenberg",
+    title: 'Heisenberg',
     description: 'A German theoretical physicist, creator of the uncertainty principle, and winner of a Nobel Prize in Physics for his development of quantum mechanics. His name was also used as an alias for the meth manufacturer Walter White in the series Breaking Bad.',
     category: Category.HISTORICAL_FIGURE,
     points: 2,
-  }
+  },
 ];
 
 export default Cards;
