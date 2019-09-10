@@ -1,12 +1,6 @@
-import {
-  Module, VuexModule, Mutation, Action, getModule,
-} from 'vuex-module-decorators';
-import { Store } from 'vuex';
-import store from '@/store';
+import { VuexModule } from 'vuex-module-decorators';
 import { db } from '@/components/Firestore';
-import { FirestoreAction, FirestoreVuexModule } from './FirebaseAction';
-import { collections } from '@/components/KeyValueService';
-import { RoomModule } from './room';
+import { FirestoreAction } from './FirebaseAction';
 
 // @Module({ name: 'appellation', namespaced: true })
 export default class AppellationRootModule extends VuexModule {

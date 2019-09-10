@@ -1,91 +1,65 @@
-import { firestoreAction } from 'vuexfire';
-import { PlayerData, collections, GamePhase } from '@/components/KeyValueService';
-import { db } from '@/components/Firestore';
+// import { firestoreAction } from 'vuexfire';
+// import { PlayerData, collections, GamePhase } from '@/components/KeyValueService';
+// import { db } from '@/components/Firestore';
+// import { VuexModule, Module } from 'vuex-module-decorators';
+// import { FirestoreAction } from './FirebaseAction';
 
-interface p {
-    attributes: Object,
-    phaseData: Object,
-}
+// @Module({ name: PlayersModule.ModuleName, namespaced: true })
+// export class PlayersModule extends VuexModule {
+//   static ModuleName: string = 'players';
 
-const statePhaseData = {
-  francis: null,
-};
+//   @FirestoreAction
+//   public async bindReference(playerIds: Array<string>, roomId: string) {
+//     const { bindFirestoreRef } = this.context;
+    
+//     console.log(`Binding player data for player ${playerId} in phase ${payload.phase}`);
 
-const actionPhaseData = {
-  bindPlayer: firestoreAction((context, { roomId, playerId, phase }) => {
-    const collection = collections.public_player_data(roomId, playerId, phase);
-    return context.bindFirestoreRef(playerId, collection);
-  }),
-};
+//     const publicData = collections.public_player_data(roomId, playerId, payload.phase.toString());
+//     await bindFirestoreRef(
+//       `phaseData_${playerId}`,
+//       db.collection(`rooms/${roomId}/players`)
+//         .where('id'),
+//     );
 
-const phaseData = {
-  namespaced: true,
-  // statePhaseData,
-  actionPhaseData,
-};
+//     const playerAttributes = collections.player(payload.roomId, playerId);
+//     await context.bindFirestoreRef(`attributes_${playerId}`, playerAttributes);
+//   }
 
-// //
+// }
 
-const stateAttributes = {
+// // const actions = {
+// //   bindPlayers: firestoreAction(async (context, payload: { playerIds: Array<string>, roomId: string, phase: string }) => {
+// //     // await payload.playerIds.forEach(async playerId => {
+// //     console.log(`Binding player data for player ${playerId} in phase ${payload.phase}`);
 
-};
+// //     const publicData = collections.public_player_data(payload.roomId, playerId, payload.phase.toString());
+// //     await context.bindFirestoreRef(
+// //       `phaseData_${playerId}`,
+// //       db.collection(`rooms/${roomId}/players`)
+// //         .where('id'),
+// //     );
 
+// //     const playerAttributes = collections.player(payload.roomId, playerId);
+// //     await context.bindFirestoreRef(`attributes_${playerId}`, playerAttributes);
+// //     // });
+// //   }),
+// // };
 
-const actionAttributes = {
-  bindPlayer: firestoreAction((context, { roomId, playerId }) => {
-    const collection = collections.player(roomId, playerId);
-    return context.bindFirestoreRef(playerId, collection);
-  }),
-};
+// const state = {};
 
-const attributes = {
-  namespaced: true,
-  stateAttributes,
-  actionAttributes,
-};
+// const getters = {
+//   playersAttributes: state => (playerId) => {
+//     console.log('running player/playersData getter');
 
+//     const keys = Object.keys(state).filter(key => key.startsWith('attributes'));
 
-// //
+//     return keys;
+//   },
+// };
 
-
-const actions = {
-  bindPlayers: firestoreAction(async (context, payload: { playerIds: Array<string>, roomId: string, phase: string }) => {
-    // await payload.playerIds.forEach(async playerId => {
-    console.log(`Binding player data for player ${playerId} in phase ${payload.phase}`);
-
-    const publicData = collections.public_player_data(payload.roomId, playerId, payload.phase.toString());
-    await context.bindFirestoreRef(
-      `phaseData_${playerId}`,
-      db.collection(`rooms/${roomId}/players`)
-        .where('id'),
-    );
-
-    const playerAttributes = collections.player(payload.roomId, playerId);
-    await context.bindFirestoreRef(`attributes_${playerId}`, playerAttributes);
-    // });
-  }),
-};
-
-const state = {};
-
-const getters = {
-  playersAttributes: state => (playerId) => {
-    console.log('running player/playersData getter');
-
-    const keys = Object.keys(state).filter(key => key.startsWith('attributes'));
-
-    return keys;
-  },
-};
-
-export default {
-  namespaced: true,
-  // modules: {
-  //     phaseData,
-  //     attributes
-  // },
-  state,
-  actions,
-  getters,
-  // mutations
-};
+// export default {
+//   namespaced: true,
+//   state,
+//   actions,
+//   getters,
+// };

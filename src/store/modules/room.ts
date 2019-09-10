@@ -151,31 +151,39 @@ export class RoomModule extends VuexModule {
       console.log(`room.addPlayer() - adding player ${playerId} to room ${roomId}`);
       const roomDocument = await collections.room(roomId);
 
-      // const existingPlayers = (await roomDocument.get()).players;
-      const existingPlayers = this.data.players;
+      const players = [...this.data.players];
 
-      const allPlayers = existingPlayers.concat([playerId]);
+      console.log(players);
 
-      await roomDocument.update({ players: allPlayers });
+      players.push(playerId);
+
+      await roomDocument.update({ players: players });
     }
 
     @Action
-    public addToDeck(payload: { cards: Array<number>, deck: string }) {
+    public addToDeck(payload: { cards: Array<number>, deckSelector: (decks: RoomDecks) => Array<number>}) {
       if (!this.data.roomId) {
         throw new Error('Room ID not set.');
       }
 
-      const { deck, cards } = payload;
+      const { cards, deckSelector } = payload;
 
-      console.log(`room.actions.addToDeck(): Adding to deck '${deck}`, cards);
+      console.log('room.actions.addToDeck(): Adding to deck', cards);
 
-      console.log('Existing Deck', this.data.decks[deck]);
-      const newDeck = this.data.decks[deck].concat(cards);
-      console.log('New Deck', newDeck);
+    //   const destinationDeck = [...deckSelector(this.data.decks)];
 
-      const allDecks = Object.assign({}, this.data.decks, { [deck]: newDeck });
+    //   console.log('Existing Deck', destinationDeck);
+    //   destinationDeck.push(...cards);
+      
+      let allDecks = Object.assign({}, this.data.decks);
 
-      return db.collection('rooms').doc(this.data.roomId!.toString()).update({ decks: allDecks });
+      let selectedDeck = deckSelector(allDecks);
+
+      selectedDeck.push(...cards);
+
+    //   final = destinationDeck;
+
+      return db.collection('rooms').doc(this.data.roomId!).update({ decks: allDecks });
     }
 
     @Mutation

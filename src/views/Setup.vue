@@ -81,32 +81,12 @@ import { db } from  '@/components/Firestore.ts';
 import {collections, KeyValueService, PlayerData } from '@/components/KeyValueService.ts';
 
 import { mapState, mapActions, mapGetters } from 'vuex'
-import player,{ PlayerDeck } from '@/store/modules/player';
-import { storeHelpers } from '../store';
+import { PlayerDeck } from '@/store/modules/player';
+import store, { storeHelpers } from '../store';
 
 @Component({
   components: {
     CardDeck,
-  },
-  computed: {
-    ...mapState({
-        deckSelection: state => state.player.decks.selection,
-        player: state => state.player,
-    }),
-  },
-  methods: {
-    ...mapActions('player', [
-        'switchTeam',
-    ]),
-    ...mapActions([
-        'createGame',
-        'joinGame',
-        'startGame',
-        'createPlayer',
-        'becomePlayer',
-        'drawSelectionCards',
-        'submitSelectionCards'
-    ])
   },
 })
 export default class Setup extends Vue {
@@ -119,6 +99,12 @@ export default class Setup extends Vue {
     private isFinishedCardSelection: boolean = false;
 
     private phase = storeHelpers.room.data.data.phase;
+
+    private deckSelection = storeHelpers.player.data.decks.selection;
+
+    private player = storeHelpers.player.data;
+
+    private switchTeam = storeHelpers.player.switchTeam;
 
     private get playersTeam1(): Array<any> {
         return this.playersByTeam(1);
@@ -191,9 +177,14 @@ export default class Setup extends Vue {
 
     public async onSetPlayerNameClick() {
         if (this.roomId) {
-            const playerId = await this.createPlayer({ roomId: this.roomId, playerName: this.playerName });
-            await this.becomePlayer({ roomId: this.roomId, playerId });
-            this.drawSelectionCards();
+            const playerId = await storeHelpers.createPlayer(
+                this.roomId,
+                this.playerName
+            );
+
+            await storeHelpers.becomePlayer(this.roomId, playerId);
+            await storeHelpers.drawSelectionCards();
+            
         } else {
             throw new Error("No room ID")
         }
@@ -204,7 +195,7 @@ export default class Setup extends Vue {
     }
 
     public async onStartGameClick() {
-        await this.startGame();
+        await storeHelpers.startGame();
     }
 
     private async onCardSelected(selectedCard: CardData) {
@@ -212,7 +203,9 @@ export default class Setup extends Vue {
             console.log("Done card selection.");
             this.isFinishedCardSelection = true;
 
-            await this.submitSelectionCards(this.selectedCardIds);
+            await storeHelpers.submitSelectionCards(
+                this.selectedCardIds
+            );
         }
     }
 }
