@@ -1,9 +1,11 @@
 import { collections, GamePhase } from '@/components/KeyValueService';
 import { Module, VuexModule, Action } from 'vuex-module-decorators';
 import { FirestoreAction } from './FirebaseAction';
+import firebase from 'firebase';
 
 export interface PlayerDeck {
-    selection: Array<number>
+    selection: Array<number>,
+    [key: string]: Array<number>
 }
 
 export interface PlayerState {
@@ -91,12 +93,11 @@ export class PlayerModule extends VuexModule {
 
     let allDecks = Object.assign({}, this.data.decks);
 
-    let selectedDeck = deckSelector(allDecks);
+    const selectedDeckName =  Object.keys(this.data.decks).filter(key => this.data.decks[key] == deckSelector(allDecks));
 
-    selectedDeck.push(...cards);
-    const player = collections.player(roomId!, playerId);
-
-    return player.update({ decks: allDecks });
+    return collections.player(roomId!, playerId).update({
+      [selectedDeckName[0]]: firebase.firestore.FieldValue.arrayUnion(...cards)
+    });
   }
 
   @Action
@@ -138,101 +139,3 @@ export class PlayerModule extends VuexModule {
     }
   }
 }
-
-// const actions = {
-  // createPlayer: firestoreAction(async (context, { roomId, playerName }) => {
-  //   console.log(`player.createPlayer() Creating player for ${playerName} in ${roomId}`);
-  //   let team1PlayerCount = 0;
-  //   let team2PlayerCount = 0;
-
-  //   (await collections.players(roomId).get()).forEach(async (p) => {
-  //     const teamId = p.get('teamId');
-
-  //     if (teamId == 1) {
-  //       team1PlayerCount++;
-  //     } else {
-  //       team2PlayerCount++;
-  //     }
-  //   });
-
-  //   const assignedTeamId = team1PlayerCount < team2PlayerCount ? 1 : 2;
-
-  //   const playerDocument = collections.player(roomId, undefined);
-
-  //   const player = {
-  //     playerId: playerDocument.id,
-  //     name: playerName,
-  //     roomId,
-  //     room: collections.room(roomId),
-  //     teamId: assignedTeamId,
-  //     decks: {
-  //       selection: new Array<number>(),
-  //     },
-  //   };
-
-  //   await playerDocument.set(player);
-
-  //   return playerDocument.id;
-  // }),
-  // addToDeck: firestoreAction(async ({ state }, { cards, deck }) => {
-  //   console.log(`player.addToDeck(): Adding to deck '${deck}'`, cards);
-
-  //   const { roomId } = state;
-  //   const { playerId } = state;
-
-  //   const newDeck = state.decks[deck].concat(cards);
-  //   const allDecks = Object.assign({}, state.decks, { [deck]: newDeck });
-
-  //   const player = collections.player(roomId, playerId);
-
-  //   return player.update({ decks: allDecks });
-  // }),
-  // switchTeam: async (context) => {
-  //   const currentTeamId = context.state.teamId;
-
-  //   const newTeamId = currentTeamId == 1 ? 2 : 1;
-
-  //   return collections.player(
-  //     context.state.roomId,
-  //     context.state.playerId,
-  //   ).update({ teamId: newTeamId });
-  // },
-  // submitSelectionCards: async (context) => {
-  //   const { roomId } = context.state;
-  //   const { playerId } = context.state;
-
-  //   console.log(`Submitting selection cards for player ${playerId} in room ${roomId}`);
-
-  //   const phaseData = collections.phase(roomId, GamePhase.Setup.toString()).doc(playerId);
-
-  //   return phaseData.update({ hasSubmittedCards: true });
-  // },
-  // ensureCurrentPhaseDataExists: async (context, { roomId, playerId, phase }) => {
-  //   // TODO: This should do a check to see if the data actually exists before writing to it
-  //   // since this does a full replace.
-  //   if (phase == GamePhase.Setup) {
-  //     await collections.phase(
-  //       roomId,
-  //       GamePhase.Setup.toString(),
-  //     ).doc(playerId).set({
-  //       playerId,
-  //       player: collections.player(roomId, playerId),
-  //       hasSubmittedCards: false,
-  //     });
-  //   }
-  // },
-// };
-
-// const mutations = {
-//   setRoomId(state: any, id: number) {
-//     state.id = id;
-//   },
-// };
-
-// export default {
-//   namespaced: true,
-//   state,
-//   actions,
-//   getters: {},
-//   mutations,
-// };

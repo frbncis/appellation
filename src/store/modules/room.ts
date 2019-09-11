@@ -6,71 +6,7 @@ import { RoomData, GamePhase, collections } from '@/components/KeyValueService';
 import { db } from '@/components/Firestore';
 import './firebaseExtensions';
 import { FirestoreAction } from './FirebaseAction';
-
-// const state = {
-//     roomId: undefined,
-//     isBound: false,
-//     data: new RoomData(),
-//     decks: {
-//         selected: new Array<number>(),
-//         activeRemaining: new Array<number>(),
-//         activeGuessed: new Array<number>(),
-//         discard: new Array<number>(),
-//     },
-//     players: [],
-// }
-
-// const actions = {
-//     createRoom: firestoreAction(async (context) => {
-//         const roomId = getRandomIntInclusive(1000, 9999).toString();
-//         const roomDocument = collections.room(roomId);
-
-//         await roomDocument.set({
-//             roomId: roomId,
-//             isBound: true,
-//             data: Object.assign({}, new RoomData()),
-//             decks: {
-//                 selected: new Array<number>(),
-//                 activeRemaining: new Array<number>(),
-//                 activeGuessed: new Array<number>(),
-//                 discard: new Array<number>(),
-//             },
-//             players: [],
-//         });
-
-//         return roomId;
-//     }),
-//     setPhase: async (context, payload: { roomId: string, phase: GamePhase} ) => {
-//         return collections.room(payload.roomId).update({ data: { phase: payload.phase.toString() }} );
-//     },
-//     addPlayer: async (context, { roomId, playerId }) => {
-//         console.log(`room.addPlayer() - adding player ${playerId} to room ${roomId}`)
-//         const roomDocument = await collections.room(roomId);
-
-//         // const existingPlayers = (await roomDocument.get()).players;
-//         const existingPlayers = state.players;
-
-//         const allPlayers = existingPlayers.concat([ playerId ]);
-
-//         await roomDocument.update({ players: allPlayers });
-//     },
-//     addToDeck: ({ state }, { cards, deck }: { cards: Array<number>, deck: string}) => {
-//         console.log(`room.actions.addToDeck(): Adding to deck '${deck}`, cards);
-//         console.log("Existing Deck", state.decks[deck]);
-//         const newDeck = state.decks[deck].concat(cards);
-//         console.log("New Deck", newDeck);
-
-//         const allDecks = Object.assign({}, state.decks, { [deck]: newDeck });
-
-//         return db.collection('rooms').doc(state.roomId).update({ decks: allDecks });
-//     }
-// }
-
-// const mutations = {
-//     setRoomId (state: any, id: number) {
-//         state.roomId = id;
-//     }
-// }
+import firebase from 'firebase'
 
 export const getRandomIntInclusive = (min: number, max: number) => {
   min = Math.ceil(min);
@@ -78,11 +14,13 @@ export const getRandomIntInclusive = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-interface RoomDecks {
+interface RoomDecks extends Decks {
     selected: Array<number>;
     activeRemaining: Array<number>;
     activeGuessed: Array<number>;
     discard: Array<number>;
+
+    [key: string]: Array<number>;
 }
 
 interface RoomState {
@@ -170,20 +108,13 @@ export class RoomModule extends VuexModule {
 
       console.log('room.actions.addToDeck(): Adding to deck', cards);
 
-    //   const destinationDeck = [...deckSelector(this.data.decks)];
-
-    //   console.log('Existing Deck', destinationDeck);
-    //   destinationDeck.push(...cards);
-      
       let allDecks = Object.assign({}, this.data.decks);
 
-      let selectedDeck = deckSelector(allDecks);
+      const selectedDeckName =  Object.keys(this.data.decks).filter(key => this.data.decks[key] == deckSelector(allDecks));
 
-      selectedDeck.push(...cards);
-
-    //   final = destinationDeck;
-
-      return db.collection('rooms').doc(this.data.roomId!).update({ decks: allDecks });
+      return db.collection('rooms').doc(this.data.roomId!).update({
+          [selectedDeckName[0]]: firebase.firestore.FieldValue.arrayUnion(...cards)
+      });
     }
 
     @Mutation
