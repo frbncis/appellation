@@ -1,7 +1,7 @@
 import {
   Module, VuexModule, Mutation, Action,
 } from 'vuex-module-decorators';
-import { RoomData, GamePhase, collections } from '@/components/KeyValueService';
+import { GamePhase, collections } from '@/components/KeyValueService';
 import { db } from '@/components/Firestore';
 import './firebaseExtensions';
 import { FirestoreAction } from './FirebaseAction';
@@ -13,40 +13,51 @@ export const getRandomIntInclusive = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-interface RoomDecks {
-    selected: Array<number>;
-    activeRemaining: Array<number>;
-    activeGuessed: Array<number>;
-    discard: Array<number>;
-
-    [key: string]: Array<number>;
+interface Cards extends Array<number> {
+  
 }
 
-interface RoomState {
-    roomId?: string,
-    isBound: boolean,
-    data: RoomData,
-    decks: RoomDecks,
-    players: Array<string>,
+class RoomStateCards {
+  public selectedCards: Cards = [];
+  public activeRemainingCards: Cards = [];
+  public activeGuessedCards: Cards = [];
+  public discard: Cards = [];
+}
+
+export class RoomState extends RoomStateCards {
+    public roomId?: string = undefined;
+    public isBound: boolean = false;
+
+    public createdAt: Date = new Date();
+
+    public currentTeamTurnId: number = -1;
+
+    public scoreTeam1: number = 0;
+    public scoreTeam2: number = 0;
+
+    public gamePhase: GamePhase = GamePhase.Setup;
+
+    public players: Array<string> = [];
+
+    public constructor(init?: Partial<RoomState>) {
+      super();
+
+      Object.assign(this, init);
+    }
+
+    public getDeck(deckName: string): Cards {
+      return (<any>this)[deckName];
+    }
 }
 
 @Module({ name: 'room', namespaced: true })
 export class RoomModule extends VuexModule {
-    public data: RoomState = {
-      roomId: undefined,
-      isBound: false,
-      data: new RoomData(),
-      decks: {
-        selected: new Array<number>(),
-        activeRemaining: new Array<number>(),
-        activeGuessed: new Array<number>(),
-        discard: new Array<number>(),
-      },
-      players: new Array<string>(),
-    }
+    public data: RoomState = new RoomState();
+
+    public phase: Array<any> = [];
 
     @FirestoreAction
-    public async bindReference(roomId: string) {
+    public async bindRoomReference(roomId: string) {
       console.log('Binding room reference');
 
       const { bindFirestoreRef } = this.context;
@@ -55,23 +66,32 @@ export class RoomModule extends VuexModule {
       await bindFirestoreRef('data', roomDocument);
     }
 
+    @FirestoreAction
+    public async bindPhaseReference(payload: { roomId: string, phase: GamePhase }) {
+      const { bindFirestoreRef } = this.context;
+
+      const phaseDocument = collections.phase(payload.roomId, payload.phase);
+
+      await bindFirestoreRef('phase', phaseDocument);
+    }
+
     @Action
     public async createRoom() {
       const roomId = getRandomIntInclusive(1000, 9999).toString();
       const roomDocument = collections.room(roomId);
 
-      await roomDocument.set({
+      const room = new RoomState({
         roomId,
         isBound: true,
-        data: Object.assign({}, new RoomData()),
-        decks: {
-          selected: new Array<number>(),
-          activeRemaining: new Array<number>(),
-          activeGuessed: new Array<number>(),
-          discard: new Array<number>(),
-        },
+        // data: Object.assign({}, new RoomData()),
+        selectedCards: new Array<number>(),
+        activeRemainingCards: new Array<number>(),
+        activeGuessedCards: new Array<number>(),
+        discard: new Array<number>(),
         players: [],
       });
+
+      await roomDocument.set(Object.assign({}, room));
 
       return roomId;
     }
@@ -98,21 +118,19 @@ export class RoomModule extends VuexModule {
     }
 
     @Action
-    public addToDeck(payload: { cards: Array<number>, deckSelector: (decks: RoomDecks) => Array<number>}) {
+    public addToDeck(payload: { cards: Array<number>, deck: keyof RoomStateCards }) {
       if (!this.data.roomId) {
         throw new Error('Room ID not set.');
       }
 
-      const { cards, deckSelector } = payload;
+      const { cards, deck } = payload;
 
-      console.log('room.actions.addToDeck(): Adding to deck', cards);
+      console.log(`room.actions.addToDeck(): Adding to deck ${deck}`, cards);
 
-      const allDecks = Object.assign({}, this.data.decks);
-
-      const selectedDeckName = Object.keys(this.data.decks).filter(key => this.data.decks[key] == deckSelector(allDecks));
+      const room = new RoomState(this.data);
 
       return db.collection('rooms').doc(this.data.roomId!).update({
-        [selectedDeckName[0]]: firebase.firestore.FieldValue.arrayUnion(...cards),
+        [deck]: firebase.firestore.FieldValue.arrayUnion(...cards),
       });
     }
 

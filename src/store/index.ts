@@ -7,8 +7,6 @@ import {
 import { GamePhase } from '@/components/KeyValueService';
 
 import { RoomModule, getRandomIntInclusive } from './modules/room';
-// import { State, Module, createVuexStore, Action } from 'vuex-simple';
-import AppellationRootModule from './modules/root';
 import { PlayerModule } from './modules/player';
 
 Vue.use(Vuex);
@@ -20,7 +18,6 @@ const store = new Vuex.Store({
 
   },
   modules: {
-    appellation: AppellationRootModule,
     room: RoomModule,
     [PlayerModule.ModuleName]: PlayerModule,
   },
@@ -38,9 +35,12 @@ export const storeHelpers = {
 
   async joinGame(roomId: string) {
     console.log(`Joining room ${roomId}`);
-    const roomModule = getModule(RoomModule, store);
 
-    await roomModule.bindReference(roomId);
+    await this.room.bindRoomReference(roomId);
+    await this.room.bindPhaseReference({
+      roomId: roomId,
+      phase: this.room.data.gamePhase,
+    });
   },
 
   async createGame() {
@@ -70,12 +70,12 @@ export const storeHelpers = {
   async becomePlayer(roomId: string, playerId: string) {
     console.log(`Becoming player ${playerId} in room ${roomId}`);
 
-    await this.player.bindReference(roomId, playerId);
-    await this.player.ensureCurrentPhaseDataExists(
+    await this.player.bindReference({ roomId, playerId });
+    await this.player.ensureCurrentPhaseDataExists({
       roomId,
       playerId,
-      this.room.data.data.phase,
-    );
+      phase: this.room.data.phase,
+    });
   },
 
   async drawSelectionCards() {
@@ -86,7 +86,7 @@ export const storeHelpers = {
       while (true) {
         const j = getRandomIntInclusive(0, 10);
 
-        if (this.room.data.decks.discard.findIndex(value => value == j) > -1) {
+        if (this.room.data.discard.findIndex(value => value == j) > -1) {
           continue;
         } else if (candidateCards.findIndex(value => value == j) > -1) {
           continue;
@@ -99,15 +99,15 @@ export const storeHelpers = {
 
     console.log('got cards ', candidateCards);
     console.log('dispatching room/addToDeck');
-    await this.room.addToDeck({ cards: candidateCards, deckSelector: decks => decks.discard });
+    await this.room.addToDeck({ cards: candidateCards, deck: "discard" });
 
     console.log('dispatching player/addToDeck');
-    await this.player.addToDeck({ cards: candidateCards, deckSelector: decks => decks.selection });
+    await this.player.addToDeck({ cards: candidateCards, deck: "selection" });
   },
 
   async submitSelectionCards(cards: Array<number>) {
     await this.player.submitSelectionCards();
-    await this.room.addToDeck({ cards, deckSelector: decks => decks.selected });
+    await this.room.addToDeck({ cards, deck: "selectedCards" });
   },
 };
 

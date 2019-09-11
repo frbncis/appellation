@@ -1,18 +1,18 @@
 import { Module, VuexModule, Action } from 'vuex-module-decorators';
 import firebase from 'firebase';
-import { collections, GamePhase } from '@/components/KeyValueService';
+import { collections, GamePhase, RoomData } from '@/components/KeyValueService';
 import { FirestoreAction } from './FirebaseAction';
+import { RoomState } from './room';
 
 export interface PlayerDeck {
     selection: Array<number>,
-    [key: string]: Array<number>
 }
 
 export interface PlayerState {
   playerId?: string,
   name?: string,
   roomId?: string,
-  room: undefined,
+  room?: RoomState,
   teamId: number,
   decks: PlayerDeck
 }
@@ -30,15 +30,15 @@ export class PlayerModule extends VuexModule {
     room: undefined,
     teamId: -1,
     decks: {
-      selection: new Array<number>(),
+      selection: [],
     },
   };
 
   @FirestoreAction
-  public async bindReference(roomId: string, playerId: string) {
+  public async bindReference(payload: { roomId: string, playerId: string }) {
     const { bindFirestoreRef } = this.context;
 
-    await bindFirestoreRef('player', collections.player(roomId, playerId));
+    await bindFirestoreRef('data', collections.player(payload.roomId, payload.playerId));
   }
 
   @Action
@@ -63,14 +63,14 @@ export class PlayerModule extends VuexModule {
 
     const playerDocument = collections.player(roomId, undefined);
 
-    const player = {
+    const player: PlayerState = {
       playerId: playerDocument.id,
       name: playerName,
       roomId,
-      room: collections.room(roomId),
+      room: <any>collections.room(roomId),
       teamId: assignedTeamId,
       decks: {
-        selection: new Array<number>(),
+        selection: [],
       },
     };
 
@@ -86,19 +86,17 @@ export class PlayerModule extends VuexModule {
    * @param deck Name of the deck to add to.
    */
   @Action
-  public async addToDeck(payload: { cards: Array<number>, deckSelector: (decks: PlayerDeck) => Array<number> }) {
-    const { cards, deckSelector } = payload;
+  public async addToDeck(payload: { cards: Array<number>, deck: keyof PlayerDeck }) {
+    const { cards, deck } = payload;
 
-    console.log('player.addToDeck(): Adding to deck', cards);
+    console.log(`player.addToDeck(): Adding to deck ${deck}`, cards);
 
     const { roomId, playerId } = this.data;
 
-    const allDecks = Object.assign({}, this.data.decks);
-
-    const selectedDeckName = Object.keys(this.data.decks).filter(key => this.data.decks[key] == deckSelector(allDecks));
-
     return collections.player(roomId!, playerId).update({
-      [selectedDeckName[0]]: firebase.firestore.FieldValue.arrayUnion(...cards),
+      decks: {
+        [deck]: firebase.firestore.FieldValue.arrayUnion(...cards),
+      },
     });
   }
 
@@ -120,22 +118,22 @@ export class PlayerModule extends VuexModule {
 
     console.log(`Submitting selection cards for player ${playerId} in room ${roomId}`);
 
-    const phaseData = collections.phase(roomId!, GamePhase.Setup.toString()).doc(playerId);
+    const phaseData = collections.phase(roomId!, GamePhase.Setup).doc(playerId);
 
     return phaseData.update({ hasSubmittedCards: true });
   }
 
   @Action
-  public async ensureCurrentPhaseDataExists(roomId: string, playerId: string, phase: GamePhase) {
+  public async ensureCurrentPhaseDataExists(payload: { roomId: string, playerId: string, phase: GamePhase }) {
     // TODO: This should do a check to see if the data actually exists before writing to it
     // since this does a full replace.
-    if (phase == GamePhase.Setup) {
+    if (payload.phase == GamePhase.Setup) {
       await collections.phase(
-        roomId,
-        GamePhase.Setup.toString(),
-      ).doc(playerId).set({
-        playerId,
-        player: collections.player(roomId, playerId),
+        payload.roomId,
+        GamePhase.Setup,
+      ).doc(payload.playerId).set({
+        playerId: payload.playerId,
+        player: collections.player(payload.roomId, payload.playerId),
         hasSubmittedCards: false,
       });
     }

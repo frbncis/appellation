@@ -11,8 +11,8 @@ export const collections = {
   public_player_data(roomId: string, playerId: string, phase: string) {
     return db.collection(`rooms/${roomId}/players/${playerId}/publicGameData`).doc(phase);
   },
-  phase(roomId: string, phase: string) {
-    return db.collection(`rooms/${roomId}/phase_${phase}`);
+  phase(roomId: string, phase: GamePhase) {
+    return db.collection(`rooms/${roomId}/phase_${phase.toString()}`);
   },
 };
 
@@ -22,22 +22,15 @@ export enum GamePhase {
     Ended,
 }
 
-export class RoomData {
-  roomCreatedTimestamp = new Date();
-
-  currentTeamId = -1;
-
-  scoreTeam1 = 0;
-
-  scoreTeam2 = 0;
-
-  phase = GamePhase.Setup;
-}
-
 export interface PlayerData {
   id?: string,
   name?: string,
   teamId?: number,
-  hasSubmittedCards: boolean,
   teamSequenceId: number,
+}
+
+export interface SetupPhaseData {
+  hasSubmittedCards: boolean,
+  player: PlayerData,
+  playerId: string,
 }

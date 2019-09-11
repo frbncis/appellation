@@ -78,7 +78,7 @@ import Footer from '@/components/Footer.vue';
 import Scoreboard from '@/components/Scoreboard.vue';
 import { db } from  '@/components/Firestore.ts';
 
-import {collections, KeyValueService, PlayerData } from '@/components/KeyValueService.ts';
+import {collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService.ts';
 
 import { mapState, mapActions, mapGetters } from 'vuex'
 import { PlayerDeck } from '@/store/modules/player';
@@ -98,9 +98,9 @@ export default class Setup extends Vue {
 
     private isFinishedCardSelection: boolean = false;
 
-    private phase = storeHelpers.room.data.data.phase;
-
-    private deckSelection = storeHelpers.player.data.decks.selection;
+    private get phase(): Array<SetupPhaseData> {
+        return storeHelpers.room.phase;
+    }
 
     private player = storeHelpers.player.data;
 
@@ -152,7 +152,7 @@ export default class Setup extends Vue {
             };
         });
         
-        const candidateCards = allCards.filter((card: CardData) => this.deckSelection.includes(card.id) && !this.selectedCardIds.includes(card.id));
+        const candidateCards = allCards.filter((card: CardData) => storeHelpers.player.data.decks.selection.includes(card.id) && !this.selectedCardIds.includes(card.id));
         
         return candidateCards;
     }

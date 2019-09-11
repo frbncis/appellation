@@ -87,7 +87,7 @@ export default class Guessing extends Vue {
 
   private timerStartValue = 60;
 
-  public cardIds: Array<number> = storeHelpers.room.data.decks.selected;
+  public cardIds: Array<number> = storeHelpers.room.data.selectedDeck;
 
   private cards: Array<any> = [];
 

@@ -51,11 +51,11 @@ export default class Home extends Vue {
     }
 
     private get isSetup() {
-      return storeHelpers.room.data.data.phase == GamePhase.Setup;
+      return storeHelpers.room.data.gamePhase == GamePhase.Setup;
     }
 
     private get isGuessing() {
-      return storeHelpers.room.data.data.phase == GamePhase.Guessing;
+      return storeHelpers.room.data.gamePhase == GamePhase.Guessing;
     }
 }
 </script>
