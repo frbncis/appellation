@@ -83,7 +83,6 @@ export class RoomModule extends FirestoreVuexModule {
       const room = new RoomState({
         roomId,
         isBound: true,
-        // data: Object.assign({}, new RoomData()),
         selectedCards: new Array<number>(),
         activeRemainingCards: new Array<number>(),
         activeGuessedCards: new Array<number>(),
@@ -97,8 +96,10 @@ export class RoomModule extends FirestoreVuexModule {
     }
 
     @Action
-    public async setPhase(payload: { roomId: string, phase: GamePhase}) {
-      return collections.room(payload.roomId).update({ data: { phase: payload.phase.toString() } });
+    public async setPhase(payload: { roomId: string, phase: GamePhase }) {
+      const document = collections.room(payload.roomId);
+
+      await document.update({ gamePhase: payload.phase });
     }
 
     @Action
@@ -132,6 +133,10 @@ export class RoomModule extends FirestoreVuexModule {
       return db.collection('rooms').doc(this.data.roomId!).update({
         [deck]: firebase.firestore.FieldValue.arrayUnion(...cards),
       });
+    }
+
+    private update(document: firebase.firestore.DocumentReference, data: Partial<RoomState>) {
+      return document.update(data);
     }
 
     @Mutation

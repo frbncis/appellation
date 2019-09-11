@@ -96,7 +96,19 @@ export default class Setup extends Vue {
     
     private playerName: string = '';
 
-    private isFinishedCardSelection: boolean = false;
+    private get isFinishedCardSelection(): boolean {
+        if (!this.phase) {
+            return false;
+        }
+
+        const playerData = this.phase.find(playerPhaseData => playerPhaseData.playerId == this.player.playerId);
+
+        if(!playerData) {
+            return false;
+        }
+
+        return playerData.hasSubmittedCards;
+    }
 
     private get phase(): Array<SetupPhaseData> {
         return storeHelpers.room.phase;
@@ -195,13 +207,14 @@ export default class Setup extends Vue {
     }
 
     public async onStartGameClick() {
+        console.log('Start game button clicked.');
         await storeHelpers.startGame();
     }
 
     private async onCardSelected(selectedCard: CardData) {
         if (this.selectedCardIds.push(selectedCard.id) == 2) {
             console.log("Done card selection.");
-            this.isFinishedCardSelection = true;
+            // this.isFinishedCardSelection = true;
 
             await storeHelpers.submitSelectionCards(
                 this.selectedCardIds

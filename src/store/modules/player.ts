@@ -1,4 +1,4 @@
-import { Module, VuexModule, Action } from 'vuex-module-decorators';
+import { Module, VuexModule, Action, Mutation } from 'vuex-module-decorators';
 import firebase from 'firebase';
 import { collections, GamePhase } from '@/components/KeyValueService';
 import { FirestoreAction, FirestoreVuexModule } from './FirebaseAction';
@@ -34,6 +34,8 @@ export class PlayerModule extends FirestoreVuexModule {
     },
   };
 
+  public playerId?: string = undefined;
+
   @FirestoreAction
   public async bindReference(payload: { roomId: string, playerId: string }) {
     const { bindFirestoreRef } = this.context;
@@ -45,7 +47,7 @@ export class PlayerModule extends FirestoreVuexModule {
   public async createPlayer(payload: { roomId: string, playerName: string}) {
     const { roomId, playerName } = payload;
 
-    console.log(`player.createPlayer() Creating player for ${playerName} in ${roomId}`);
+    console.log(`player.createPlayer() Creating player for ${playerName} in ${roomId} with player ID ${this.context.state.playerId}`);
     let team1PlayerCount = 0;
     let team2PlayerCount = 0;
 
@@ -61,10 +63,10 @@ export class PlayerModule extends FirestoreVuexModule {
 
     const assignedTeamId = team1PlayerCount < team2PlayerCount ? 1 : 2;
 
-    const playerDocument = collections.player(roomId, undefined);
+    const playerDocument = collections.player(roomId, this.context.state.playerId);
 
     const player: PlayerState = {
-      playerId: playerDocument.id,
+      playerId: this.context.state.playerId,
       name: playerName,
       roomId,
       room: <any>collections.room(roomId),
@@ -137,5 +139,10 @@ export class PlayerModule extends FirestoreVuexModule {
         hasSubmittedCards: false,
       });
     }
+  }
+
+  @Mutation
+  public setPlayerId(playerId: string) {
+    this.playerId = playerId;
   }
 }

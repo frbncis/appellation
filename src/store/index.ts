@@ -8,6 +8,7 @@ import { GamePhase } from '@/components/KeyValueService';
 
 import { RoomModule, getRandomIntInclusive } from './modules/room';
 import { PlayerModule } from './modules/player';
+import firebase from 'firebase';
 
 Vue.use(Vuex);
 
@@ -41,6 +42,8 @@ export const storeHelpers = {
       roomId: roomId,
       phase: this.room.data.gamePhase,
     });
+
+
   },
 
   async createGame() {
@@ -55,6 +58,26 @@ export const storeHelpers = {
       roomId: this.room.data.roomId!,
       phase: GamePhase.Guessing,
     });
+  },
+
+  async loadUser() {
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (user) {
+        console.log(`Firebase authentication succeeded, user ID ${user.uid}.`);
+
+        await storeHelpers.player.setPlayerId(user.uid);
+
+        await new Promise(resolve => setTimeout(()=>resolve(), 1000)).then(()=>console.log("fired"));
+        // This feels a little tangled up. Should user.uid be replaced with
+        // playerId variable to be more clear?
+        console.log(`firebase.auth().onAuthStateChanged() - Room ID is currently ${this.room.data.roomId}.`)
+        if (this.room.data.roomId && this.room.data.players.indexOf(user.uid)> -1) {
+          storeHelpers.becomePlayer(this.room.data.roomId, user.uid);
+        }
+      }
+    });
+
+    await firebase.auth().signInAnonymously();
   },
 
   async createPlayer(roomId: string, playerName: string) {

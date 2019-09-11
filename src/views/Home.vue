@@ -14,6 +14,7 @@
     </v-container>
 
     <div v-else>
+        Is Joined: {{ isJoined ? 'T': 'F' }}
         <Setup v-if="isSetup" :roomId="roomId"/>
         <Guessing v-else-if="isGuessing" />
         <h1 v-else>Game Over.</h1>
@@ -37,8 +38,37 @@ export default class Home extends Vue {
     @Prop() private roomId?: string | null;
 
     public async created() {
+      await storeHelpers.loadUser();
+
       if (this.roomId) {
         await storeHelpers.joinGame(this.roomId);
+      }
+    }
+
+    private get isJoined() {
+      if (storeHelpers.room.data.roomId == undefined) {
+        return false;
+      } else {
+        if (storeHelpers.player.playerId && 
+          // TODO: Add a isBound property on the document instead to directly
+          // check binding.
+          storeHelpers.player.data.playerId == undefined &&
+          storeHelpers.room.data.players.indexOf(storeHelpers.player.playerId) > -1
+        ) {
+          // fire and forget.
+          storeHelpers.becomePlayer(storeHelpers.room.data.roomId, storeHelpers.player.playerId);
+          return false;
+        } else if (
+          storeHelpers.player.playerId && 
+          // TODO: Add a isBound property on the document instead to directly
+          // check binding.
+          storeHelpers.player.data.playerId &&
+          storeHelpers.room.data.players.indexOf(storeHelpers.player.playerId) > -1
+        ) {
+          return true;
+        } else {
+          return false;
+        }
       }
     }
 
