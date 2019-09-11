@@ -21,3 +21,23 @@ export enum GamePhase {
     Guessing,
     Ended,
 }
+
+export class RoomData {
+  roomCreatedTimestamp = new Date();
+
+  currentTeamId = -1;
+
+  scoreTeam1 = 0;
+
+  scoreTeam2 = 0;
+
+  phase = GamePhase.Setup;
+}
+
+export interface PlayerData {
+  id?: string,
+  name?: string,
+  teamId?: number,
+  hasSubmittedCards: boolean,
+  teamSequenceId: number,
+}

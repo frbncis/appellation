@@ -36,7 +36,9 @@ export class PlayerModule extends VuexModule {
 
   @FirestoreAction
   public async bindReference(roomId: string, playerId: string) {
-    await this.context.bindFirestoreRef('player', collections.player(roomId, playerId));
+    const { bindFirestoreRef } = this.context;
+
+    await bindFirestoreRef('player', collections.player(roomId, playerId));
   }
 
   @Action

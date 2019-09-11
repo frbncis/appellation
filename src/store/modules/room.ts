@@ -1,6 +1,5 @@
-import { firestoreAction } from 'vuexfire';
 import {
-  Module, VuexModule, Mutation, Action, getModule,
+  Module, VuexModule, Mutation, Action,
 } from 'vuex-module-decorators';
 import { RoomData, GamePhase, collections } from '@/components/KeyValueService';
 import { db } from '@/components/Firestore';
@@ -14,7 +13,7 @@ export const getRandomIntInclusive = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-interface RoomDecks extends Decks {
+interface RoomDecks {
     selected: Array<number>;
     activeRemaining: Array<number>;
     activeGuessed: Array<number>;
