@@ -1,7 +1,7 @@
-import { collections, GamePhase } from '@/components/KeyValueService';
 import { Module, VuexModule, Action } from 'vuex-module-decorators';
-import { FirestoreAction } from './FirebaseAction';
 import firebase from 'firebase';
+import { collections, GamePhase } from '@/components/KeyValueService';
+import { FirestoreAction } from './FirebaseAction';
 
 export interface PlayerDeck {
     selection: Array<number>,
@@ -81,24 +81,24 @@ export class PlayerModule extends VuexModule {
 
   /**
    * Add cards to a deck.
-   * 
+   *
    * @param cards Array of the card IDs to add to the deck
    * @param deck Name of the deck to add to.
    */
   @Action
   public async addToDeck(payload: { cards: Array<number>, deckSelector: (decks: PlayerDeck) => Array<number> }) {
-    const { cards, deckSelector} = payload;
+    const { cards, deckSelector } = payload;
 
-    console.log(`player.addToDeck(): Adding to deck`, cards);
+    console.log('player.addToDeck(): Adding to deck', cards);
 
     const { roomId, playerId } = this.data;
 
-    let allDecks = Object.assign({}, this.data.decks);
+    const allDecks = Object.assign({}, this.data.decks);
 
-    const selectedDeckName =  Object.keys(this.data.decks).filter(key => this.data.decks[key] == deckSelector(allDecks));
+    const selectedDeckName = Object.keys(this.data.decks).filter(key => this.data.decks[key] == deckSelector(allDecks));
 
     return collections.player(roomId!, playerId).update({
-      [selectedDeckName[0]]: firebase.firestore.FieldValue.arrayUnion(...cards)
+      [selectedDeckName[0]]: firebase.firestore.FieldValue.arrayUnion(...cards),
     });
   }
 

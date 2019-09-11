@@ -60,7 +60,7 @@ export const storeHelpers = {
   async createPlayer(roomId: string, playerName: string) {
     console.log(`Creating player ${playerName}`);
 
-    const playerId = await this.player.createPlayer({roomId, playerName});
+    const playerId = await this.player.createPlayer({ roomId, playerName });
 
     await this.room.addPlayer({ roomId, playerId });
 
@@ -79,23 +79,21 @@ export const storeHelpers = {
   },
 
   async drawSelectionCards() {
-    console.log('store.actions.drawSelectionCards')
+    console.log('store.actions.drawSelectionCards');
     const candidateCards = new Array<number>(2).fill(0);
 
     for (let i = 0; i < candidateCards.length; i++) {
       while (true) {
-          const j = getRandomIntInclusive(0, 10);
+        const j = getRandomIntInclusive(0, 10);
 
-          if (this.room.data.decks.discard.findIndex((value) => value == j) > -1) {
-              continue;
-          }
-          else if (candidateCards.findIndex((value) => value == j) > -1) {
-              continue;
-          }
-          else {
-              candidateCards[i] = <any>j;
-              break;
-          }
+        if (this.room.data.decks.discard.findIndex(value => value == j) > -1) {
+          continue;
+        } else if (candidateCards.findIndex(value => value == j) > -1) {
+          continue;
+        } else {
+          candidateCards[i] = <any>j;
+          break;
+        }
       }
     }
 
@@ -110,7 +108,7 @@ export const storeHelpers = {
   async submitSelectionCards(cards: Array<number>) {
     await this.player.submitSelectionCards();
     await this.room.addToDeck({ cards, deckSelector: decks => decks.selected });
-  }
+  },
 };
 
 export default store;

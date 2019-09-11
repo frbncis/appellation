@@ -11,7 +11,7 @@
 //   @FirestoreAction
 //   public async bindReference(playerIds: Array<string>, roomId: string) {
 //     const { bindFirestoreRef } = this.context;
-    
+
 //     console.log(`Binding player data for player ${playerId} in phase ${payload.phase}`);
 
 //     const publicData = collections.public_player_data(roomId, playerId, payload.phase.toString());

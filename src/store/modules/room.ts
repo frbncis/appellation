@@ -5,7 +5,7 @@ import { RoomData, GamePhase, collections } from '@/components/KeyValueService';
 import { db } from '@/components/Firestore';
 import './firebaseExtensions';
 import { FirestoreAction } from './FirebaseAction';
-import firebase from 'firebase'
+import firebase from 'firebase';
 
 export const getRandomIntInclusive = (min: number, max: number) => {
   min = Math.ceil(min);
@@ -94,7 +94,7 @@ export class RoomModule extends VuexModule {
 
       players.push(playerId);
 
-      await roomDocument.update({ players: players });
+      await roomDocument.update({ players });
     }
 
     @Action
@@ -107,12 +107,12 @@ export class RoomModule extends VuexModule {
 
       console.log('room.actions.addToDeck(): Adding to deck', cards);
 
-      let allDecks = Object.assign({}, this.data.decks);
+      const allDecks = Object.assign({}, this.data.decks);
 
-      const selectedDeckName =  Object.keys(this.data.decks).filter(key => this.data.decks[key] == deckSelector(allDecks));
+      const selectedDeckName = Object.keys(this.data.decks).filter(key => this.data.decks[key] == deckSelector(allDecks));
 
       return db.collection('rooms').doc(this.data.roomId!).update({
-          [selectedDeckName[0]]: firebase.firestore.FieldValue.arrayUnion(...cards)
+        [selectedDeckName[0]]: firebase.firestore.FieldValue.arrayUnion(...cards),
       });
     }
 
