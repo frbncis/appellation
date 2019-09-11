@@ -34,7 +34,8 @@ export class PlayerModule extends FirestoreVuexModule {
     },
   };
 
-  public playerId?: string = undefined;
+  
+  public playerId: string = '';
 
   @FirestoreAction
   public async bindReference(payload: { roomId: string, playerId: string }) {
@@ -47,7 +48,7 @@ export class PlayerModule extends FirestoreVuexModule {
   public async createPlayer(payload: { roomId: string, playerName: string}) {
     const { roomId, playerName } = payload;
 
-    console.log(`player.createPlayer() Creating player for ${playerName} in ${roomId} with player ID ${this.context.state.playerId}`);
+    console.log(`player.createPlayer() Creating player for ${playerName} in ${roomId} with player ID ${this.playerId}`);
     let team1PlayerCount = 0;
     let team2PlayerCount = 0;
 
@@ -61,12 +62,18 @@ export class PlayerModule extends FirestoreVuexModule {
       }
     });
 
-    const assignedTeamId = team1PlayerCount < team2PlayerCount ? 1 : 2;
+    let assignedTeamId;
 
-    const playerDocument = collections.player(roomId, this.context.state.playerId);
+    if (team1PlayerCount == 0 && team2PlayerCount == 0) {
+      assignedTeamId = 1;
+    }  else {
+      assignedTeamId = team1PlayerCount < team2PlayerCount ? 1 : 2;
+    }
+
+    const playerDocument = collections.player(roomId, this.playerId);
 
     const player: PlayerState = {
-      playerId: this.context.state.playerId,
+      playerId: this.playerId,
       name: playerName,
       roomId,
       room: <any>collections.room(roomId),
