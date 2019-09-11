@@ -4,7 +4,7 @@ import {
 import { GamePhase, collections } from '@/components/KeyValueService';
 import { db } from '@/components/Firestore';
 import './firebaseExtensions';
-import { FirestoreAction } from './FirebaseAction';
+import { FirestoreAction, FirestoreVuexModule } from './FirebaseAction';
 import firebase from 'firebase';
 
 export const getRandomIntInclusive = (min: number, max: number) => {
@@ -51,7 +51,7 @@ export class RoomState extends RoomStateCards {
 }
 
 @Module({ name: 'room', namespaced: true })
-export class RoomModule extends VuexModule {
+export class RoomModule extends FirestoreVuexModule {
     public data: RoomState = new RoomState();
 
     public phase: Array<any> = [];

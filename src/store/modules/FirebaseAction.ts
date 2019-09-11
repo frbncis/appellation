@@ -13,10 +13,12 @@ interface FirestoreActionContext<S, R> extends ActionContext<S, R> {
     unbindFirestoreRef(key: string): void;
 }
 
-export declare class FirestoreVuexModule<S = ThisType<any>, R = any> extends VuexModule<S, R> {
-    context: FirestoreActionContext<S, R>;
+export class FirestoreVuexModule<S = ThisType<any>, R = any> extends VuexModule<S, R> {
+    context!: FirestoreActionContext<S, R>;
 
-  // constructor(m: any) {}
+    constructor(m: any) {
+      super(m);
+    }
 }
 
 function firestoreActionDecoratorFactory<T>(params?: ActionDecoratorParams): MethodDecorator {

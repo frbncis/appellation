@@ -74,7 +74,7 @@ export const storeHelpers = {
     await this.player.ensureCurrentPhaseDataExists({
       roomId,
       playerId,
-      phase: this.room.data.phase,
+      phase: this.room.data.gamePhase,
     });
   },
 

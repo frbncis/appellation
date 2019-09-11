@@ -1,7 +1,7 @@
 import { Module, VuexModule, Action } from 'vuex-module-decorators';
 import firebase from 'firebase';
-import { collections, GamePhase, RoomData } from '@/components/KeyValueService';
-import { FirestoreAction } from './FirebaseAction';
+import { collections, GamePhase } from '@/components/KeyValueService';
+import { FirestoreAction, FirestoreVuexModule } from './FirebaseAction';
 import { RoomState } from './room';
 
 export interface PlayerDeck {
@@ -19,7 +19,7 @@ export interface PlayerState {
 
 
 @Module({ name: PlayerModule.ModuleName, namespaced: true})
-export class PlayerModule extends VuexModule {
+export class PlayerModule extends FirestoreVuexModule {
 
   static ModuleName: string = 'player';
 
