@@ -8,35 +8,41 @@
         :onTimerEnded="onTimerEnded"
       />
 
-      <v-container fluid>
-        <v-layout
-          column align-center
+      <div v-if="isPlayerTurn">
+        <v-container fluid>
+          <v-layout
+            column align-center
+          >
+            <v-flex class="card-deck-container" v-if="isRoundActive">
+              <CardDeck
+                :onDeckEmpty="onDeckEmpty"
+                :onCardGuessed="onCardGuess"
+                :cards="cards"
+                class="card-deck"
+              />
+            </v-flex>
+
+            <v-flex v-else>
+              <h1>Round {{ activeRound }}</h1>
+              <h3>{{ rounds[activeRound] ? rounds[activeRound] : 'Make up your own rules.' }}</h3>
+            </v-flex>
+          </v-layout>
+        </v-container>
+
+        <v-footer
+          app
         >
-          <v-flex class="card-deck-container" v-if="isRoundActive">
-            <CardDeck
-              :onDeckEmpty="onDeckEmpty"
-              :onCardGuessed="onCardGuess"
-              :cards="cards"
-              class="card-deck"
-            />
-          </v-flex>
+          <Button v-if="showStartButton" text="Start" @click="onStartClick" />
 
-          <v-flex v-else>
-            <h1>Round {{ activeRound }}</h1>
-            <h3>{{ rounds[activeRound] ? rounds[activeRound] : 'Make up your own rules.' }}</h3>
-          </v-flex>
-        </v-layout>
-      </v-container>
+          <v-progress-linear
+              v-else
+              :value="progress" />
+        </v-footer>
+      </div>
 
-      <v-footer
-        app
-      >
-        <Button v-if="showStartButton" text="Start" @click="onStartClick" />
-
-        <v-progress-linear
-            v-else
-            :value="progress" />
-      </v-footer>
+      <div v-else>
+        <h3>It's someone else's turn</h3>
+      </div>
     </v-content>
 
 </template>
@@ -90,6 +96,10 @@ export default class Guessing extends Vue {
   public cardIds: Array<number> = storeHelpers.room.data.selectedCards;
 
   private cards: Array<any> = [];
+
+  public get isPlayerTurn() {
+    return storeHelpers.room.data.currentPlayerId === storeHelpers.player.data.playerId;
+  }
 
   private created() {
     this.resetDeck();

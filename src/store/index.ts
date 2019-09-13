@@ -4,7 +4,7 @@ import { vuexfireMutations } from 'vuexfire';
 import {
   getModule,
 } from 'vuex-module-decorators';
-import { GamePhase } from '@/components/KeyValueService';
+import { GamePhase, SetupPhaseData } from '@/components/KeyValueService';
 
 import { RoomModule, getRandomIntInclusive } from './modules/room';
 import { PlayerModule } from './modules/player';
@@ -54,10 +54,30 @@ export const storeHelpers = {
 
   async startGame() {
     console.log('Starting game...');
+
+    await this.room.generateTurnSequences();
+
+    const firstPlayerId = this.room.data.turnSequence[1][0];
+
+    await this.room.update({ currentTeamTurnId: 1, currentPlayerId: firstPlayerId });
+
+    // This need to fire last as the view transition is bound to this.
     await this.room.setPhase({
       roomId: this.room.data.roomId!,
       phase: GamePhase.Guessing,
     });
+  },
+
+  async endTurn(remainingCards: Array<number>, scoreTeam1: number, scoreTeam2: number) {
+    await this.room.update({ scoreTeam1, scoreTeam2 });
+
+    if (remainingCards.length > 0) {
+      await this.room.update({ activeRemainingCards: remainingCards });
+      await this.room.setNextPlayer();
+    } else {
+      // No more cards! Time for a new round.
+      await this.room.setNextRound();
+    }
   },
 
   async loadUser() {

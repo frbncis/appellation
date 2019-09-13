@@ -1,7 +1,7 @@
 import {
   Module, VuexModule, Mutation, Action,
 } from 'vuex-module-decorators';
-import { GamePhase, collections } from '@/components/KeyValueService';
+import { GamePhase, collections, SetupPhaseData } from '@/components/KeyValueService';
 import { db } from '@/components/Firestore';
 import './firebaseExtensions';
 import { FirestoreAction, FirestoreVuexModule } from './FirebaseAction';
@@ -30,10 +30,19 @@ export class RoomState extends RoomStateCards {
 
     public createdAt: Date = new Date();
 
-    public currentTeamTurnId: number = -1;
+    public currentTeamTurnId?: number = undefined;
+    public currentPlayerId?: string = undefined;
+    public previousPlayerId?: string = undefined;
+
+    public guessingPhaseRound = 1;
 
     public scoreTeam1: number = 0;
     public scoreTeam2: number = 0;
+
+    public turnSequence: Sequences = {
+      1: [],
+      2: [],
+    }
 
     public gamePhase: GamePhase = GamePhase.Setup;
 
@@ -50,11 +59,37 @@ export class RoomState extends RoomStateCards {
     }
 }
 
+interface Sequences {
+  [key: number]: Array<string>
+}
+
 @Module({ name: 'room', namespaced: true })
 export class RoomModule extends FirestoreVuexModule {
     public data: RoomState = new RoomState();
 
+    /**
+     * Returns data specific to the current phase of the game.
+     */
     public phase: Array<any> = [];
+
+    private _documentCached?: firebase.firestore.DocumentReference = undefined;
+
+    private get document() {
+      if (!this.data.roomId) {
+        throw new Error('Room ID not set.');
+      }
+
+      if (!this._documentCached && this.data.roomId) {
+        this._documentCached = collections.room(this.data.roomId);
+      }
+
+      return this._documentCached!;
+    }
+
+    @Action
+    public update(data: Partial<RoomState>) {
+      return this.document.update(data);
+    }
 
     @FirestoreAction
     public async bindRoomReference(roomId: string) {
@@ -97,9 +132,8 @@ export class RoomModule extends FirestoreVuexModule {
 
     @Action
     public async setPhase(payload: { roomId: string, phase: GamePhase }) {
-      const document = collections.room(payload.roomId);
 
-      await document.update({ gamePhase: payload.phase });
+      await this.update({ gamePhase: payload.phase });
     }
 
     @Action
@@ -135,8 +169,92 @@ export class RoomModule extends FirestoreVuexModule {
       });
     }
 
-    private update(document: firebase.firestore.DocumentReference, data: Partial<RoomState>) {
-      return document.update(data);
+    /**
+     * Increment the active team's point counter.
+     */
+    @Action
+    public async incrementActiveTeamPoint() {
+      if (!this.data.roomId) {
+        throw new Error('Room ID was not set in the state store.');
+      }
+
+      if (!this.data.currentTeamTurnId) {
+        throw new Error('No active team ID is set in the state store.');
+      }
+
+      if (this.data.currentTeamTurnId === 1) {
+        return collections.room(this.data.roomId).update(<Partial<RoomState>>{ scoreTeam1: this.data.scoreTeam1 + 1});
+      } else {
+        return collections.room(this.data.roomId).update(<Partial<RoomState>>{ scoreTeam2: this.data.scoreTeam2 + 1});
+      }
+    }
+
+    @Action
+    public async generateTurnSequences() {
+      // Assign turn sequence numbers.
+      const turnSequence: Sequences = {
+        1: [],
+        2: [],
+      };
+
+      this.phase.forEach((phaseData: SetupPhaseData) => {
+        if (!phaseData.player.teamId) {
+          throw new Error('Team ID not set.');
+        }
+
+        turnSequence[phaseData.player.teamId!].push(phaseData.player.id!);
+      });
+
+      return this.document.update(<Partial<RoomState>>{ turnSequence });
+    }
+
+    @Action
+    public async setNextPlayer() {
+      const { previousPlayerId, currentPlayerId, currentTeamTurnId } = this.data;
+
+      const nextTeamId = currentTeamTurnId === 1 ? 2 : 1;
+      const nextTeamSequence = this.data.turnSequence[nextTeamId];
+
+      let nextPlayerId;
+
+      if (!previousPlayerId) {
+        nextPlayerId = nextTeamSequence[0];
+      } else {
+        const previousPlayerIndex = nextTeamSequence.indexOf(previousPlayerId);
+
+        const nextPlayerIndex = (previousPlayerIndex + 1) % nextTeamSequence.length;
+        nextPlayerId = this.data.turnSequence[nextTeamId][nextPlayerIndex];
+      }
+
+      return this.update({
+        previousPlayerId: currentPlayerId,
+        currentPlayerId: nextPlayerId,
+        currentTeamTurnId: nextTeamId,
+      });
+    }
+
+    /**
+     * Setup for a new round. The round counter is incremented, cards are reset, and the next player
+     * is set.
+     */
+    @Action
+    public async setNextRound() {
+      const guessingPhaseRound = this.data.guessingPhaseRound + 1;
+      const activeRemainingCards = this.data.selectedCards;
+
+      // Reset the cards being iterated through to the full deck.
+      const update1 = this.document.update(<Partial<RoomState>>{
+        guessingPhaseRound,
+        activeRemainingCards
+      });
+
+      // Set the next player.
+      const update2 = this.setNextPlayer();
+
+      await update1;
+      await update2;
+
+      return;
     }
 
     @Mutation
