@@ -14,7 +14,6 @@
     </v-container>
 
     <div v-else>
-        Is Joined: {{ isJoined ? 'T': 'F' }}
         <Setup v-if="isSetup" :roomId="roomId"/>
         <Guessing v-else-if="isGuessing" />
         <h1 v-else>Game Over.</h1>

@@ -25,14 +25,14 @@ class RoomStateCards {
 }
 
 export class RoomState extends RoomStateCards {
-    public roomId?: string = undefined;
+    public roomId?: string = '';
     public isBound: boolean = false;
 
     public createdAt: Date = new Date();
 
-    public currentTeamTurnId?: number = undefined;
-    public currentPlayerId?: string = undefined;
-    public previousPlayerId?: string = undefined;
+    public currentTeamTurnId?: number = -1;
+    public currentPlayerId?: string = '';
+    public previousPlayerId?: string = '';
 
     public guessingPhaseRound = 1;
 
@@ -79,11 +79,7 @@ export class RoomModule extends FirestoreVuexModule {
         throw new Error('Room ID not set.');
       }
 
-      if (!this._documentCached && this.data.roomId) {
-        this._documentCached = collections.room(this.data.roomId);
-      }
-
-      return this._documentCached!;
+      return collections.room(this.data.roomId);
     }
 
     @Action
@@ -112,7 +108,11 @@ export class RoomModule extends FirestoreVuexModule {
 
     @Action
     public async createRoom() {
+      console.log("Room module - createRoom()");
+
       const roomId = getRandomIntInclusive(1000, 9999).toString();
+
+      console.log("Room module - createRoom() getting document");
       const roomDocument = collections.room(roomId);
 
       const room = new RoomState({
@@ -125,7 +125,16 @@ export class RoomModule extends FirestoreVuexModule {
         players: [],
       });
 
-      await roomDocument.set(Object.assign({}, room));
+      console.log("Room module - createRoom() saving room document");
+
+      try {
+        await roomDocument.set(Object.assign({}, room));
+      } catch(err) {
+        console.error(err);
+        throw err;
+      }
+
+      console.log(`Room module - createRoom() returning room ID ${roomId}`);
 
       return roomId;
     }
@@ -205,7 +214,10 @@ export class RoomModule extends FirestoreVuexModule {
         turnSequence[phaseData.player.teamId!].push(phaseData.player.id!);
       });
 
-      return this.document.update(<Partial<RoomState>>{ turnSequence });
+      var d = <Partial<RoomState>>{ turnSequence }
+
+      console.log(d);
+      return this.document.update(d);
     }
 
     @Action

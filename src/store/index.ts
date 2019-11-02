@@ -55,11 +55,15 @@ export const storeHelpers = {
   async startGame() {
     console.log('Starting game...');
 
+    console.log("Generating turn sequences...");
     await this.room.generateTurnSequences();
 
     const firstPlayerId = this.room.data.turnSequence[1][0];
 
+    console.log("Updating room data...");
     await this.room.update({ currentTeamTurnId: 1, currentPlayerId: firstPlayerId });
+
+    console.log("Done updating room data...");
 
     // This need to fire last as the view transition is bound to this.
     await this.room.setPhase({

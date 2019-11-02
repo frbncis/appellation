@@ -18,7 +18,7 @@
                 <p>Room: {{ roomId }}</p>
             </div>
 
-            <div v-if="player.playerId == undefined && roomId != undefined">
+            <div v-if="player.playerId !== undefined && roomId !== undefined && player.name == undefined">
                 <v-text-field
                     v-model="playerName"
                     label="Player Name"
@@ -33,13 +33,13 @@
 
             <ul id="players">
                 <h2>Team 1</h2>
-                <li v-for="playerData in playersTeam1" :key="player.name">
-                    {{ playerData.player.name }}         {{ playerData.hasSubmittedCards ? 'Y': 'N' }}
+                <li v-for="playerData in playersTeam1" :key="playerData.name">
+                    {{ playerData.player.name }}    -     {{ playerData.hasSubmittedCards ? '(Ready!)': '(Waiting...)' }}
                 </li>
 
                 <h2>Team 2</h2>
-                <li v-for="playerData in playersTeam2" :key="player.name">
-                    {{ playerData.player.name }}         {{ playerData.hasSubmittedCards ? 'Y': 'N' }}
+                <li v-for="playerData in playersTeam2" :key="playerData.name">
+                    {{ playerData.player.name }}    -     {{ playerData.hasSubmittedCards ? '(Ready!)': '(Waiting...)' }}
                 </li>
                 <v-btn @click="onSwitchTeamClick">Switch Team</v-btn>
             </ul>

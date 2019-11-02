@@ -27,15 +27,14 @@ export class PlayerModule extends FirestoreVuexModule {
     playerId: undefined,
     name: undefined,
     roomId: undefined,
-    room: undefined,
+    room: new RoomState(),
     teamId: -1,
     decks: {
       selection: [],
     },
   };
 
-  
-  public playerId: string = '';
+  // public playerId: string = '';
 
   @FirestoreAction
   public async bindReference(payload: { roomId: string, playerId: string }) {
@@ -48,7 +47,7 @@ export class PlayerModule extends FirestoreVuexModule {
   public async createPlayer(payload: { roomId: string, playerName: string}) {
     const { roomId, playerName } = payload;
 
-    console.log(`player.createPlayer() Creating player for ${playerName} in ${roomId} with player ID ${this.playerId}`);
+    console.log(`player.createPlayer() Creating player for ${playerName} in ${roomId} with player ID ${this.data.playerId}`);
     let team1PlayerCount = 0;
     let team2PlayerCount = 0;
 
@@ -70,10 +69,10 @@ export class PlayerModule extends FirestoreVuexModule {
       assignedTeamId = team1PlayerCount < team2PlayerCount ? 1 : 2;
     }
 
-    const playerDocument = collections.player(roomId, this.playerId);
+    const playerDocument = collections.player(roomId, this.data.playerId);
 
     const player: PlayerState = {
-      playerId: this.playerId,
+      playerId: this.data.playerId,
       name: playerName,
       roomId,
       room: <any>collections.room(roomId),
@@ -150,6 +149,6 @@ export class PlayerModule extends FirestoreVuexModule {
 
   @Mutation
   public setPlayerId(playerId: string) {
-    this.playerId = playerId;
+    this.data.playerId = playerId;
   }
 }
