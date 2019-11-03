@@ -5,44 +5,62 @@
           column align-center
         >
           <v-flex>
-            <div v-if="roomId == undefined">
-                <v-btn @click="onCreateGameClick">Create Game</v-btn>
-                <v-text-field
-                    v-model="roomIdTextField"
-                    label="Room ID"
-                    placeholder="asdfg"
-                />
-                <v-btn @click="onJoinGameClick">Join Game</v-btn>
-            </div>
-            <div v-else>
-                <p>Room: {{ roomId }}</p>
-            </div>
+            <v-flex v-if="roomId == undefined">
+                <v-flex>
+                    <v-text-field
+                        v-model="roomIdTextField"
+                        label="Room ID"
+                    />
+                </v-flex>
 
-            <div v-if="player.playerId !== undefined && roomId !== undefined && player.name == undefined">
+                <v-flex>
+                    <v-btn block @click="onJoinGameClick">Join Game</v-btn>
+                </v-flex>
+
+                <v-flex>
+                    <v-btn block @click="onCreateGameClick">Create Game</v-btn>
+                </v-flex>
+            </v-flex>
+            <!-- <div v-else>
+                <p>Room: {{ roomId }}</p>
+            </div> -->
+
+            <v-flex v-if="player.playerId !== undefined && roomId !== undefined && player.name == null">
                 <v-text-field
                     v-model="playerName"
                     label="Player Name"
                     placeholder="Adam"
                 ></v-text-field>
                 <v-btn @click="onSetPlayerNameClick">Set Player Name</v-btn>
-            </div>
-            <div v-else>
+            </v-flex>
+            <!-- <div v-else>
                 <p>Player ID: {{ player.playerId }}</p>
                 <p>Player Name: {{ player.name }}</p>
+            </div> -->
+
+            <div v-else>
+                <ul id="players" v-if="player.playerId !== undefined && roomId !== undefined">
+                    <v-row>
+                        <v-col>
+                            <h2>Team 1</h2>
+                            <li v-for="playerData in playersTeam1" :key="playerData.name">
+                                {{ playerData.player.name }}    -     {{ playerData.hasSubmittedCards ? '(Ready!)': '(Waiting...)' }}
+                            </li>
+                        </v-col>
+
+                        <v-col>
+                            <h2>Team 2</h2>
+                            <li v-for="playerData in playersTeam2" :key="playerData.name">
+                                {{ playerData.player.name }}    -     {{ playerData.hasSubmittedCards ? '(Ready!)': '(Waiting...)' }}
+                            </li>
+                        </v-col>
+                    </v-row>
+
+                    <v-row>
+                        <v-btn block @click="onSwitchTeamClick">Switch Team</v-btn>
+                    </v-row>
+                </ul>
             </div>
-
-            <ul id="players">
-                <h2>Team 1</h2>
-                <li v-for="playerData in playersTeam1" :key="playerData.name">
-                    {{ playerData.player.name }}    -     {{ playerData.hasSubmittedCards ? '(Ready!)': '(Waiting...)' }}
-                </li>
-
-                <h2>Team 2</h2>
-                <li v-for="playerData in playersTeam2" :key="playerData.name">
-                    {{ playerData.player.name }}    -     {{ playerData.hasSubmittedCards ? '(Ready!)': '(Waiting...)' }}
-                </li>
-                <v-btn @click="onSwitchTeamClick">Switch Team</v-btn>
-            </ul>
           </v-flex>
         <v-container fluid >
 
@@ -114,7 +132,9 @@ export default class Setup extends Vue {
         return storeHelpers.room.phase;
     }
 
-    private player = storeHelpers.player.data;
+    private get player() {
+        return storeHelpers.player.data;
+    }
 
     private switchTeam = storeHelpers.player.switchTeam;
 
@@ -157,15 +177,32 @@ export default class Setup extends Vue {
     private get cards(): Array<any> {
         let allCards = <Array<CardData>>JSON.parse(JSON.stringify(Cards));
 
-        allCards = allCards.map((card, index) => {
+        const cardKeyedById = allCards.map((card, index) => {
             return {
                 id: index,
                 ...card
             };
         });
         
-        const candidateCards = allCards.filter((card: CardData) => storeHelpers.player.data.decks.selection.includes(card.id) && !this.selectedCardIds.includes(card.id));
+        const candidateCards = cardKeyedById.filter((card: CardData) => {
+            console.log("Setup.cards() - filtering card ID " + card.id);
+
+            if (storeHelpers.player.data.decks.selection.includes(card.id)) {
+                console.log(`Setup.cards() - player has card ID ${card.id} in selection deck`);
+
+                if (this.selectedCardIds.includes(card.id)) {
+                    console.log(`Setup.cards() - player has already selected card ID ${card.id}, skipping`);
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        });
         
+        console.log(`Setup.cards() - returning ${candidateCards.length} cards.`);
+
         return candidateCards;
     }
 
@@ -188,13 +225,14 @@ export default class Setup extends Vue {
     }
 
     public async onSetPlayerNameClick() {
-        if (this.roomId) {
+        if (this.roomId && this.playerName != '') {
             const playerId = await storeHelpers.createPlayer(
                 this.roomId,
                 this.playerName
             );
 
             await storeHelpers.becomePlayer(this.roomId, playerId);
+
             await storeHelpers.drawSelectionCards();
             
         } else {
@@ -212,9 +250,10 @@ export default class Setup extends Vue {
     }
 
     private async onCardSelected(selectedCard: CardData) {
-        if (this.selectedCardIds.push(selectedCard.id) == 2) {
+        console.log("Card selected");
+        
+        if (this.selectedCardIds.push(selectedCard.id) == 5) {
             console.log("Done card selection.");
-            // this.isFinishedCardSelection = true;
 
             await storeHelpers.submitSelectionCards(
                 this.selectedCardIds

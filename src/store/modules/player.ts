@@ -1,4 +1,6 @@
-import { Module, VuexModule, Action, Mutation } from 'vuex-module-decorators';
+import {
+  Module, VuexModule, Action, Mutation,
+} from 'vuex-module-decorators';
 import firebase from 'firebase';
 import { collections, GamePhase } from '@/components/KeyValueService';
 import { FirestoreAction, FirestoreVuexModule } from './FirebaseAction';
@@ -9,32 +11,29 @@ export interface PlayerDeck {
 }
 
 export interface PlayerState {
-  playerId?: string,
-  name?: string,
-  roomId?: string,
+  playerId: string | null,
+  name: string | null,
+  roomId: string | null,
   room?: RoomState,
   teamId: number,
   decks: PlayerDeck
 }
 
 
-@Module({ name: PlayerModule.ModuleName, namespaced: true})
+@Module({ name: PlayerModule.ModuleName, namespaced: true })
 export class PlayerModule extends FirestoreVuexModule {
-
   static ModuleName: string = 'player';
 
   public data: PlayerState = {
-    playerId: undefined,
-    name: undefined,
-    roomId: undefined,
+    playerId: null,
+    name: null,
+    roomId: null,
     room: new RoomState(),
     teamId: -1,
     decks: {
       selection: [],
     },
   };
-
-  // public playerId: string = '';
 
   @FirestoreAction
   public async bindReference(payload: { roomId: string, playerId: string }) {
@@ -47,7 +46,7 @@ export class PlayerModule extends FirestoreVuexModule {
   public async createPlayer(payload: { roomId: string, playerName: string}) {
     const { roomId, playerName } = payload;
 
-    console.log(`player.createPlayer() Creating player for ${playerName} in ${roomId} with player ID ${this.data.playerId}`);
+    console.log(`player.createPlayer() Creating player named ${playerName} in ${roomId} with player ID ${this.data.playerId}`);
     let team1PlayerCount = 0;
     let team2PlayerCount = 0;
 
@@ -65,7 +64,7 @@ export class PlayerModule extends FirestoreVuexModule {
 
     if (team1PlayerCount == 0 && team2PlayerCount == 0) {
       assignedTeamId = 1;
-    }  else {
+    } else {
       assignedTeamId = team1PlayerCount < team2PlayerCount ? 1 : 2;
     }
 

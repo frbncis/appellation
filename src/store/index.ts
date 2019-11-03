@@ -4,11 +4,12 @@ import { vuexfireMutations } from 'vuexfire';
 import {
   getModule,
 } from 'vuex-module-decorators';
+import firebase from 'firebase';
 import { GamePhase, SetupPhaseData } from '@/components/KeyValueService';
 
 import { RoomModule, getRandomIntInclusive } from './modules/room';
 import { PlayerModule } from './modules/player';
-import firebase from 'firebase';
+import Cards from '@/data/Cards';
 
 Vue.use(Vuex);
 
@@ -39,11 +40,9 @@ export const storeHelpers = {
 
     await this.room.bindRoomReference(roomId);
     await this.room.bindPhaseReference({
-      roomId: roomId,
+      roomId,
       phase: this.room.data.gamePhase,
     });
-
-
   },
 
   async createGame() {
@@ -55,15 +54,15 @@ export const storeHelpers = {
   async startGame() {
     console.log('Starting game...');
 
-    console.log("Generating turn sequences...");
+    console.log('Generating turn sequences...');
     await this.room.generateTurnSequences();
 
     const firstPlayerId = this.room.data.turnSequence[1][0];
 
-    console.log("Updating room data...");
+    console.log('Updating room data...');
     await this.room.update({ currentTeamTurnId: 1, currentPlayerId: firstPlayerId });
 
-    console.log("Done updating room data...");
+    console.log('Done updating room data...');
 
     // This need to fire last as the view transition is bound to this.
     await this.room.setPhase({
@@ -91,11 +90,11 @@ export const storeHelpers = {
 
         await storeHelpers.player.setPlayerId(user.uid);
 
-        await new Promise(resolve => setTimeout(()=>resolve(), 1000)).then(()=>console.log("fired"));
+        await new Promise(resolve => setTimeout(() => resolve(), 1000)).then(() => console.log('fired'));
         // This feels a little tangled up. Should user.uid be replaced with
         // playerId variable to be more clear?
-        console.log(`firebase.auth().onAuthStateChanged() - Room ID is currently ${this.room.data.roomId}.`)
-        if (this.room.data.roomId && this.room.data.players.indexOf(user.uid)> -1) {
+        console.log(`firebase.auth().onAuthStateChanged() - Room ID is currently ${this.room.data.roomId}.`);
+        if (this.room.data.roomId && this.room.data.players.indexOf(user.uid) > -1) {
           storeHelpers.becomePlayer(this.room.data.roomId, user.uid);
         }
       }
@@ -127,11 +126,14 @@ export const storeHelpers = {
 
   async drawSelectionCards() {
     console.log('store.actions.drawSelectionCards');
-    const candidateCards = new Array<number>(2).fill(0);
+    const candidateCards = new Array<number>(10).fill(0);
+
+    let x = 0;
 
     for (let i = 0; i < candidateCards.length; i++) {
-      while (true) {
-        const j = getRandomIntInclusive(0, 10);
+      while (x !== 100) {
+        const j = getRandomIntInclusive(0, Cards.length - 1);
+        x = x + 1;
 
         if (this.room.data.discard.findIndex(value => value == j) > -1) {
           continue;
@@ -146,15 +148,15 @@ export const storeHelpers = {
 
     console.log('got cards ', candidateCards);
     console.log('dispatching room/addToDeck');
-    await this.room.addToDeck({ cards: candidateCards, deck: "discard" });
+    await this.room.addToDeck({ cards: candidateCards, deck: 'discard' });
 
     console.log('dispatching player/addToDeck');
-    await this.player.addToDeck({ cards: candidateCards, deck: "selection" });
+    await this.player.addToDeck({ cards: candidateCards, deck: 'selection' });
   },
 
   async submitSelectionCards(cards: Array<number>) {
     await this.player.submitSelectionCards();
-    await this.room.addToDeck({ cards, deck: "selectedCards" });
+    await this.room.addToDeck({ cards, deck: 'selectedCards' });
   },
 };
 

@@ -47,28 +47,26 @@ export default class Home extends Vue {
     private get isJoined() {
       if (storeHelpers.room.data.roomId == undefined) {
         return false;
-      } else {
-        if (storeHelpers.player.playerId && 
-          // TODO: Add a isBound property on the document instead to directly
-          // check binding.
-          storeHelpers.player.data.playerId == undefined &&
-          storeHelpers.room.data.players.indexOf(storeHelpers.player.playerId) > -1
-        ) {
-          // fire and forget.
-          storeHelpers.becomePlayer(storeHelpers.room.data.roomId, storeHelpers.player.playerId);
-          return false;
-        } else if (
-          storeHelpers.player.playerId && 
-          // TODO: Add a isBound property on the document instead to directly
-          // check binding.
-          storeHelpers.player.data.playerId &&
-          storeHelpers.room.data.players.indexOf(storeHelpers.player.playerId) > -1
-        ) {
-          return true;
-        } else {
-          return false;
-        }
       }
+      if (storeHelpers.player.playerId
+          // TODO: Add a isBound property on the document instead to directly
+          // check binding.
+          && storeHelpers.player.data.playerId == undefined
+          && storeHelpers.room.data.players.indexOf(storeHelpers.player.playerId) > -1
+      ) {
+        // fire and forget.
+        storeHelpers.becomePlayer(storeHelpers.room.data.roomId, storeHelpers.player.playerId);
+        return false;
+      } if (
+        storeHelpers.player.playerId
+          // TODO: Add a isBound property on the document instead to directly
+          // check binding.
+          && storeHelpers.player.data.playerId
+          && storeHelpers.room.data.players.indexOf(storeHelpers.player.playerId) > -1
+      ) {
+        return true;
+      }
+      return false;
     }
 
     private get isReady() {
@@ -84,7 +82,7 @@ export default class Home extends Vue {
     }
 
     private get isGuessing() {
-      return storeHelpers.room.data.gamePhase == GamePhase.Guessing;
+      return storeHelpers.room.data.gamePhase === GamePhase.Guessing;
     }
 }
 </script>

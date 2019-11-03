@@ -14,29 +14,36 @@ export const getRandomIntInclusive = (min: number, max: number) => {
 };
 
 interface Cards extends Array<number> {
-  
+
 }
 
 class RoomStateCards {
   public selectedCards: Cards = [];
+
   public activeRemainingCards: Cards = [];
+
   public activeGuessedCards: Cards = [];
+
   public discard: Cards = [];
 }
 
 export class RoomState extends RoomStateCards {
     public roomId?: string = '';
+
     public isBound: boolean = false;
 
     public createdAt: Date = new Date();
 
     public currentTeamTurnId?: number = -1;
+
     public currentPlayerId?: string = '';
+
     public previousPlayerId?: string = '';
 
     public guessingPhaseRound = 1;
 
     public scoreTeam1: number = 0;
+
     public scoreTeam2: number = 0;
 
     public turnSequence: Sequences = {
@@ -55,7 +62,7 @@ export class RoomState extends RoomStateCards {
     }
 
     public getDeck(deckName: string): Cards {
-      return (<any>this)[deckName];
+      return (<any> this)[deckName];
     }
 }
 
@@ -108,11 +115,11 @@ export class RoomModule extends FirestoreVuexModule {
 
     @Action
     public async createRoom() {
-      console.log("Room module - createRoom()");
+      console.log('Room module - createRoom()');
 
       const roomId = getRandomIntInclusive(1000, 9999).toString();
 
-      console.log("Room module - createRoom() getting document");
+      console.log('Room module - createRoom() getting document');
       const roomDocument = collections.room(roomId);
 
       const room = new RoomState({
@@ -125,11 +132,11 @@ export class RoomModule extends FirestoreVuexModule {
         players: [],
       });
 
-      console.log("Room module - createRoom() saving room document");
+      console.log('Room module - createRoom() saving room document');
 
       try {
         await roomDocument.set(Object.assign({}, room));
-      } catch(err) {
+      } catch (err) {
         console.error(err);
         throw err;
       }
@@ -141,7 +148,6 @@ export class RoomModule extends FirestoreVuexModule {
 
     @Action
     public async setPhase(payload: { roomId: string, phase: GamePhase }) {
-
       await this.update({ gamePhase: payload.phase });
     }
 
@@ -192,10 +198,9 @@ export class RoomModule extends FirestoreVuexModule {
       }
 
       if (this.data.currentTeamTurnId === 1) {
-        return collections.room(this.data.roomId).update(<Partial<RoomState>>{ scoreTeam1: this.data.scoreTeam1 + 1});
-      } else {
-        return collections.room(this.data.roomId).update(<Partial<RoomState>>{ scoreTeam2: this.data.scoreTeam2 + 1});
+        return collections.room(this.data.roomId).update(<Partial<RoomState>>{ scoreTeam1: this.data.scoreTeam1 + 1 });
       }
+      return collections.room(this.data.roomId).update(<Partial<RoomState>>{ scoreTeam2: this.data.scoreTeam2 + 1 });
     }
 
     @Action
@@ -214,7 +219,7 @@ export class RoomModule extends FirestoreVuexModule {
         turnSequence[phaseData.player.teamId!].push(phaseData.player.id!);
       });
 
-      var d = <Partial<RoomState>>{ turnSequence }
+      const d = <Partial<RoomState>>{ turnSequence };
 
       console.log(d);
       return this.document.update(d);
@@ -257,7 +262,7 @@ export class RoomModule extends FirestoreVuexModule {
       // Reset the cards being iterated through to the full deck.
       const update1 = this.document.update(<Partial<RoomState>>{
         guessingPhaseRound,
-        activeRemainingCards
+        activeRemainingCards,
       });
 
       // Set the next player.
@@ -265,8 +270,6 @@ export class RoomModule extends FirestoreVuexModule {
 
       await update1;
       await update2;
-
-      return;
     }
 
     @Mutation
