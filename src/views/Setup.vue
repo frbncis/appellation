@@ -174,10 +174,11 @@ export default class Setup extends Vue {
         return this.phase.filter(playerPhaseData => playerPhaseData.hasSubmittedCards).length == this.phase.length;
     }
 
-    private get cards(): Array<any> {
-        let allCards = <Array<CardData>>JSON.parse(JSON.stringify(Cards));
+    private allCards = <Array<CardData>>JSON.parse(JSON.stringify(Cards));
 
-        const cardKeyedById = allCards.map((card, index) => {
+    private get cards(): Array<any> {
+
+        const cardKeyedById = this.allCards.map((card, index) => {
             return {
                 id: index,
                 ...card

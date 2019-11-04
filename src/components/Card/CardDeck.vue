@@ -65,64 +65,67 @@ interface CardDataView extends CardData {
         VueSwing,
     },
 })
+
 export default class CardDeck extends Vue {
-
-    private keyCounter: number = 0;
-    private topCard?: CardData;
-    private nextCard?: CardData;
-
+    
     @Prop() private onCardGuessed?: (card: CardData) => void;
+    
     @Prop() private onDeckEmpty?: () => void;
 
     @Prop() private cards?: Array<CardData>;
 
+    private renderKey: number = 0;
+    
+    private topCard?: CardData;
+
+    private nextCard?: CardData;
+
+    /**
+     * Backing field for the getter slidingWindowIndex
+     */
+    private slidingWindowIndexField: number = 0;
+
+    /**
+     * Index of the top card being rendered.
+     */
+    public get slidingWindowIndex(): number {
+        return this.slidingWindowIndexField % this.cards.length;
+    }
+
     get renderableCards(): Array<CardDataView> {
-        if (!this.cards || this.cards.length == 0)
-        {
+        console.log("Getting renderableCards");
+
+        if (!this.cards || this.cards.length == 0) {
+            console.log(`CardDeck.renderableCards - got no cards.`);
             return [];
-        }
-
-        let topCardIndex;
-
-        // Only create the DOM elements for the top and next card.
-        if (this.topCard == undefined) {
-            this.topCard = this.cards[0];
-            topCardIndex = 0;
-        } else {
-            topCardIndex = this.cards.indexOf(this.topCard);
         }
 
         let renderableCardsCandidates;
 
-        if (this.cards.length == 1) {            
-            renderableCardsCandidates = this.cards.slice(0, 1);
-        }
-        else if (this.cards.length <= topCardIndex + 1) {
+        // Case 1: Initial Load
+        // Case 1a: Deck greater than 2.
+        if (this.cards.length >= 2) {
             renderableCardsCandidates = [
-                this.cards[topCardIndex],
-                this.cards[0]
-            ]
-        } else {
-            renderableCardsCandidates = this.cards.slice(topCardIndex, topCardIndex + 2);
-        }
-        
-        const nextCard = renderableCardsCandidates[renderableCardsCandidates.length - 1];
-
-        if (nextCard != this.topCard) {
-            this.nextCard = renderableCardsCandidates[renderableCardsCandidates.length - 1];
-        } else {
-            this.nextCard = undefined;
+                this.cards[this.slidingWindowIndex],
+                this.cards[(this.slidingWindowIndex + 1) % this.cards.length],
+            ];
+        } else if (this.cards.length == 1) {
+            renderableCardsCandidates = [
+                this.cards[this.slidingWindowIndex]
+            ];
         }
 
-        return renderableCardsCandidates.reduce((accumulator: Array<CardDataView>, card: CardData) => {
+        const renderableCards = renderableCardsCandidates.reduce((accumulator: Array<CardDataView>, card: CardData) => {
             const view = <CardDataView>card;
 
-            view.renderKey = this.keyCounter++;
+            view.renderKey = this.renderKey++;
 
             accumulator.unshift(view);
 
             return accumulator;
         }, []);
+
+        return renderableCards;
     }
 
     private swingConfig = {
@@ -137,34 +140,24 @@ export default class CardDeck extends Vue {
     }
 
     private _onCardSkipped() {
-        setTimeout(() => {
-            const skippedCard = this.renderableCards.pop();
-            const appendedCard = Object.assign({}, skippedCard, { renderKey: this.keyCounter++ });
-
-            setTimeout(() => {
-                this.renderableCards.unshift(appendedCard);
-            }, 50);
-        }, 50);
-
-        if (this.nextCard)
-            this.topCard = this.nextCard;
+        console.log("Incrementing _slidingWindowIndex");
+        this.slidingWindowIndexField = this.slidingWindowIndexField + 1;
     }
 
     private _onCardGuessed() {
-        const skippedCard = this.renderableCards.pop();
+        const selectedCard = this.renderableCards.pop();
 
-        if (this.nextCard) {
-            console.log("Setting top card");
-            this.topCard = this.nextCard;
-        } else {
-            console.log("DECK EMPTY!!!!")
+        if (this.cards.length == 0) {
+            console.log("CardDeck._onCardGuessed() - deck is empty");
+
             if(this.onDeckEmpty) {
                 this.onDeckEmpty();
             }
         }
 
-        if (this.onCardGuessed)
-            this.onCardGuessed(<CardData>skippedCard);
+        if (this.onCardGuessed) {
+            this.onCardGuessed(<CardData>selectedCard);
+        }
     }
 }
 </script>
