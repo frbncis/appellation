@@ -106,8 +106,8 @@ export default class CardDeck extends Vue {
         // Case 1a: Deck greater than 2.
         if (this.cards.length >= 2) {
             renderableCardsCandidates = [
-                this.cards[this.slidingWindowIndex],
                 this.cards[(this.slidingWindowIndex + 1) % this.cards.length],
+                this.cards[this.slidingWindowIndex],
             ];
         } else if (this.cards.length == 1) {
             renderableCardsCandidates = [
@@ -115,15 +115,13 @@ export default class CardDeck extends Vue {
             ];
         }
 
-        const renderableCards = renderableCardsCandidates.reduce((accumulator: Array<CardDataView>, card: CardData) => {
+        const renderableCards = renderableCardsCandidates.map((card: CardData) => {
             const view = <CardDataView>card;
 
             view.renderKey = this.renderKey++;
 
-            accumulator.unshift(view);
-
-            return accumulator;
-        }, []);
+            return view;
+        });
 
         return renderableCards;
     }
@@ -145,7 +143,7 @@ export default class CardDeck extends Vue {
     }
 
     private _onCardGuessed() {
-        const selectedCard = this.renderableCards.pop();
+        const selectedCard = this.renderableCards[this.renderableCards.length - 1];
 
         if (this.cards.length == 0) {
             console.log("CardDeck._onCardGuessed() - deck is empty");
@@ -156,6 +154,7 @@ export default class CardDeck extends Vue {
         }
 
         if (this.onCardGuessed) {
+            console.log("CardDeck._onCardGuess() - executing callback for onCardGuessed", selectedCard);
             this.onCardGuessed(<CardData>selectedCard);
         }
     }
