@@ -66,18 +66,18 @@
                 </p>
               </v-col>
             </v-row>
-
-            <v-flex>
-              <v-btn block @click="onSwitchTeamClick">Switch Team</v-btn>
-            </v-flex>
           </ul>
         </div>
       </v-layout>
 
       <v-layout
-        v-if="!isFinishedCardSelection"
+        v-if="shouldShowDeck"
         column align-center
       >
+        <div class="pb-5">
+          <h3>Choose {{ this.NUMBER_OF_CARDS_TO_SELECT - this.selectedCardIds.length }} cards</h3>
+        </div>
+          
         <v-flex 
           class="card-deck-container"
         >
@@ -95,6 +95,10 @@
         app
       >
         <v-flex>
+          <v-flex class="pb-4">
+            <v-btn block @click="onSwitchTeamClick">Switch Team</v-btn>
+          </v-flex>
+
           <v-btn :loading="isGameStarting" :dark="playersReady" :disabled="!playersReady" block @click="onStartGameClick">
             Start Game
           </v-btn>
@@ -128,11 +132,17 @@ import store, { storeHelpers } from '../store';
 export default class Setup extends Vue {
     @Prop() private roomId?: string | null;
 
+    private const NUMBER_OF_CARDS_TO_SELECT = 5;
+
     private roomIdTextField: string = '';
     
     private playerName: string = '';
 
     private isGameStarting: boolean = false;
+
+    private get shouldShowDeck() {
+      return !this.isFinishedCardSelection && this.player !== null && this.player.name;
+    }
 
     private get isFinishedCardSelection(): boolean {
         if (!this.phase) {
@@ -274,7 +284,7 @@ export default class Setup extends Vue {
     private async onCardSelected(selectedCard: CardData) {
         console.log("Card selected");
         
-        if (this.selectedCardIds.push(selectedCard.id) == 5) {
+        if (this.selectedCardIds.push(selectedCard.id) == this.NUMBER_OF_CARDS_TO_SELECT) {
             console.log("Done card selection.");
 
             await storeHelpers.submitSelectionCards(

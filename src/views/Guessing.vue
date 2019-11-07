@@ -32,7 +32,7 @@
         <v-footer
           app
         >
-          <Button v-if="showStartButton" text="Start" @click="onStartClick" />
+          <Button v-if="showStartButton" text="Start Round" @click="onStartClick" />
 
           <v-progress-linear
               v-else
@@ -41,7 +41,7 @@
       </div>
 
       <div v-else>
-        <h3>It's someone else's turn</h3>
+        <h3>Let's go {{ activePlayerId }}!</h3>
       </div>
     </v-content>
 
@@ -68,7 +68,9 @@ import { storeHelpers } from '../store';
   },
 })
 export default class Guessing extends Vue {
-  private activeTeam = 1;
+  private get activeTeam() {
+    return storeHelpers.room.data.currentTeamTurnId;
+  }
 
   private activeRound = 1;
 
@@ -82,10 +84,12 @@ export default class Guessing extends Vue {
     3: 'Just charades - sound effects are OK.',
   }
 
-  private scores: { [team: string]: number; } = {
-    1: 0,
-    2: 0,
-  };
+  private get scores() {
+    return {
+      1: storeHelpers.room.data.scoreTeam1,
+      2: storeHelpers.room.data.scoreTeam2,
+    };
+  }
 
   public startButtonPressed = false;
 
@@ -99,6 +103,10 @@ export default class Guessing extends Vue {
 
   public get isPlayerTurn() {
     return storeHelpers.room.data.currentPlayerId === storeHelpers.player.data.playerId;
+  }
+
+  public get activePlayerId() {
+    return storeHelpers.room.data.currentPlayerId
   }
 
   private created() {
@@ -163,6 +171,12 @@ export default class Guessing extends Vue {
     this.scores[this.activeTeam] += guessedCard.points;
 
     this.cards = this.cards.filter(card => card.id != guessedCard.id);
+
+    storeHelpers.room.setScores(this.scores);
+    
+    if (this.cards.length == 0) {
+      this.onDeckEmpty();
+    }
   }
 
   private onStartClick() {
@@ -173,7 +187,7 @@ export default class Guessing extends Vue {
     this.hasTimeRemaining = false;
 
     this.resetTurn();
-    this.setNextTeam();
+    storeHelpers.room.setNextPlayer();
   }
 
   private setNextTeam(setByLowestScore: boolean = false) {

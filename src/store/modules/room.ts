@@ -227,6 +227,7 @@ export class RoomModule extends FirestoreVuexModule {
 
     @Action
     public async setNextPlayer() {
+      console.log('RoomModule.setNextPlayer() - starting');
       const { previousPlayerId, currentPlayerId, currentTeamTurnId } = this.data;
 
       const nextTeamId = currentTeamTurnId === 1 ? 2 : 1;
@@ -247,6 +248,16 @@ export class RoomModule extends FirestoreVuexModule {
         previousPlayerId: currentPlayerId,
         currentPlayerId: nextPlayerId,
         currentTeamTurnId: nextTeamId,
+      });
+    }
+
+    @Action
+    public async setScores(payload: { 1: number, 2: number }) {
+      console.log('RoomModule.setScores() called', payload);
+      
+      return await this.document.update(<Partial<RoomStateCards>>{
+        scoreTeam1: payload[1],
+        scoreTeam2: payload[2],
       });
     }
 

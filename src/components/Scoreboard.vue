@@ -56,4 +56,9 @@ export default class Scoreboard extends Vue {
 .right-header {
     text-align: right;
 }
+
+.active-team {
+    font-weight: 700;
+    border-bottom-style: outset;
+}
 </style>
