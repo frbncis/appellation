@@ -254,7 +254,7 @@ export class RoomModule extends FirestoreVuexModule {
     @Action
     public async setScores(payload: { 1: number, 2: number }) {
       console.log('RoomModule.setScores() called', payload);
-      
+
       return await this.document.update(<Partial<RoomStateCards>>{
         scoreTeam1: payload[1],
         scoreTeam2: payload[2],
@@ -281,6 +281,13 @@ export class RoomModule extends FirestoreVuexModule {
 
       await update1;
       await update2;
+    }
+
+    @Action
+    public async setActiveDeck(cardIds: Array<number>) {
+      this.document.update({
+        activeRemainingCards: cardIds,
+      });
     }
 
     @Mutation

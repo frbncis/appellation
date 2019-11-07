@@ -62,6 +62,9 @@ export const storeHelpers = {
     console.log('Updating room data...');
     await this.room.update({ currentTeamTurnId: 1, currentPlayerId: firstPlayerId });
 
+    console.log('Setting cards to be played with');
+    await this.room.update({ activeRemainingCards: this.room.data.selectedCards });
+    
     console.log('Done updating room data...');
 
     // This need to fire last as the view transition is bound to this.

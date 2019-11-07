@@ -13,11 +13,11 @@
           </v-flex>
 
           <v-flex>
-            <v-btn block @click="onJoinGameClick">Join Game</v-btn>
+            <v-btn block :loading="joinGameClicked" :disabled="createGameClicked" @click="onJoinGameClick">Join Game</v-btn>
           </v-flex>
 
           <v-flex>
-            <v-btn block @click="onCreateGameClick">Create Game</v-btn>
+            <v-btn block :loading="createGameClicked" :disabled="joinGameClicked" @click="onCreateGameClick">Create Game</v-btn>
           </v-flex>
         </v-flex>
 
@@ -91,7 +91,7 @@
       </v-layout>
 
       <v-footer
-        v-else
+        v-if="isFinishedCardSelection && !shouldShowDeck"
         app
       >
         <v-flex>
@@ -139,6 +139,10 @@ export default class Setup extends Vue {
     private playerName: string = '';
 
     private isGameStarting: boolean = false;
+
+    private createGameClicked: boolean = false;
+
+    private joinGameClicked: boolean = false;
 
     private get shouldShowDeck() {
       return !this.isFinishedCardSelection && this.player !== null && this.player.name;
@@ -244,15 +248,19 @@ export default class Setup extends Vue {
     }
 
     public async onCreateGameClick() {
-        this.roomId = await storeHelpers.createGame();
-        this.$router.push(`/${this.roomId}`);
-        await storeHelpers.joinGame(this.roomId!);
+      this.createGameClicked = true;
+
+      this.roomId = await storeHelpers.createGame();
+      this.$router.push(`/${this.roomId}`);
+      await storeHelpers.joinGame(this.roomId!);
     }
 
     public async onJoinGameClick() {
-        if (this.roomIdTextField) {
-            this.$router.push(`/${this.roomIdTextField}`);
-        }
+      this.joinGameClicked = true;
+
+      if (this.roomIdTextField) {
+        this.$router.push(`/${this.roomIdTextField}`);
+      }
     }
 
     public async onSetPlayerNameClick() {

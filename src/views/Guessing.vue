@@ -155,6 +155,7 @@ export default class Guessing extends Vue {
     this.hasTimeRemaining = true;
 
     this.shuffle(this.cards);
+    storeHelpers.room.setPlayingDeck(this.cards);
   }
 
   private resetRound() {
