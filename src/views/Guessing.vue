@@ -3,7 +3,7 @@
       <Scoreboard
         :scores="scores"
         :activeTeam="activeTeam"
-        :isRoundActive="isRoundActive"
+        :isRoundActive="playerGuessesAllowed"
         :timerInitialValue="TIMER_START_VALUE"
         :timeRemainingSeconds="timeRemainingSeconds"
         @timerTick="onTimerTick"
@@ -14,7 +14,7 @@
           <v-layout
             column align-center
           >
-            <v-flex class="card-deck-container" v-if="isRoundActive">
+            <v-flex class="card-deck-container" v-if="playerGuessesAllowed">
               <CardDeck
                 :onCardGuessed="onCardGuessed"
                 :cards="cards"
@@ -73,11 +73,17 @@ import { storeHelpers } from '../store';
 })
 export default class Guessing extends Vue {
 
+  /**
+   * The maximum amount of time in seconds for a turn.
+   */
   private readonly TIMER_START_VALUE = 60;
 
+  /**
+   * The timer's current value.
+   */
   private timeRemainingSeconds = this.TIMER_START_VALUE;
 
-  public startButtonPressed = false;
+  public roundActive = false;
 
   private rounds = {
     1: 'Use any words, sounds, or gestures except the name itself.',
@@ -124,24 +130,16 @@ export default class Guessing extends Vue {
     return storeHelpers.room.data.currentPlayerId
   }
 
-  get isRoundActive(): boolean {
-    return this.startButtonPressed == true && this.hasTimeRemaining == true && this.cards.length > 0;
+  get playerGuessesAllowed(): boolean {
+    return this.roundActive == true && this.hasTimeRemaining == true && this.cards.length > 0;
   }
 
   get showStartButton(): boolean {
-    return !this.startButtonPressed;
+    return !this.roundActive;
   }
 
   get progress() {
     return this.cardsGuessed / this.cardsTotal * 100;
-  }
-
-  private onTimerTick() {
-    this.timeRemainingSeconds = this.timeRemainingSeconds - 1;
-
-    if (this.timeRemainingSeconds <= 0) {
-      this.endTurn();
-    }
   }
 
   private get cards() {
@@ -157,11 +155,22 @@ export default class Guessing extends Vue {
     return cards.filter(card => card !== null);
   }
 
-  private resetTurn() {
-    this.startButtonPressed = false;
+  private startTurn() {
+    this.roundActive = true;
     this.timeRemainingSeconds = this.TIMER_START_VALUE;
+  }
 
-    this.shuffle(this.cards);
+  private async endTurn() {
+    this.roundActive = false;
+    await storeHelpers.endTurn();
+  }
+
+  private onTimerTick() {
+    this.timeRemainingSeconds = this.timeRemainingSeconds - 1;
+
+    if (this.timeRemainingSeconds <= 0) {
+      this.endTurn();
+    }
   }
 
   private async onCardGuessed(guessedCard: any) {
@@ -177,15 +186,6 @@ export default class Guessing extends Vue {
     if (this.cards.length == 0) {
       await this.endTurn();
     }
-  }
-
-  private startTurn() {
-    this.startButtonPressed = true;
-    this.timeRemainingSeconds = this.TIMER_START_VALUE;
-  }
-
-  private async endTurn() {
-    await storeHelpers.endTurn()
   }
 
   /**
