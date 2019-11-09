@@ -4,8 +4,9 @@
         :scores="scores"
         :activeTeam="activeTeam"
         :isRoundActive="isRoundActive"
-        :timerStartValue="timerStartValue"
-        :onTimerEnded="onTimerEnded"
+        :timerInitialValue="TIMER_START_VALUE"
+        :timeRemainingSeconds="timeRemainingSeconds"
+        @timerTick="onTimerTick"
       />
 
       <div v-if="isPlayerTurn">
@@ -15,29 +16,32 @@
           >
             <v-flex class="card-deck-container" v-if="isRoundActive">
               <CardDeck
-                :onDeckEmpty="onDeckEmpty"
-                :onCardGuessed="onCardGuess"
+                :onCardGuessed="onCardGuessed"
                 :cards="cards"
                 class="card-deck"
               />
+
+              <v-footer
+                app
+              >
+                <v-progress-linear
+                  :value="progress" />
+              </v-footer>
             </v-flex>
 
             <v-flex v-else>
               <h1>Round {{ activeRound }}</h1>
               <h3>{{ rounds[activeRound] ? rounds[activeRound] : 'Make up your own rules.' }}</h3>
+
+              <v-footer
+                app
+              >
+                <Button text="Start Round" @click="startTurn" />
+              </v-footer>
             </v-flex>
           </v-layout>
         </v-container>
 
-        <v-footer
-          app
-        >
-          <Button v-if="showStartButton" text="Start Round" @click="onStartClick" />
-
-          <v-progress-linear
-              v-else
-              :value="progress" />
-        </v-footer>
       </div>
 
       <div v-else>
@@ -68,20 +72,33 @@ import { storeHelpers } from '../store';
   },
 })
 export default class Guessing extends Vue {
-  private get activeTeam() {
-    return storeHelpers.room.data.currentTeamTurnId;
-  }
 
-  private activeRound = 1;
+  private readonly TIMER_START_VALUE = 60;
 
-  private cardsGuessed = 0;
+  private timeRemainingSeconds = this.TIMER_START_VALUE;
 
-  private cardsTotal = 0;
+  public startButtonPressed = false;
 
   private rounds = {
     1: 'Use any words, sounds, or gestures except the name itself.',
     2: 'Use only one word.',
     3: 'Just charades - sound effects are OK.',
+  }
+
+  private get activeTeam() {
+    return storeHelpers.room.data.currentTeamTurnId;
+  }
+
+  private get activeRound() {
+    return storeHelpers.room.data.guessingPhaseRound;
+  }
+
+  private get cardsGuessed() {
+    return storeHelpers.room.data.selectedCards.length - storeHelpers.room.data.activeRemainingCards.length;
+  }
+
+  private get cardsTotal() {
+    return storeHelpers.room.data.selectedCards.length;
   }
 
   private get scores() {
@@ -91,15 +108,13 @@ export default class Guessing extends Vue {
     };
   }
 
-  public startButtonPressed = false;
+  private get hasTimeRemaining() {
+    return this.timeRemainingSeconds > 0;
+  }
 
-  private hasTimeRemaining = true;
-
-  private timerStartValue = 60;
-
-  public cardIds: Array<number> = storeHelpers.room.data.selectedCards;
-
-  private cards: Array<any> = [];
+  public get cardIds(): Array<number> {
+    return storeHelpers.room.data.activeRemainingCards;
+  }
 
   public get isPlayerTurn() {
     return storeHelpers.room.data.currentPlayerId === storeHelpers.player.data.playerId;
@@ -107,11 +122,6 @@ export default class Guessing extends Vue {
 
   public get activePlayerId() {
     return storeHelpers.room.data.currentPlayerId
-  }
-
-  private created() {
-    this.resetDeck();
-    this.shuffle(this.cards);
   }
 
   get isRoundActive(): boolean {
@@ -123,83 +133,59 @@ export default class Guessing extends Vue {
   }
 
   get progress() {
-    return (this.cardsGuessed) / this.cardsTotal * 100;
+    return this.cardsGuessed / this.cardsTotal * 100;
   }
 
-  private onDeckEmpty() {
-    console.log('Deck is empty, resetting for next round.');
-    setTimeout(() => {
-      this.resetRound();
-      this.resetTurn();
-    }, 300);
+  private onTimerTick() {
+    this.timeRemainingSeconds = this.timeRemainingSeconds - 1;
+
+    if (this.timeRemainingSeconds <= 0) {
+      this.endTurn();
+    }
   }
 
-  private resetDeck() {
+  private get cards() {
     const cardModels: Array<CardData> = (JSON.parse(JSON.stringify(Cards)) as Array<CardData>).map((cardModel, index) => ({
       id: index,
       ...cardModel,
     }));
 
-    this.cardIds.forEach((cardId) => {
-      this.cards.push(
-        cardModels[cardId],
-      );
+    const cards = storeHelpers.room.data.activeRemainingCards.map((cardId: number) => {
+      return cardModels[cardId];
     });
 
-    this.cardsGuessed = 0;
-    this.cardsTotal = this.cards.length;
+    return cards.filter(card => card !== null);
   }
 
   private resetTurn() {
     this.startButtonPressed = false;
-    this.hasTimeRemaining = true;
+    this.timeRemainingSeconds = this.TIMER_START_VALUE;
 
     this.shuffle(this.cards);
-    storeHelpers.room.setPlayingDeck(this.cards);
   }
 
-  private resetRound() {
-    this.activeRound++;
+  private async onCardGuessed(guessedCard: any) {
+    console.log("Guessing.onCardGuessed() called", guessedCard);
 
-    setTimeout(() => {
-      this.resetDeck();
-      this.setNextTeam(true);
-    }, 300);
-  }
+    console.log(`Guessing.onCardGuessed() - removing card ID ${guessedCard.id}`);
 
-  private onCardGuess(guessedCard: any) {
-    this.cardsGuessed++;
-    this.scores[this.activeTeam] += guessedCard.points;
+    await storeHelpers.room.setDrawDeck(this.cardIds.filter(cardId => cardId !== guessedCard.id));
 
-    this.cards = this.cards.filter(card => card.id != guessedCard.id);
+    console.log(`Guessing.onCardGuessed() - active deck update done.`, this.cardIds);
+    await storeHelpers.room.increaseScore({ teamId: this.activeTeam!, pointsEarned: guessedCard.points });
 
-    storeHelpers.room.setScores(this.scores);
-    
     if (this.cards.length == 0) {
-      this.onDeckEmpty();
+      await this.endTurn();
     }
   }
 
-  private onStartClick() {
+  private startTurn() {
     this.startButtonPressed = true;
+    this.timeRemainingSeconds = this.TIMER_START_VALUE;
   }
 
-  private onTimerEnded() {
-    this.hasTimeRemaining = false;
-
-    this.resetTurn();
-    storeHelpers.room.setNextPlayer();
-  }
-
-  private setNextTeam(setByLowestScore: boolean = false) {
-    if (setByLowestScore) {
-      const teams = Object.keys(this.scores);
-      const lowest = Math.min.apply(null, teams.map(team => this.scores[team]));
-
-      this.activeTeam = parseInt(teams.filter(y => this.scores[y] === lowest)[0]);
-    } else {
-      this.activeTeam = this.activeTeam == 1 ? 2 : 1;
-    }
+  private async endTurn() {
+    await storeHelpers.endTurn()
   }
 
   /**

@@ -10,8 +10,10 @@
         <div text-center class="team-game-header">
             <Timer
                 v-if="isRoundActive"
+                @tick="onTimerTick"
+                :timeRemainingSeconds="timeRemainingSeconds"
                 :timerRunning="isRoundActive"
-                :timerStartValue="timerStartValue"
+                :timerInitialValue="timerInitialValue"
                 :onTimerEnded="onTimerEnded"
             />
         </div>
@@ -41,9 +43,17 @@ export default class Scoreboard extends Vue {
 
     @Prop() private isRoundActive?: boolean;
 
-    @Prop() private timerStartValue?: number;
+    @Prop() private timerInitialValue?: number;
 
     @Prop() private onTimerEnded?: () => void;
+
+    @Prop() private timeRemainingSeconds?: number;
+
+    private timerKey: number = 0;
+
+    private onTimerTick() {
+        this.$emit('timerTick');
+    }
 }
 </script>
 

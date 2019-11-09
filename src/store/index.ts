@@ -74,14 +74,14 @@ export const storeHelpers = {
     });
   },
 
-  async endTurn(remainingCards: Array<number>, scoreTeam1: number, scoreTeam2: number) {
-    await this.room.update({ scoreTeam1, scoreTeam2 });
+  async endTurn() {
+    console.log("storeHelpers.endTurn() called");
 
-    if (remainingCards.length > 0) {
-      await this.room.update({ activeRemainingCards: remainingCards });
+    if (this.room.data.activeRemainingCards.length > 0) {
+      console.log('There are cards in the draw pile, setting next player.');
       await this.room.setNextPlayer();
     } else {
-      // No more cards! Time for a new round.
+      console.log('End of round.');
       await this.room.setNextRound();
     }
   },

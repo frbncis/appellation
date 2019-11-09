@@ -132,7 +132,7 @@ import store, { storeHelpers } from '../store';
 export default class Setup extends Vue {
     @Prop() private roomId?: string | null;
 
-    private const NUMBER_OF_CARDS_TO_SELECT = 5;
+    private NUMBER_OF_CARDS_TO_SELECT: number = 5;
 
     private roomIdTextField: string = '';
     

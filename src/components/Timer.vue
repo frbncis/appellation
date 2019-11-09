@@ -4,7 +4,7 @@
         size="60"
         width="4"
         rotate="-90"
-        :value="timeRemainingSeconds / timerStartValue * 100"
+        :value="timeRemainingSeconds / timerInitialValue * 100"
         :color="color" >
         {{ timeRemainingSeconds }}
     </v-progress-circular>
@@ -15,13 +15,13 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 @Component
 export default class Timer extends Vue {
-    private timeRemainingSeconds: number = 120;
+    @Prop() private timeRemainingSeconds: number;
 
     private timer?: number = undefined;
 
     private shouldScaleUp: boolean = true;
 
-    @Prop() private timerStartValue?: number;
+    @Prop() private timerInitialValue?: number;
 
     @Prop() private timerRunning?: boolean;
 
@@ -40,10 +40,6 @@ export default class Timer extends Vue {
       return 'primary';
     }
 
-    public beforeMount() {
-      if (this.timerStartValue) { this.timeRemainingSeconds = this.timerStartValue; }
-    }
-
     public mounted() {
       this.startTimer();
     }
@@ -52,34 +48,26 @@ export default class Timer extends Vue {
       this.stopTimer();
     }
 
-
-    // public beforeUpdate() {
-    //     if (this.timerRunning && this.timer) {
-    //         console.log("Starting timer");
-    //         this.startTimer();
-    //     } else if (!this.timerRunning && this.timer) {
-    //         this.stopTimer();
-    //     }
-    // }
-
     private startTimer() {
       this.timer = setInterval(this.updateTimer, 1000);
     }
 
     private updateTimer() {
-      this.timeRemainingSeconds--;
+      this.$emit('tick');
 
-      if (this.timeRemainingSeconds <= 10) {
-        this.shouldScaleUp = !this.shouldScaleUp;
+      if (this.timerRunning) {
+        if (this.timeRemainingSeconds <= 10) {
+          this.shouldScaleUp = !this.shouldScaleUp;
 
-        setTimeout(() => this.shouldScaleUp = !this.shouldScaleUp, 100);
-      }
+          setTimeout(() => this.shouldScaleUp = !this.shouldScaleUp, 100);
+        }
 
-      if (this.timeRemainingSeconds <= 0) {
-        this.stopTimer();
+        if (this.timeRemainingSeconds <= 0) {
+          this.stopTimer();
 
-        if (this.onTimerEnded) {
-          this.onTimerEnded();
+          if (this.onTimerEnded) {
+            this.onTimerEnded();
+          }
         }
       }
     }

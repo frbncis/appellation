@@ -70,8 +70,6 @@ export default class CardDeck extends Vue {
     
     @Prop() private onCardGuessed?: (card: CardData) => void;
     
-    @Prop() private onDeckEmpty?: () => void;
-
     @Prop() private cards?: Array<CardData>;
 
     private renderKey: number = 0;

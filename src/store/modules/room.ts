@@ -227,28 +227,43 @@ export class RoomModule extends FirestoreVuexModule {
 
     @Action
     public async setNextPlayer() {
-      console.log('RoomModule.setNextPlayer() - starting');
-      const { previousPlayerId, currentPlayerId, currentTeamTurnId } = this.data;
+      console.log('RoomModule.setNextPlayer() - called.');
 
-      const nextTeamId = currentTeamTurnId === 1 ? 2 : 1;
-      const nextTeamSequence = this.data.turnSequence[nextTeamId];
+      let turnData = {};
 
-      let nextPlayerId;
-
-      if (!previousPlayerId) {
-        nextPlayerId = nextTeamSequence[0];
+      if (this.data.players.length == 1) {
+        const currentPlayerId = this.data.currentPlayerId;
+        const currentPlayerTeamId = this.data.currentTeamTurnId;
+        turnData = {
+          previousPlayerId: currentPlayerId,
+          currentPlayerId: currentPlayerId,
+          currentTeamTurnId: currentPlayerTeamId,
+        }
       } else {
-        const previousPlayerIndex = nextTeamSequence.indexOf(previousPlayerId);
+        const { previousPlayerId, currentPlayerId, currentTeamTurnId } = this.data;
 
-        const nextPlayerIndex = (previousPlayerIndex + 1) % nextTeamSequence.length;
-        nextPlayerId = this.data.turnSequence[nextTeamId][nextPlayerIndex];
+        const nextTeamId = currentTeamTurnId === 1 ? 2 : 1;
+        const nextTeamSequence = this.data.turnSequence[nextTeamId];
+  
+        let nextPlayerId;
+  
+        if (!previousPlayerId) {
+          nextPlayerId = nextTeamSequence[0];
+        } else {
+          const previousPlayerIndex = nextTeamSequence.indexOf(previousPlayerId);
+  
+          const nextPlayerIndex = (previousPlayerIndex + 1) % nextTeamSequence.length;
+          nextPlayerId = this.data.turnSequence[nextTeamId][nextPlayerIndex];
+        }
+  
+        turnData = {
+          previousPlayerId: currentPlayerId,
+          currentPlayerId: nextPlayerId,
+          currentTeamTurnId: nextTeamId,
+        };
       }
-
-      return this.update({
-        previousPlayerId: currentPlayerId,
-        currentPlayerId: nextPlayerId,
-        currentTeamTurnId: nextTeamId,
-      });
+      
+      return this.update(turnData);
     }
 
     @Action
@@ -259,6 +274,21 @@ export class RoomModule extends FirestoreVuexModule {
         scoreTeam1: payload[1],
         scoreTeam2: payload[2],
       });
+    }
+
+    @Action
+    public async increaseScore(payload: { teamId: number, pointsEarned: number}) {
+      console.log('RoomModule.increaseScore() called.', payload);
+
+      if (payload.teamId === 1) {
+        return await this.document.update(<Partial<RoomStateCards>>{
+          scoreTeam1: this.data.scoreTeam1 + payload.pointsEarned,
+        });
+      } else {
+        return await this.document.update(<Partial<RoomStateCards>>{
+          scoreTeam2: this.data.scoreTeam2 + payload.pointsEarned,
+        });
+      }
     }
 
     /**
@@ -284,8 +314,10 @@ export class RoomModule extends FirestoreVuexModule {
     }
 
     @Action
-    public async setActiveDeck(cardIds: Array<number>) {
-      this.document.update({
+    public async setDrawDeck(cardIds: Array<number>) {
+      console.log("RoomModule.setDrawDeck() - Setting the active deck.", cardIds);
+
+      await this.document.update({
         activeRemainingCards: cardIds,
       });
     }
