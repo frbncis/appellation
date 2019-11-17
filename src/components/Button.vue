@@ -1,6 +1,5 @@
 <template>
     <v-btn
-        v-if="!startButtonPressed"
         @click="(event) => this.$emit('click', event)"
         block
         color="secondary"

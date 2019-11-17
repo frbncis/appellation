@@ -24,56 +24,65 @@
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import Setup from '@/views/Setup.vue';
 import Guessing from '@/views/Guessing.vue';
-import { mapState, mapActions, mapGetters } from 'vuex'
 import { GamePhase } from '@/components/KeyValueService';
+import { storeHelpers } from '@/store';
 
 @Component({
   components: {
     Setup,
     Guessing,
   },
-  computed: {
-    ...mapState({
-        phase: state => state.room.data.phase,
-        isBound: state => state.room.isBound,
-    }),
-  },
-methods: {
-    ...mapActions([
-        'joinGame',
-    ])
-  },
 })
 export default class Home extends Vue {
     @Prop() private roomId?: string | null;
 
+    public async created() {
+      await storeHelpers.loadUser();
 
-    public created() {
-        if (this.roomId) {
-            this.joinGame(this.roomId);
-        }
+      if (this.roomId) {
+        await storeHelpers.joinGame(this.roomId);
+      }
+    }
+
+    private get isJoined() {
+      if (storeHelpers.room.data.roomId == undefined) {
+        return false;
+      }
+      if (storeHelpers.player.playerId
+          // TODO: Add a isBound property on the document instead to directly
+          // check binding.
+          && storeHelpers.player.data.playerId == undefined
+          && storeHelpers.room.data.players.indexOf(storeHelpers.player.playerId) > -1
+      ) {
+        // fire and forget.
+        storeHelpers.becomePlayer(storeHelpers.room.data.roomId, storeHelpers.player.playerId);
+        return false;
+      } if (
+        storeHelpers.player.playerId
+          // TODO: Add a isBound property on the document instead to directly
+          // check binding.
+          && storeHelpers.player.data.playerId
+          && storeHelpers.room.data.players.indexOf(storeHelpers.player.playerId) > -1
+      ) {
+        return true;
+      }
+      return false;
     }
 
     private get isReady() {
-        if (this.roomId == undefined) {
-            return true;
-        }
-        else
-        {
-            if (this.isBound == false) {
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
+      if (this.roomId == undefined) {
+        return true;
+      }
+
+      return storeHelpers.room.data.isBound;
     }
+
     private get isSetup() {
-        return this.phase == GamePhase.Setup;
+      return storeHelpers.room.data.gamePhase == GamePhase.Setup;
     }
-    
+
     private get isGuessing() {
-        return this.phase == GamePhase.Guessing;
+      return storeHelpers.room.data.gamePhase === GamePhase.Guessing;
     }
 }
 </script>

@@ -26,13 +26,13 @@ export default class Selecting extends Vue {
   private cards: Array<any> = Cards;
 
   get isFinishedSelecting() {
-    return this.selectedCards.length == 1;
+    return this.selectedCards.length === 1;
   }
 
   private onCardSelected(selectedCard: any) {
     this.selectedCards.push(selectedCard);
 
-    this.cards = this.cards.filter(card => card.id != selectedCard.id);
+    this.cards = this.cards.filter(card => card.id !== selectedCard.id);
   }
 }
 </script>

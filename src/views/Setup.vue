@@ -1,71 +1,112 @@
 <template>
-    <v-content class="pb-0 viewport">
-      <v-container fluid>
-        <v-layout
-          column align-center
-        >
+  <v-content class="pb-0 viewport">
+    <v-container fluid>
+      <v-layout
+        column align-center
+      >
+        <v-flex v-if="roomId == undefined">
           <v-flex>
-            <div v-if="roomId == undefined">
-                <v-btn @click="onCreateGameClick">Create Game</v-btn>
-                <v-text-field
-                    v-model="roomIdTextField"
-                    label="Room ID"
-                    placeholder="asdfg"
-                />
-                <v-btn @click="onJoinGameClick">Join Game</v-btn>
-            </div>
-            <div v-else>
-                <p>Room: {{ roomId }}</p>
-            </div>
-
-            <div v-if="player.playerId == undefined && roomId != undefined">
-                <v-text-field
-                    v-model="playerName"
-                    label="Player Name"
-                    placeholder="Adam"
-                ></v-text-field>
-                <v-btn @click="onSetPlayerNameClick">Set Player Name</v-btn>
-            </div>
-            <div v-else>
-                <p>Player ID: {{ player.playerId }}</p>
-                <p>Player Name: {{ player.name }}</p>
-            </div>
-
-            <ul id="players">
-                <h2>Team 1</h2>
-                <li v-for="playerData in playersTeam1" :key="player.name">
-                    {{ playerData.player.name }}         {{ playerData.hasSubmittedCards ? 'Y': 'N' }}
-                </li>
-
-                <h2>Team 2</h2>
-                <li v-for="playerData in playersTeam2" :key="player.name">
-                    {{ playerData.player.name }}         {{ playerData.hasSubmittedCards ? 'Y': 'N' }}
-                </li>
-                <v-btn @click="onSwitchTeamClick">Switch Team</v-btn>
-            </ul>
-          </v-flex>
-        <v-container fluid >
-
-        <v-layout
-          column align-center
-        >
-          <v-flex class="card-deck-container">
-            <CardDeck
-              v-if="!isFinishedCardSelection"
-              :onDeckEmpty="onDeckEmpty"
-              :onCardGuessed="onCardSelected"
-              :cards="cards"
-              class="card-deck"
+            <v-text-field
+              v-model="roomIdTextField"
+              label="Room ID"
+              type="number"
             />
-            <h1 v-else-if="!playersReady">Waiting to start game</h1>
-            <v-btn v-else @click="onStartGameClick">Start Game</v-btn>
           </v-flex>
 
-        </v-layout>
-      </v-container>
-        </v-layout>
-      </v-container>
-    </v-content>
+          <v-flex>
+            <v-btn block :loading="joinGameClicked" :disabled="createGameClicked" @click="onJoinGameClick">Join Game</v-btn>
+          </v-flex>
+
+          <v-flex>
+            <v-btn block :loading="createGameClicked" :disabled="joinGameClicked" @click="onCreateGameClick">Create Game</v-btn>
+          </v-flex>
+        </v-flex>
+
+        <v-flex v-else align-center>
+          <p>Room {{ roomId }}</p>
+        </v-flex>
+      </v-layout>
+
+      <v-layout
+        column align-center
+      >
+        <v-flex
+          v-if="player.playerId !== undefined && roomId !== undefined && player.name == null"
+        >
+          <v-text-field
+            v-model="playerName"
+            label="Player Name"
+            placeholder="Adam"
+          />
+
+          <v-btn @click="onSetPlayerNameClick">Set Player Name</v-btn>
+        </v-flex>
+
+        <div v-if="isFinishedCardSelection">
+          <ul id="players" v-if="player.playerId !== undefined && roomId !== undefined">
+            <v-row>
+              <v-col>
+                <h2>Team 1</h2>
+                <p
+                  v-for="playerData in playersTeam1"
+                  :key="playerData.name"
+                  :class="{ playerReady: playerData.hasSubmittedCards, playerWaiting: !playerData.hasSubmittedCards }"
+                >
+                  {{ playerData.player.name }}
+                </p>
+              </v-col>
+
+              <v-col>
+                <h2>Team 2</h2>
+                <p
+                  v-for="playerData in playersTeam2"
+                  :key="playerData.name"
+                  :class="{ playerReady: playerData.hasSubmittedCards, playerWaiting: !playerData.hasSubmittedCards }"
+                >
+                  {{ playerData.player.name }}
+                </p>
+              </v-col>
+            </v-row>
+          </ul>
+        </div>
+      </v-layout>
+
+      <v-layout
+        v-if="shouldShowDeck"
+        column align-center
+      >
+        <div class="pb-5">
+          <h3>Choose {{ this.NUMBER_OF_CARDS_TO_SELECT - this.selectedCardIds.length }} cards</h3>
+        </div>
+          
+        <v-flex 
+          class="card-deck-container"
+        >
+          <CardDeck
+            :onDeckEmpty="onDeckEmpty"
+            :onCardGuessed="onCardSelected"
+            :cards="cards"
+            class="card-deck"
+          />
+        </v-flex>
+      </v-layout>
+
+      <v-footer
+        v-if="isFinishedCardSelection && !shouldShowDeck"
+        app
+      >
+        <v-flex>
+          <v-flex class="pb-4">
+            <v-btn block @click="onSwitchTeamClick">Switch Team</v-btn>
+          </v-flex>
+
+          <v-btn :loading="isGameStarting" :dark="playersReady" :disabled="!playersReady" block @click="onStartGameClick">
+            Start Game
+          </v-btn>
+        </v-flex>
+      </v-footer>
+    </v-container>
+  </v-content>
 </template>
 
 <script lang="ts">
@@ -78,48 +119,59 @@ import Footer from '@/components/Footer.vue';
 import Scoreboard from '@/components/Scoreboard.vue';
 import { db } from  '@/components/Firestore.ts';
 
-import {collections, KeyValueService, PlayerData } from '@/components/KeyValueService.ts';
+import {collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService.ts';
 
 import { mapState, mapActions, mapGetters } from 'vuex'
-import player,{ PlayerDeck } from '@/store/modules/player';
+import { PlayerDeck } from '@/store/modules/player';
+import store, { storeHelpers } from '../store';
 
 @Component({
   components: {
     CardDeck,
   },
-  computed: {
-    ...mapState({
-        deckSelection: state => state.player.decks.selection,
-        phase: state => state.phase,
-        player: state => state.player,
-    }),
-  },
-  methods: {
-    ...mapActions('room', [
-        'bindRoomRef',
-    ]),
-    ...mapActions('player', [
-        'switchTeam',
-    ]),
-    ...mapActions([
-        'createGame',
-        'joinGame',
-        'startGame',
-        'createPlayer',
-        'becomePlayer',
-        'drawSelectionCards',
-        'submitSelectionCards'
-    ])
-  },
 })
 export default class Setup extends Vue {
     @Prop() private roomId?: string | null;
+
+    private NUMBER_OF_CARDS_TO_SELECT: number = 5;
 
     private roomIdTextField: string = '';
     
     private playerName: string = '';
 
-    private isFinishedCardSelection: boolean = false;
+    private isGameStarting: boolean = false;
+
+    private createGameClicked: boolean = false;
+
+    private joinGameClicked: boolean = false;
+
+    private get shouldShowDeck() {
+      return !this.isFinishedCardSelection && this.player !== null && this.player.name;
+    }
+
+    private get isFinishedCardSelection(): boolean {
+        if (!this.phase) {
+            return false;
+        }
+
+        const playerData = this.phase.find(playerPhaseData => playerPhaseData.playerId == this.player.playerId);
+
+        if(!playerData) {
+            return false;
+        }
+
+        return playerData.hasSubmittedCards;
+    }
+
+    private get phase(): Array<SetupPhaseData> {
+        return storeHelpers.room.phase;
+    }
+
+    private get player() {
+        return storeHelpers.player.data;
+    }
+
+    private switchTeam = storeHelpers.player.switchTeam;
 
     private get playersTeam1(): Array<any> {
         return this.playersByTeam(1);
@@ -157,18 +209,36 @@ export default class Setup extends Vue {
         return this.phase.filter(playerPhaseData => playerPhaseData.hasSubmittedCards).length == this.phase.length;
     }
 
-    private get cards(): Array<any> {
-        let allCards = <Array<CardData>>JSON.parse(JSON.stringify(Cards));
+    private allCards = <Array<CardData>>JSON.parse(JSON.stringify(Cards));
 
-        allCards = allCards.map((card, index) => {
+    private get cards(): Array<any> {
+
+        const cardKeyedById = this.allCards.map((card, index) => {
             return {
                 id: index,
                 ...card
             };
         });
         
-        const candidateCards = allCards.filter((card: CardData) => this.deckSelection.includes(card.id) && !this.selectedCardIds.includes(card.id));
+        const candidateCards = cardKeyedById.filter((card: CardData) => {
+            // console.log("Setup.cards() - filtering card ID " + card.id);
+
+            if (storeHelpers.player.data.decks.selection.includes(card.id)) {
+                // console.log(`Setup.cards() - player has card ID ${card.id} in selection deck`);
+
+                if (this.selectedCardIds.includes(card.id)) {
+                    // console.log(`Setup.cards() - player has already selected card ID ${card.id}, skipping`);
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        });
         
+        console.log(`Setup.cards() - returning ${candidateCards.length} cards.`);
+
         return candidateCards;
     }
 
@@ -179,23 +249,32 @@ export default class Setup extends Vue {
     }
 
     public async onCreateGameClick() {
-        this.roomId = await this.createGame();
+      this.createGameClicked = true;
 
-        this.$router.push(`/${this.roomId}`);
-        this.joinGame(this.roomId);
+      this.roomId = await storeHelpers.createGame();
+      this.$router.push(`/${this.roomId}`);
+      await storeHelpers.joinGame(this.roomId!);
     }
 
     public async onJoinGameClick() {
-        if (this.roomIdTextField) {
-            this.$router.push(`/${this.roomIdTextField}`);
-        }
+      this.joinGameClicked = true;
+
+      if (this.roomIdTextField) {
+        this.$router.push(`/${this.roomIdTextField}`);
+      }
     }
 
     public async onSetPlayerNameClick() {
-        if (this.roomId) {
-            const playerId = await this.createPlayer({ roomId: this.roomId, playerName: this.playerName });
-            await this.becomePlayer({ roomId: this.roomId, playerId });
-            this.drawSelectionCards();
+        if (this.roomId && this.playerName != '') {
+            const playerId = await storeHelpers.createPlayer(
+                this.roomId,
+                this.playerName
+            );
+
+            await storeHelpers.becomePlayer(this.roomId, playerId);
+
+            await storeHelpers.drawSelectionCards();
+            
         } else {
             throw new Error("No room ID")
         }
@@ -206,15 +285,20 @@ export default class Setup extends Vue {
     }
 
     public async onStartGameClick() {
-        await this.startGame();
+        console.log('Start game button clicked.');
+        this.isGameStarting = true;
+        await storeHelpers.startGame();
     }
 
     private async onCardSelected(selectedCard: CardData) {
-        if (this.selectedCardIds.push(selectedCard.id) == 2) {
+        console.log("Card selected");
+        
+        if (this.selectedCardIds.push(selectedCard.id) == this.NUMBER_OF_CARDS_TO_SELECT) {
             console.log("Done card selection.");
-            this.isFinishedCardSelection = true;
 
-            await this.submitSelectionCards(this.selectedCardIds);
+            await storeHelpers.submitSelectionCards(
+                this.selectedCardIds
+            );
         }
     }
 }
@@ -225,6 +309,14 @@ export default class Setup extends Vue {
   position: fixed;
   height: 100%;
   width: 100%;
+}
+
+.playerReady {
+  font-weight: 900;
+}
+
+.playerWaiting {
+  font-weight: 100;
 }
 
 .card-deck {

@@ -12,6 +12,15 @@ module.exports = {
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
   },
+  overrides: [
+    {
+      files: '**/*.ts',
+      rules: {
+        'no-useless-constructor': 'off',
+        '@typescript-eslint/no-useless-constructor': 'error',
+      },
+    },
+  ],
   parserOptions: {
     parser: '@typescript-eslint/parser',
   },

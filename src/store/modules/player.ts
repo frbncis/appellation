@@ -1,116 +1,153 @@
-import { PlayerData, collections, GamePhase } from "@/components/KeyValueService";
-import { firestoreAction } from 'vuexfire'
-import { db } from '@/components/Firestore';
+import {
+  Module, VuexModule, Action, Mutation,
+} from 'vuex-module-decorators';
+import firebase from 'firebase';
+import { collections, GamePhase } from '@/components/KeyValueService';
+import { FirestoreAction, FirestoreVuexModule } from './FirebaseAction';
+import { RoomState } from './room';
 
-export enum PlayerDeck {
-    selection
+export interface PlayerDeck {
+    selection: Array<number>,
 }
 
-const state = {
-    playerId: undefined,
-    name: undefined,
-    roomId: undefined,
-    room: undefined,
+export interface PlayerState {
+  playerId: string | null,
+  name: string | null,
+  roomId: string | null,
+  room?: RoomState,
+  teamId: number,
+  decks: PlayerDeck
+}
+
+
+@Module({ name: PlayerModule.ModuleName, namespaced: true })
+export class PlayerModule extends FirestoreVuexModule {
+  static ModuleName: string = 'player';
+
+  public data: PlayerState = {
+    playerId: null,
+    name: null,
+    roomId: null,
+    room: new RoomState(),
     teamId: -1,
     decks: {
-        selection: new Array<number>(),
-    }
-}
-
-const actions = {
-    createPlayer: firestoreAction(async (context, { roomId, playerName }) => {
-        console.log(`player.createPlayer() Creating player for ${playerName} in ${roomId}`);
-        let team1PlayerCount = 0;
-        let team2PlayerCount = 0;
-
-        (await collections.players(roomId).get()).forEach(async (p) => {
-            const teamId = p.get('teamId');
-
-            if (teamId == 1) {
-                team1PlayerCount++;
-            } else {
-                team2PlayerCount++;
-            }
-        });
-
-        const assignedTeamId = team1PlayerCount < team2PlayerCount ? 1 : 2;
-
-        const playerDocument = collections.player(roomId, undefined);
-
-        const player = {
-            playerId: playerDocument.id,
-            name: playerName,
-            roomId: roomId,
-            room: collections.room(roomId),
-            teamId: assignedTeamId,
-            decks: {
-                selection: new Array<number>(),
-            },
-        }
-       
-        await playerDocument.set(player);
-
-        return playerDocument.id;
-    }),
-    addToDeck: firestoreAction(async ({ state }, {cards, deck}) => {
-        console.log(`player.addToDeck(): Adding to deck '${deck}'`, cards);
-
-        const roomId = state.roomId;
-        const playerId = state.playerId;
-
-        const newDeck = state.decks[deck].concat(cards);
-        const allDecks = Object.assign({}, state.decks, { [deck]: newDeck })
-
-        const player = collections.player(roomId, playerId);
-
-        return player.update({ decks: allDecks })
-    }),
-    switchTeam: async (context) => {
-        const currentTeamId = context.state.teamId;
-
-        const newTeamId = currentTeamId == 1 ? 2 : 1;
-
-        return collections.player(
-            context.state.roomId,
-            context.state.playerId,
-        ).update({ teamId: newTeamId });
+      selection: [],
     },
-    submitSelectionCards: async (context) => {
-        const roomId = context.state.roomId;
-        const playerId = context.state.playerId;
+  };
 
-        console.log(`Submitting selection cards for player ${playerId} in room ${roomId}`)
+  @FirestoreAction
+  public async bindReference(payload: { roomId: string, playerId: string }) {
+    const { bindFirestoreRef } = this.context;
 
-        const phaseData = collections.phase(roomId, GamePhase.Setup.toString()).doc(playerId);
+    await bindFirestoreRef('data', collections.player(payload.roomId, payload.playerId));
+  }
 
-        return phaseData.update({ hasSubmittedCards: true });
-    },
-    ensureCurrentPhaseDataExists: async (context, { roomId, playerId, phase }) => {
-        // TODO: This should do a check to see if the data actually exists before writing to it
-        // since this does a full replace.
-        if (phase == GamePhase.Setup) {
-            await collections.phase(
-                roomId,
-                GamePhase.Setup.toString(),
-            ).doc(playerId).set({
-                playerId,
-                player: collections.player(roomId, playerId),
-                hasSubmittedCards: false 
-            });
-        }
+  @Action
+  public async createPlayer(payload: { roomId: string, playerName: string}) {
+    const { roomId, playerName } = payload;
+
+    console.log(`player.createPlayer() Creating player named ${playerName} in ${roomId} with player ID ${this.data.playerId}`);
+    let team1PlayerCount = 0;
+    let team2PlayerCount = 0;
+
+    (await collections.players(roomId).get()).forEach(async (p) => {
+      const teamId = p.get('teamId');
+
+      if (teamId == 1) {
+        team1PlayerCount++;
+      } else {
+        team2PlayerCount++;
+      }
+    });
+
+    let assignedTeamId;
+
+    if (team1PlayerCount == 0 && team2PlayerCount == 0) {
+      assignedTeamId = 1;
+    } else {
+      assignedTeamId = team1PlayerCount < team2PlayerCount ? 1 : 2;
     }
-}
 
-const mutations = {
-    setRoomId (state: any, id: number) {
-        state.id = id;
+    const playerDocument = collections.player(roomId, this.data.playerId);
+
+    const player: PlayerState = {
+      playerId: this.data.playerId,
+      name: playerName,
+      roomId,
+      room: <any>collections.room(roomId),
+      teamId: assignedTeamId,
+      decks: {
+        selection: [],
+      },
+    };
+
+    await playerDocument.set(player);
+
+    return playerDocument.id;
+  }
+
+  /**
+   * Add cards to a deck.
+   *
+   * @param cards Array of the card IDs to add to the deck
+   * @param deck Name of the deck to add to.
+   */
+  @Action
+  public async addToDeck(payload: { cards: Array<number>, deck: keyof PlayerDeck }) {
+    const { cards, deck } = payload;
+
+    console.log(`player.addToDeck(): Adding to deck ${deck}`, cards);
+
+    const { roomId, playerId } = this.data;
+
+    return collections.player(roomId!, playerId).update({
+      decks: {
+        [deck]: firebase.firestore.FieldValue.arrayUnion(...cards),
+      },
+    });
+  }
+
+  @Action
+  public async switchTeam() {
+    const currentTeamId = this.data.teamId;
+
+    const newTeamId = currentTeamId == 1 ? 2 : 1;
+
+    return collections.player(
+      this.data.roomId!,
+      this.data.playerId,
+    ).update({ teamId: newTeamId });
+  }
+
+  @Action
+  public async submitSelectionCards() {
+    const { roomId, playerId } = this.data;
+
+    console.log(`Submitting selection cards for player ${playerId} in room ${roomId}`);
+
+    const phaseData = collections.phase(roomId!, GamePhase.Setup).doc(playerId);
+
+    return phaseData.update({ hasSubmittedCards: true });
+  }
+
+  @Action
+  public async ensureCurrentPhaseDataExists(payload: { roomId: string, playerId: string, phase: GamePhase }) {
+    // TODO: This should do a check to see if the data actually exists before writing to it
+    // since this does a full replace.
+    if (payload.phase == GamePhase.Setup) {
+      await collections.phase(
+        payload.roomId,
+        GamePhase.Setup,
+      ).doc(payload.playerId).set({
+        playerId: payload.playerId,
+        player: collections.player(payload.roomId, payload.playerId),
+        hasSubmittedCards: false,
+      });
     }
-}
+  }
 
-export default {
-    namespaced: true,
-    state,
-    actions,
-    getters: {},
-    mutations
+  @Mutation
+  public setPlayerId(playerId: string) {
+    this.data.playerId = playerId;
+  }
 }
