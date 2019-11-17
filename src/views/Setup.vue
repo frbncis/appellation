@@ -9,6 +9,7 @@
             <v-text-field
               v-model="roomIdTextField"
               label="Room ID"
+              type="number"
             />
           </v-flex>
 
