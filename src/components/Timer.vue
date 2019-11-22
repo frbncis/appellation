@@ -15,7 +15,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 @Component
 export default class Timer extends Vue {
-    @Prop() private timeRemainingSeconds: number;
+    @Prop() private timeRemainingSeconds?: number;
 
     private timer?: number = undefined;
 
@@ -32,9 +32,9 @@ export default class Timer extends Vue {
     }
 
     get color() {
-      if (this.timeRemainingSeconds < 10) {
+      if (this.timeRemainingSeconds! < 10) {
         return 'error';
-      } if (this.timeRemainingSeconds < 20) {
+      } if (this.timeRemainingSeconds! < 20) {
         return 'warning';
       }
       return 'primary';
@@ -56,13 +56,13 @@ export default class Timer extends Vue {
       this.$emit('tick');
 
       if (this.timerRunning) {
-        if (this.timeRemainingSeconds <= 10) {
+        if (this.timeRemainingSeconds! <= 10) {
           this.shouldScaleUp = !this.shouldScaleUp;
 
           setTimeout(() => this.shouldScaleUp = !this.shouldScaleUp, 100);
         }
 
-        if (this.timeRemainingSeconds <= 0) {
+        if (this.timeRemainingSeconds! <= 0) {
           this.stopTimer();
 
           if (this.onTimerEnded) {

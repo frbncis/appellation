@@ -48,21 +48,21 @@ export default class Home extends Vue {
       if (storeHelpers.room.data.roomId == undefined) {
         return false;
       }
-      if (storeHelpers.player.playerId
+      if (storeHelpers.player.data.playerId
           // TODO: Add a isBound property on the document instead to directly
           // check binding.
           && storeHelpers.player.data.playerId == undefined
-          && storeHelpers.room.data.players.indexOf(storeHelpers.player.playerId) > -1
+          && storeHelpers.room.data.players.indexOf(storeHelpers.player.data.playerId) > -1
       ) {
         // fire and forget.
-        storeHelpers.becomePlayer(storeHelpers.room.data.roomId, storeHelpers.player.playerId);
+        storeHelpers.becomePlayer(storeHelpers.room.data.roomId, storeHelpers.player.data.playerId);
         return false;
       } if (
-        storeHelpers.player.playerId
+        storeHelpers.player.data.playerId
           // TODO: Add a isBound property on the document instead to directly
           // check binding.
           && storeHelpers.player.data.playerId
-          && storeHelpers.room.data.players.indexOf(storeHelpers.player.playerId) > -1
+          && storeHelpers.room.data.players.indexOf(storeHelpers.player.data.playerId) > -1
       ) {
         return true;
       }

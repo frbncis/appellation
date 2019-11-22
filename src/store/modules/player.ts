@@ -68,7 +68,7 @@ export class PlayerModule extends FirestoreVuexModule {
       assignedTeamId = team1PlayerCount < team2PlayerCount ? 1 : 2;
     }
 
-    const playerDocument = collections.player(roomId, this.data.playerId);
+    const playerDocument = collections.player(roomId, this.data.playerId!);
 
     const player: PlayerState = {
       playerId: this.data.playerId,
@@ -100,7 +100,7 @@ export class PlayerModule extends FirestoreVuexModule {
 
     const { roomId, playerId } = this.data;
 
-    return collections.player(roomId!, playerId).update({
+    return collections.player(roomId!, playerId!).update({
       decks: {
         [deck]: firebase.firestore.FieldValue.arrayUnion(...cards),
       },
@@ -115,7 +115,7 @@ export class PlayerModule extends FirestoreVuexModule {
 
     return collections.player(
       this.data.roomId!,
-      this.data.playerId,
+      this.data.playerId!,
     ).update({ teamId: newTeamId });
   }
 
@@ -125,7 +125,7 @@ export class PlayerModule extends FirestoreVuexModule {
 
     console.log(`Submitting selection cards for player ${playerId} in room ${roomId}`);
 
-    const phaseData = collections.phase(roomId!, GamePhase.Setup).doc(playerId);
+    const phaseData = collections.phase(roomId!, GamePhase.Setup).doc(playerId!);
 
     return phaseData.update({ hasSubmittedCards: true });
   }

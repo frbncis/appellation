@@ -87,7 +87,7 @@ export default class CardDeck extends Vue {
      * Index of the top card being rendered.
      */
     public get slidingWindowIndex(): number {
-        return this.slidingWindowIndexField % this.cards.length;
+        return this.slidingWindowIndexField % this.cards!.length;
     }
 
     get renderableCards(): Array<CardDataView> {
@@ -98,7 +98,7 @@ export default class CardDeck extends Vue {
             return [];
         }
 
-        let renderableCardsCandidates;
+        let renderableCardsCandidates: Array<CardData> = [];
 
         // Case 1: Initial Load
         // Case 1a: Deck greater than 2.
