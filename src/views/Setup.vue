@@ -36,7 +36,7 @@
           <v-text-field
             v-model="playerName"
             label="Player Name"
-            placeholder="Adam"
+            placeholder="Enter Your Name"
           />
 
           <v-btn @click="onSetPlayerNameClick">Set Player Name</v-btn>

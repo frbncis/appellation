@@ -45,7 +45,7 @@
       </div>
 
       <div v-else>
-        <h3>Let's go {{ activePlayerId }}!</h3>
+        <h3>Let's go {{ activePlayerName }}!</h3>
       </div>
     </v-content>
 
@@ -126,8 +126,11 @@ export default class Guessing extends Vue {
     return storeHelpers.room.data.currentPlayerId === storeHelpers.player.data.playerId;
   }
 
-  public get activePlayerId() {
-    return storeHelpers.room.data.currentPlayerId
+  public get activePlayerName() {
+    if (storeHelpers.room.currentPlayer)
+      return storeHelpers.room.currentPlayer.name;
+    else
+      return '';
   }
 
   get playerGuessesAllowed(): boolean {

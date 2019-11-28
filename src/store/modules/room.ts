@@ -6,6 +6,7 @@ import { db } from '@/components/Firestore';
 import './firebaseExtensions';
 import { FirestoreAction, FirestoreVuexModule } from './FirebaseAction';
 import firebase from 'firebase';
+import { PlayerState } from './player';
 
 export const getRandomIntInclusive = (min: number, max: number) => {
   min = Math.ceil(min);
@@ -37,6 +38,8 @@ export class RoomState extends RoomStateCards {
     public currentTeamTurnId?: number = -1;
 
     public currentPlayerId?: string = '';
+
+    public currentPlayerName?: string = '';
 
     public previousPlayerId?: string = '';
 
@@ -79,7 +82,16 @@ export class RoomModule extends FirestoreVuexModule {
      */
     public phase: Array<any> = [];
 
-    private _documentCached?: firebase.firestore.DocumentReference = undefined;
+    public currentPlayer?: PlayerState = {
+      playerId: null,
+      name: null,
+      roomId: null,
+      room: new RoomState(),
+      teamId: -1,
+      decks: {
+        selection: [],
+      },
+    };
 
     private get document() {
       if (!this.data.roomId) {
@@ -102,6 +114,19 @@ export class RoomModule extends FirestoreVuexModule {
 
       const roomDocument = db.collection('rooms').doc(roomId);
       await bindFirestoreRef('data', roomDocument);
+
+      await this.bindCurrentPlayerReference(this.data.currentPlayerId!);
+    }
+
+    @FirestoreAction
+    public bindCurrentPlayerReference(playerId: string) {
+      console.log('Binding current player reference', playerId);
+
+      const { bindFirestoreRef } = this.context;
+
+      const currentPlayerDocument = collections.player(this.data.roomId!, playerId);
+
+      return bindFirestoreRef('currentPlayer', currentPlayerDocument);
     }
 
     @FirestoreAction
@@ -229,15 +254,15 @@ export class RoomModule extends FirestoreVuexModule {
     public async setNextPlayer() {
       console.log('RoomModule.setNextPlayer() - called.');
 
-      let turnData = {};
+      let turnData: { previousPlayerId: string, currentPlayerId: string, currentTeamTurnId: number } | null = null;
 
       if (this.data.players.length == 1) {
         const currentPlayerId = this.data.currentPlayerId;
         const currentPlayerTeamId = this.data.currentTeamTurnId;
         turnData = {
-          previousPlayerId: currentPlayerId,
-          currentPlayerId: currentPlayerId,
-          currentTeamTurnId: currentPlayerTeamId,
+          previousPlayerId: currentPlayerId!,
+          currentPlayerId: currentPlayerId!,
+          currentTeamTurnId: currentPlayerTeamId!,
         }
       } else {
         const { previousPlayerId, currentPlayerId, currentTeamTurnId } = this.data;
@@ -257,13 +282,15 @@ export class RoomModule extends FirestoreVuexModule {
         }
   
         turnData = {
-          previousPlayerId: currentPlayerId,
+          previousPlayerId: currentPlayerId!,
           currentPlayerId: nextPlayerId,
           currentTeamTurnId: nextTeamId,
         };
       }
       
-      return this.update(turnData);
+      await this.update(turnData);
+
+      return await this.bindCurrentPlayerReference(turnData.currentPlayerId);
     }
 
     @Action
