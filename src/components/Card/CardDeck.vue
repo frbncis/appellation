@@ -1,7 +1,7 @@
 <template>
     <vue-swing
-            @throwoutright="_onCardSkipped"
-            @throwoutleft="_onCardGuessed"
+            @throwoutright="_onCardGuessed"
+            @throwoutleft="_onCardSkipped"
             :config="swingConfig"
             ref="stack"
             v-if="renderableCards"
