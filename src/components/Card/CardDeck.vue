@@ -1,50 +1,58 @@
 <template>
     <vue-swing
-            @throwoutright="_onCardGuessed"
-            @throwoutleft="_onCardSkipped"
-            :config="swingConfig"
-            ref="stack"
-            v-if="renderableCards"
+      @throwoutright="_onCardGuessed"
+      @throwoutleft="_onCardSkipped"
+      :config="swingConfig"
+      ref="stack"
+      v-if="renderableCards"
+      @dragmove="onCardMoved"
+      @dragend="onCardMovementStopped"
+    >
+      <div
+        v-for="card in renderableCards"
+        :key="card.renderKey"
+        class="card"
+      >
+        <v-layout
+          fill-height
+          column
+          text-center
         >
-        <div
-            v-for="card in renderableCards" :key="card.renderKey" class="card"
-        >
-            <v-layout fill-height column text-center>
-                <v-flex class="card-details">
-                    <h1 class="card-title">
-                        {{ card.title }}
-                    </h1>
+          <v-flex class="card-details">
+            <h1 class="card-title">
+              {{ card.title }}
+            </h1>
 
-                    <p class="card-description">
-                        {{ card.description }}
-                    </p>
-                </v-flex>
+            <p class="card-description">
+              {{ card.description }}
+            </p>
+          </v-flex>
 
-                <v-flex class="card-meta"
-                    :class="{
-                        'points-1': card.points == 1,
-                        'points-2': card.points == 2,
-                        'points-3': card.points == 3,
-                        'points-4': card.points == 4,
-                    }"
-                >
-                    <h2 class="card-category">
-                        {{ card.category }}
-                    </h2>
+          <v-flex class="card-meta"
+            :class="{
+              'points-1': card.points == 1,
+              'points-2': card.points == 2,
+              'points-3': card.points == 3,
+              'points-4': card.points == 4,
+            }"
+          >
+            <h2 class="card-category">
+              {{ card.category }}
+            </h2>
 
-                    <div class="semicircle" />             
-
-                    <v-flex class="card-points-container-shape">
-                        <h3>{{ card.points }}</h3>
-                        <p class="points-text">Points</p>
-                    </v-flex>
-                </v-flex>
-            </v-layout>
-        </div>
+            <div class="semicircle" />             
+              <v-flex class="card-points-container-shape">
+                <h3>{{ card.points }}</h3>
+                <p class="points-text">Points</p>
+              </v-flex>
+            </v-flex>
+        </v-layout>
+      </div>
     </vue-swing>
 </template>
 
 <script lang="ts">
+import VNode from 'vue';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import VueSwing from 'vue-swing';
 
@@ -78,6 +86,8 @@ export default class CardDeck extends Vue {
 
     private nextCard?: CardData;
 
+    private cardMovementState = {}
+
     /**
      * Backing field for the getter slidingWindowIndex
      */
@@ -87,7 +97,45 @@ export default class CardDeck extends Vue {
      * Index of the top card being rendered.
      */
     public get slidingWindowIndex(): number {
-        return this.slidingWindowIndexField % this.cards!.length;
+      return this.slidingWindowIndexField % this.cards!.length;
+    }
+
+    public onCardMoved(cardMovement: any) {
+      const movedCardDiv: HTMLDivElement = cardMovement.target;
+      const movedDirection = cardMovement.throwDirection;
+      const movedConfidence = cardMovement.throwOutConfidence;
+
+      let hint: CardHint = CardHint.None;
+
+      if (movedDirection == VueSwing.Direction.RIGHT && movedConfidence == 1) {
+        hint = CardHint.Guessed;
+      } else if (movedDirection == VueSwing.Direction.LEFT && movedConfidence == 1) {
+        hint = CardHint.Skipped;
+      } else {
+        hint = CardHint.None;
+      }
+
+      this.setCardHints(movedCardDiv, hint);
+    }
+    
+    public onCardMovementStopped(cardMovement: any) {
+      this.setCardHints(cardMovement.target, CardHint.None)
+    }
+
+    private setCardHints(cardDivElement: HTMLDivElement, hint: CardHint) {
+      switch (hint) {
+        case CardHint.Guessed:
+          cardDivElement.classList.remove('card-skipped-hint');
+          cardDivElement.classList.add('card-selected-hint');
+          break;
+        case CardHint.Skipped:
+          cardDivElement.classList.remove('card-selected-hint');
+          cardDivElement.classList.add('card-skipped-hint');          
+          break;
+        case CardHint.None:
+          cardDivElement.classList.remove('card-selected-hint');
+          cardDivElement.classList.remove('card-skipped-hint');
+      }
     }
 
     get renderableCards(): Array<CardDataView> {
@@ -126,7 +174,7 @@ export default class CardDeck extends Vue {
 
     private swingConfig = {
         throwOutConfidence: (xOffset: number, yOffset: number, element: HTMLElement) => {
-            const xConfidence = Math.min(Math.abs(xOffset) / (0.55 * element.offsetWidth), 1);
+            const xConfidence = Math.min(Math.abs(xOffset) / (0.30 * element.offsetWidth), 1);
             return xConfidence;
         },
         allowedDirections: [
@@ -149,6 +197,12 @@ export default class CardDeck extends Vue {
         }
     }
 }
+
+enum CardHint {
+  None,
+  Skipped,
+  Guessed
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -161,6 +215,22 @@ export default class CardDeck extends Vue {
     height: inherit;
     width: inherit;
     padding: 1em;
+}
+
+.card-selected-hint {
+  background-color: green;
+}
+
+.card-selected-hint::after {
+  content: "CARD SELECTED";
+}
+
+.card-skipped-hint {
+  background-color: red;
+}
+
+.card-skipped-hint::after {
+  content: "CARD SKIPPED";
 }
 
 @media only screen and (max-width: 320px) {

@@ -2,7 +2,7 @@
   <v-footer
     app
     fixed
-    color="#0bf"
+    color="rgba(36, 36, 36, 1)"
     style="height: 120px;"
   >
     <v-flex

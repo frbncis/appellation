@@ -2,7 +2,8 @@
   <v-content class="pb-0 viewport">
     <v-container fluid>
       <v-layout
-        column align-center
+        column
+        align-center
       >
         <PlayerNameSetup 
           :roomId="roomId"
@@ -168,11 +169,11 @@ export default class Setup extends Vue {
     }
 
     private get playersReady(): boolean {
-        if (!this.phase) {
-            return false;
-        }
+      if (!this.phase) {
+        return false;
+      }
 
-        return this.phase.filter(playerPhaseData => playerPhaseData.hasSubmittedCards).length == this.phase.length;
+      return this.phase.filter(playerPhaseData => playerPhaseData.hasSubmittedCards).length == this.phase.length;
     }
 
     private allCards = <Array<CardData>>JSON.parse(JSON.stringify(Cards));
@@ -257,15 +258,13 @@ export default class Setup extends Vue {
     }
 
     private async onCardSelected(selectedCard: CardData) {
-        console.log("Card selected");
+      console.log("Card selected");
         
-        if (this.selectedCardIds.push(selectedCard.id) == this.NUMBER_OF_CARDS_TO_SELECT) {
-            console.log("Done card selection.");
+      if (this.selectedCardIds.push(selectedCard.id) == this.NUMBER_OF_CARDS_TO_SELECT) {
+        console.log("Done card selection.");
 
-            await storeHelpers.submitSelectionCards(
-                this.selectedCardIds
-            );
-        }
+        await storeHelpers.submitSelectionCards(this.selectedCardIds);
+      }
     }
 }
 </script>

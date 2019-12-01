@@ -1,17 +1,32 @@
 <template>
-  <v-app>
+  <v-app style="background: #0bf; color: #fff">
     <v-content>
-      <v-container fill-height>
+      <v-container fluid fill-height>
         <v-row
           justify="center"
           align="center"
+          no-gutters
         >
-          <v-col>
+          <v-col cols="12">
+            <h1 class="display-3 font-weight-black">Unmonikers</h1>
+            <p class="subtitle-1 font-weight-bold">A dumb party game that respects your intelligence.</p>
+          </v-col>
+        </v-row>
+
+        <v-row
+          justify="center"
+          align="center"
+          no-gutters
+        >
+          <v-col cols="12">
+            <p class="overline">Enter the room code to join your buddies, or click on Create Game.</p>
             <v-text-field
+              full-width
               outlined
-              single-line
+              dense
+              dark
               v-model="roomIdTextField"
-              label="Room ID"
+              label="Room Code"
               type="number"
             />
           </v-col>
