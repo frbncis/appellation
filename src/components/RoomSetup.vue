@@ -1,48 +1,72 @@
 <template>
-  <v-container fill-height>
-    <v-text-field
-      outlined
-      single-line
-      v-model="roomIdTextField"
-      label="Room ID"
-      type="number"
-    />
-
-    <v-footer 
-      app
-      fixed
-      color="#0bf"
-    >
-      <v-flex class="pb-4 pt-4">
-        <v-flex>
-          <v-btn
-            v-if="canJoinGame"
-            block
+  <v-app>
+  <v-content>
+    <v-container fill-height>
+      <v-row
+        justify="center"
+        align="center"
+      >
+        <v-col>
+          <v-text-field
             outlined
-            dark
-            :loading="joinGameClicked"
-            :disabled="!canJoinGame"
-            @click="onJoinGameClick"
-          >
-            Join Game
-          </v-btn>
-        </v-flex>
+            single-line
+            v-model="roomIdTextField"
+            label="Room ID"
+            type="number"
+          />
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-content>
 
-        <v-flex>
-          <v-btn
-            v-if="!canCreateGame"
-            block
-            outlined
-            dark
-            :loading="createGameClicked"
-            :disabled="canCreateGame"
-            @click="onCreateGameClick">
-            Create Game
-          </v-btn>
-        </v-flex>
+  <v-footer 
+    app
+    fixed
+    color="#0bf"
+  >
+    <v-flex class="pb-4 pt-4">
+      <v-flex>
+        <v-btn
+          v-if="canJoinGame"
+          block
+          outlined
+          dark
+          :loading="joinGameClicked"
+          :disabled="!canJoinGame"
+          @click="onJoinGameClick"
+        >
+          Join Game
+        </v-btn>
       </v-flex>
-    </v-footer>
-  </v-container>
+
+      <v-flex>
+        <v-btn
+          v-if="!canCreateGame"
+          block
+          outlined
+          dark
+          :loading="createGameClicked"
+          :disabled="canCreateGame"
+          @click="onCreateGameClick">
+          Create Game
+        </v-btn>
+      </v-flex>
+
+      <v-flex
+        class="pt-5"
+      >
+        <v-btn
+          block
+          outlined
+          dark
+          @click="onRulesClicked"
+        >
+          Rules
+        </v-btn>
+      </v-flex>
+    </v-flex>
+  </v-footer>
+  </v-app>
 </template>
 
 <script lang="ts">
@@ -90,16 +114,25 @@ export default class RoomSetup extends Vue {
       this.createGameClicked = true;
 
       this.roomId = await storeHelpers.createGame();
-      this.$router.push(`/${this.roomId}`);
-      await storeHelpers.joinGame(this.roomId!);
+
+      this.joinRoom(this.roomId);
     }
 
     public async onJoinGameClick() {
       this.joinGameClicked = true;
 
       if (this.roomIdTextField) {
-        this.$router.push(`/${this.roomIdTextField}`);
+        this.joinRoom(this.roomIdTextField);
       }
+    }
+
+    public async onRulesClicked() {
+      this.$router.push("/rules");
+    }
+
+    private async joinRoom(roomId: string) {
+      this.$router.push(`/room/${this.roomId}`);
+      await storeHelpers.joinGame(this.roomId!);
     }
 }
 </script>

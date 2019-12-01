@@ -1,8 +1,8 @@
 <template>
   <v-content class="pb-0 viewport">
-    <RoomSetup  v-if="roomId == undefined" />
+    <!-- <RoomSetup  v-if="roomId == undefined" /> -->
 
-    <v-container fluid v-else>
+    <v-container fluid>
       <v-layout
         column align-center
       >
