@@ -1,7 +1,5 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Setup from './views/Setup.vue';
-import Rules from './views/Rules.vue';
 
 import RoomSetup from './components/RoomSetup.vue'
 
@@ -18,18 +16,14 @@ export default new Router({
     },
     {
       path: '/room/:roomId?',
-      name: 'Main',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      // component: () => import(/* webpackChunkName: "about" */ './views/About.vue'),
-      component: Setup,
+      name: 'PlayerSetup',
+      component: () => import(/* webpackChunkName: "setup" */ './views/Setup.vue'),
       props: true,
     },
     {
       path: '/rules',
       name: 'Rules',
-      component: Rules,
+      component: () => import(/* webpackChunkName: "rules" */ './views/Rules.vue'),
     },
   ],
 });

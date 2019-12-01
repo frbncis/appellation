@@ -1,28 +1,15 @@
 <template>
   <v-content class="pb-0 viewport">
-    <!-- <RoomSetup  v-if="roomId == undefined" /> -->
-
     <v-container fluid>
       <v-layout
         column align-center
       >
-
-      </v-layout>
-
-      <v-layout
-        column align-center
-      >
-        <v-flex
-          v-if="player.playerId !== undefined && roomId !== undefined && player.name == null"
-        >
-          <v-text-field
-            v-model="playerName"
-            label="Player Name"
-            placeholder="Enter Your Name"
-          />
-
-          <v-btn @click="onSetPlayerNameClick">Set Player Name</v-btn>
-        </v-flex>
+        <PlayerSetup 
+          :roomId="roomId"
+          v-if="player.playerId !== undefined 
+            && roomId !== undefined 
+            && player.name == null"
+        />
 
         <div v-if="isFinishedCardSelection">
           <ul id="players" v-if="player.playerId !== undefined && roomId !== undefined">
@@ -85,7 +72,7 @@ import Button from '@/components/Button.vue';
 import Footer from '@/components/Footer.vue';
 import Scoreboard from '@/components/Scoreboard.vue';
 import { db } from  '@/components/Firestore.ts';
-import RoomSetup from '@/components/RoomSetup.vue';
+import PlayerNameSetup from '@/components/PlayerNameSetup.vue';
 
 import {collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService.ts';
 
@@ -96,7 +83,7 @@ import store, { storeHelpers } from '../store';
 @Component({
   components: {
     CardDeck,
-    RoomSetup,
+    PlayerNameSetup,
   },
 })
 export default class Setup extends Vue {
@@ -150,6 +137,11 @@ export default class Setup extends Vue {
         return this.playersByTeam(2);
     }
 
+    public async created() {
+      if (this.roomId !== '' && this.roomId !== undefined) {
+        await storeHelpers.joinGame(this.roomId!);
+      }
+    }
     private playersByTeam(teamId: number): Array<any> {
         if (!this.phase) {
             return [];
