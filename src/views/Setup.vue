@@ -1,30 +1,12 @@
 <template>
   <v-content class="pb-0 viewport">
-    <v-container fluid>
+    <RoomSetup  v-if="roomId == undefined" />
+
+    <v-container fluid v-else>
       <v-layout
         column align-center
       >
-        <v-flex v-if="roomId == undefined">
-          <v-flex>
-            <v-text-field
-              v-model="roomIdTextField"
-              label="Room ID"
-              type="number"
-            />
-          </v-flex>
 
-          <v-flex>
-            <v-btn block :loading="joinGameClicked" :disabled="createGameClicked" @click="onJoinGameClick">Join Game</v-btn>
-          </v-flex>
-
-          <v-flex>
-            <v-btn block :loading="createGameClicked" :disabled="joinGameClicked" @click="onCreateGameClick">Create Game</v-btn>
-          </v-flex>
-        </v-flex>
-
-        <v-flex v-else align-center>
-          <p>Room {{ roomId }}</p>
-        </v-flex>
       </v-layout>
 
       <v-layout
@@ -90,21 +72,6 @@
           />
         </v-flex>
       </v-layout>
-
-      <v-footer
-        v-if="isFinishedCardSelection && !shouldShowDeck"
-        app
-      >
-        <v-flex>
-          <v-flex class="pb-4">
-            <v-btn block @click="onSwitchTeamClick">Switch Team</v-btn>
-          </v-flex>
-
-          <v-btn :loading="isGameStarting" :dark="playersReady" :disabled="!playersReady" block @click="onStartGameClick">
-            Start Game
-          </v-btn>
-        </v-flex>
-      </v-footer>
     </v-container>
   </v-content>
 </template>
@@ -118,6 +85,7 @@ import Button from '@/components/Button.vue';
 import Footer from '@/components/Footer.vue';
 import Scoreboard from '@/components/Scoreboard.vue';
 import { db } from  '@/components/Firestore.ts';
+import RoomSetup from '@/components/RoomSetup.vue';
 
 import {collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService.ts';
 
@@ -128,6 +96,7 @@ import store, { storeHelpers } from '../store';
 @Component({
   components: {
     CardDeck,
+    RoomSetup,
   },
 })
 export default class Setup extends Vue {
