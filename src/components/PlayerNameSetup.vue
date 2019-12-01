@@ -21,33 +21,33 @@
       </v-container>
     </v-content>
 
-    <v-footer 
-      app
-      fixed
-      color="#0bf"
-    >
-      <v-flex
-        class="pb-2 pt-2"
-        style="height: 100px;"
+    <Footer>
+      <v-row
+        justify="center"
+        align="center"
       >
-        <v-row
-          justify="center"
-          align="center"
-        >
-          <v-col>
-            <v-btn
-              block
-              outlined
-              dark
-              :loading="nameConfirmClicked"
-              @click="onNameConfirmClicked"
-            >
-              That's what they call me
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-flex>
-    </v-footer>
+        <v-col>
+          <v-btn
+            block
+            outlined
+            dark
+            :loading="nameConfirmClicked"
+            @click="onNameConfirmClicked"
+          >
+            That's what they call me
+          </v-btn>
+
+          <v-btn
+            block
+            outlined
+            dark
+            @click="() => this.$router.go(-1)"
+          >
+            Get me out of here!
+          </v-btn>
+        </v-col>
+      </v-row>
+    </Footer>
   </v-app>
 </template>
 
@@ -58,7 +58,11 @@ import Footer from '@/components/Footer.vue';
 
 import { storeHelpers } from '@/store';
 
-@Component({})
+@Component({
+  components: {
+    Footer,
+  }
+})
 export default class PlayerNameSetup extends Vue {
   @Prop() private roomId?: string | null;
 

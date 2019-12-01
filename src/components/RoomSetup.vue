@@ -19,53 +19,47 @@
       </v-container>
     </v-content>
 
-    <v-footer 
-      app
-      fixed
-      color="#0bf"
-    >
-      <v-flex class="pb-2 pt-2">
-        <v-flex>
-          <v-btn
-            v-if="canJoinGame"
-            block
-            outlined
-            dark
-            :loading="joinGameClicked"
-            :disabled="!canJoinGame"
-            @click="onJoinGameClick"
-          >
-            Join Game
-          </v-btn>
-        </v-flex>
-
-        <v-flex>
-          <v-btn
-            v-if="!canCreateGame"
-            block
-            outlined
-            dark
-            :loading="createGameClicked"
-            :disabled="canCreateGame"
-            @click="onCreateGameClick">
-            Create Game
-          </v-btn>
-        </v-flex>
-
-        <v-flex
-          class="pt-3"
+    <Footer>
+      <v-flex>
+        <v-btn
+          v-if="canJoinGame"
+          block
+          outlined
+          dark
+          :loading="joinGameClicked"
+          :disabled="!canJoinGame"
+          @click="onJoinGameClick"
         >
-          <v-btn
-            block
-            outlined
-            dark
-            @click="onRulesClicked"
-          >
-            Rules
-          </v-btn>
-        </v-flex>
+          Join Game
+        </v-btn>
       </v-flex>
-    </v-footer>
+
+      <v-flex>
+        <v-btn
+          v-if="!canCreateGame"
+          block
+          outlined
+          dark
+          :loading="createGameClicked"
+          :disabled="canCreateGame"
+          @click="onCreateGameClick">
+          Create Game
+        </v-btn>
+      </v-flex>
+
+      <v-flex
+        class="pt-3"
+      >
+        <v-btn
+          block
+          outlined
+          dark
+          @click="onRulesClicked"
+        >
+          Rules
+        </v-btn>
+      </v-flex>
+    </Footer>
   </v-app>
 </template>
 
@@ -83,6 +77,7 @@ import store, { storeHelpers } from '../store';
 
 @Component({
   components: {
+    Footer,
   },
 })
 export default class RoomSetup extends Vue {

@@ -83,13 +83,7 @@
     </v-container>
   </v-content>
 
-  <v-footer 
-    app
-    fixed
-    color="#0bf"
-  >
-  
-  <v-flex class="pb-4 pt-4">
+  <Footer>
     <v-flex>
       <v-btn
         block
@@ -102,7 +96,7 @@
     </v-flex>
 
     <v-flex
-      class="pt-5"
+      class="pt-3"
     >
       <v-btn
         block
@@ -113,16 +107,20 @@
         Back
       </v-btn>
     </v-flex>
-  </v-flex>
-  </v-footer>
+  </Footer>
 </div>
 </template>
 
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import Footer from '@/components/Footer.vue';
 
-@Component({})
+@Component({
+  components: {
+    Footer
+  },
+})
 export default class Rules extends Vue {
   public async onBackClicked() {
     this.$router.go(-1);

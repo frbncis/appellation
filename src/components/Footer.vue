@@ -1,12 +1,15 @@
 <template>
-    <!-- <div class="footer">
+  <v-footer
+    app
+    fixed
+    color="#0bf"
+    style="height: 120px;"
+  >
+    <v-flex
+      class="pb-2 pt-2"
+    >
       <slot></slot>
-    </div> -->
-
-  <v-footer>
-    <slot></slot>
-    <v-spacer></v-spacer>
-    <!-- <div>&copy; {{ new Date().getFullYear() }}</div> -->
+    </v-flex>
   </v-footer>
 </template>
 
@@ -18,7 +21,5 @@ export default class Footer extends Vue {}
 </script>
 
 <style scoped>
-.footer {
-  margin-bottom: 1em;
-}
+
 </style>

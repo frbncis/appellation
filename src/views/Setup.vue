@@ -4,7 +4,7 @@
       <v-layout
         column align-center
       >
-        <PlayerSetup 
+        <PlayerNameSetup 
           :roomId="roomId"
           v-if="player.playerId !== undefined 
             && roomId !== undefined 
@@ -37,6 +37,8 @@
               </v-col>
             </v-row>
           </ul>
+
+          <Footer />
         </div>
       </v-layout>
 
@@ -58,6 +60,8 @@
             class="card-deck"
           />
         </v-flex>
+
+        <Footer />
       </v-layout>
     </v-container>
   </v-content>
@@ -83,6 +87,7 @@ import store, { storeHelpers } from '../store';
 @Component({
   components: {
     CardDeck,
+    Footer,
     PlayerNameSetup,
   },
 })
