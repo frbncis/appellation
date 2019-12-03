@@ -72,7 +72,6 @@ import { storeHelpers } from '../store';
   },
 })
 export default class Guessing extends Vue {
-
   /**
    * The maximum amount of time in seconds for a turn.
    */
@@ -127,10 +126,8 @@ export default class Guessing extends Vue {
   }
 
   public get activePlayerName() {
-    if (storeHelpers.room.currentPlayer)
-      return storeHelpers.room.currentPlayer.name;
-    else
-      return '';
+    if (storeHelpers.room.currentPlayer) return storeHelpers.room.currentPlayer.name;
+    return '';
   }
 
   get playerGuessesAllowed(): boolean {
@@ -151,9 +148,7 @@ export default class Guessing extends Vue {
       ...cardModel,
     }));
 
-    const cards = storeHelpers.room.data.activeRemainingCards.map((cardId: number) => {
-      return cardModels[cardId];
-    });
+    const cards = storeHelpers.room.data.activeRemainingCards.map((cardId: number) => cardModels[cardId]);
 
     return cards.filter(card => card !== null);
   }
@@ -177,13 +172,13 @@ export default class Guessing extends Vue {
   }
 
   private async onCardGuessed(guessedCard: any) {
-    console.log("Guessing.onCardGuessed() called", guessedCard);
+    console.log('Guessing.onCardGuessed() called', guessedCard);
 
     console.log(`Guessing.onCardGuessed() - removing card ID ${guessedCard.id}`);
 
     await storeHelpers.room.setDrawDeck(this.cardIds.filter(cardId => cardId !== guessedCard.id));
 
-    console.log(`Guessing.onCardGuessed() - active deck update done.`, this.cardIds);
+    console.log('Guessing.onCardGuessed() - active deck update done.', this.cardIds);
     await storeHelpers.room.increaseScore({ teamId: this.activeTeam!, pointsEarned: guessedCard.points });
 
     if (this.cards.length == 0) {

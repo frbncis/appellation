@@ -65,7 +65,7 @@ import { storeHelpers } from '@/store';
 @Component({
   components: {
     Footer,
-  }
+  },
 })
 export default class PlayerNameSetup extends Vue {
   @Prop() private roomId?: string | null;
@@ -84,14 +84,14 @@ export default class PlayerNameSetup extends Vue {
     if (this.roomId && this.playerName != '') {
       const playerId = await storeHelpers.createPlayer(
         this.roomId,
-        this.playerName
+        this.playerName,
       );
 
       await storeHelpers.becomePlayer(this.roomId, playerId);
 
-      await storeHelpers.drawSelectionCards();          
+      await storeHelpers.drawSelectionCards();
     } else {
-      throw new Error("No room ID")
+      throw new Error('No room ID');
     }
   }
 }

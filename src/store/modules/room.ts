@@ -257,37 +257,37 @@ export class RoomModule extends FirestoreVuexModule {
       let turnData: { previousPlayerId: string, currentPlayerId: string, currentTeamTurnId: number } | null = null;
 
       if (this.data.players.length == 1) {
-        const currentPlayerId = this.data.currentPlayerId;
+        const { currentPlayerId } = this.data;
         const currentPlayerTeamId = this.data.currentTeamTurnId;
         turnData = {
           previousPlayerId: currentPlayerId!,
           currentPlayerId: currentPlayerId!,
           currentTeamTurnId: currentPlayerTeamId!,
-        }
+        };
       } else {
         const { previousPlayerId, currentPlayerId, currentTeamTurnId } = this.data;
 
         const nextTeamId = currentTeamTurnId === 1 ? 2 : 1;
         const nextTeamSequence = this.data.turnSequence[nextTeamId];
-  
+
         let nextPlayerId;
-  
+
         if (!previousPlayerId) {
           nextPlayerId = nextTeamSequence[0];
         } else {
           const previousPlayerIndex = nextTeamSequence.indexOf(previousPlayerId);
-  
+
           const nextPlayerIndex = (previousPlayerIndex + 1) % nextTeamSequence.length;
           nextPlayerId = this.data.turnSequence[nextTeamId][nextPlayerIndex];
         }
-  
+
         turnData = {
           previousPlayerId: currentPlayerId!,
           currentPlayerId: nextPlayerId,
           currentTeamTurnId: nextTeamId,
         };
       }
-      
+
       await this.update(turnData);
 
       return await this.bindCurrentPlayerReference(turnData.currentPlayerId);
@@ -311,11 +311,10 @@ export class RoomModule extends FirestoreVuexModule {
         return await this.document.update(<Partial<RoomStateCards>>{
           scoreTeam1: this.data.scoreTeam1 + payload.pointsEarned,
         });
-      } else {
-        return await this.document.update(<Partial<RoomStateCards>>{
-          scoreTeam2: this.data.scoreTeam2 + payload.pointsEarned,
-        });
       }
+      return await this.document.update(<Partial<RoomStateCards>>{
+        scoreTeam2: this.data.scoreTeam2 + payload.pointsEarned,
+      });
     }
 
     /**
@@ -342,7 +341,7 @@ export class RoomModule extends FirestoreVuexModule {
 
     @Action
     public async setDrawDeck(cardIds: Array<number>) {
-      console.log("RoomModule.setDrawDeck() - Setting the active deck.", cardIds);
+      console.log('RoomModule.setDrawDeck() - Setting the active deck.', cardIds);
 
       await this.document.update({
         activeRemainingCards: cardIds,

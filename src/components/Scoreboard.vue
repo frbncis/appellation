@@ -52,7 +52,7 @@ export default class Scoreboard extends Vue {
     private timerKey: number = 0;
 
     private onTimerTick() {
-        this.$emit('timerTick');
+      this.$emit('timerTick');
     }
 }
 </script>

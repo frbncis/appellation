@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 
-import RoomSetup from './components/RoomSetup.vue'
+import RoomSetup from './components/RoomSetup.vue';
 
 Vue.use(Router);
 

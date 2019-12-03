@@ -4,16 +4,16 @@
     <v-container fill-height>
       <h1>Getting Started</h1>
 
-      <p>Monikers only takes about 5-10 minutes to learn. Start 
+      <p>Monikers only takes about 5-10 minutes to learn. Start
         by dividing your group into 2 teams.</p>
 
-      <p>Deal 8 cards to each person. Everyone secretly chooses 5 
-        that they like. Shuffle all the cards people chose into one 
-        deck, which will be used by both teams for the entire game. Put 
+      <p>Deal 8 cards to each person. Everyone secretly chooses 5
+        that they like. Shuffle all the cards people chose into one
+        deck, which will be used by both teams for the entire game. Put
         the other cards back in the box.</p>
-      
-      <p>You want to aim for using around 40-50 cards in the deck, so 
-        deal fewer and choose fewer playing with a big group, and 
+
+      <p>You want to aim for using around 40-50 cards in the deck, so
+        deal fewer and choose fewer playing with a big group, and
         deal more and choose more with a small group.</p>
 
       <h1>How to Play</h1>
@@ -71,7 +71,7 @@
           gestures.
         </p>
       </div>
-    
+
       <div>
         <h4>
           ROUND 3
@@ -118,7 +118,7 @@ import Footer from '@/components/Footer.vue';
 
 @Component({
   components: {
-    Footer
+    Footer,
   },
 })
 export default class Rules extends Vue {

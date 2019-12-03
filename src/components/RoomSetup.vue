@@ -80,14 +80,14 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import { mapState, mapActions, mapGetters } from 'vuex';
 import ProgressBar from '@/components/ProgressBar.vue';
 import Button from '@/components/Button.vue';
 import Footer from '@/components/Footer.vue';
-import { db } from  '@/components/Firestore.ts';
+import { db } from '@/components/Firestore.ts';
 
-import {collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService.ts';
+import { collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService.ts';
 
-import { mapState, mapActions, mapGetters } from 'vuex'
 import store, { storeHelpers } from '../store';
 
 @Component({
@@ -105,17 +105,15 @@ export default class RoomSetup extends Vue {
     public get canJoinGame() {
       if (this.roomIdTextField == '') {
         return false;
-      } else {
-        return true;
       }
+      return true;
     }
 
     public get canCreateGame() {
       if (this.roomIdTextField == '') {
         return false;
-      } else {
-        return true;
       }
+      return true;
     }
 
     public async onCreateGameClick() {
@@ -135,7 +133,7 @@ export default class RoomSetup extends Vue {
     }
 
     public async onRulesClicked() {
-      this.$router.push("/rules");
+      this.$router.push('/rules');
     }
 
     private async gotoRoom(roomId: string) {

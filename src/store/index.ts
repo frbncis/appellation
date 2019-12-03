@@ -64,7 +64,7 @@ export const storeHelpers = {
 
     console.log('Setting cards to be played with');
     await this.room.update({ activeRemainingCards: this.room.data.selectedCards });
-    
+
     console.log('Done updating room data...');
 
     // This need to fire last as the view transition is bound to this.
@@ -75,7 +75,7 @@ export const storeHelpers = {
   },
 
   async endTurn() {
-    console.log("storeHelpers.endTurn() called");
+    console.log('storeHelpers.endTurn() called');
 
     if (this.room.data.activeRemainingCards.length > 0) {
       console.log('There are cards in the draw pile, setting next player.');
@@ -136,7 +136,7 @@ export const storeHelpers = {
     for (let i = 0; i < candidateCards.length; i++) {
       while (x !== 100) {
         const j = getRandomIntInclusive(0, Cards.length - 1);
-        x = x + 1;
+        x += 1;
 
         if (this.room.data.discard.findIndex(value => value == j) > -1) {
           continue;
