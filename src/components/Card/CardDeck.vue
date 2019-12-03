@@ -1,54 +1,56 @@
 <template>
-    <vue-swing
-      @throwoutright="_onCardGuessed"
-      @throwoutleft="_onCardSkipped"
-      :config="swingConfig"
-      ref="stack"
-      v-if="renderableCards"
-      @dragmove="onCardMoved"
-      @dragend="onCardMovementStopped"
+    <v-col
+      cols="12"
     >
-      <div
-        v-for="card in renderableCards"
-        :key="card.renderKey"
-        class="card"
+      <vue-swing
+        @throwoutright="_onCardGuessed"
+        @throwoutleft="_onCardSkipped"
+        :config="swingConfig"
+        ref="stack"
+        v-if="renderableCards"
+        @dragmove="onCardMoved"
+        @dragend="onCardMovementStopped"
+        class="swinggable-card-deck"
       >
-        <v-layout
-          fill-height
-          column
-          text-center
+        <v-row
+          v-for="card in renderableCards"
+          :key="card.renderKey"
+          class="card"
+          justify="center"
+          align="stretch"
         >
-          <v-flex class="card-details">
-            <h1 class="card-title">
-              {{ card.title }}
-            </h1>
+          <h1 class="card-title">
+            {{ card.title }}
+          </h1>
 
-            <p class="card-description">
-              {{ card.description }}
-            </p>
-          </v-flex>
+          <p class="card-description">
+            {{ card.description }}
+          </p>
 
-          <v-flex class="card-meta"
+          <div
             :class="{
+              'points': true,
               'points-1': card.points == 1,
               'points-2': card.points == 2,
               'points-3': card.points == 3,
               'points-4': card.points == 4,
             }"
           >
-            <h2 class="card-category">
+            <h2
+              class="card-category"
+            >
               {{ card.category }}
             </h2>
 
-            <div class="semicircle" />             
-              <v-flex class="card-points-container-shape">
-                <h3>{{ card.points }}</h3>
-                <p class="points-text">Points</p>
-              </v-flex>
-            </v-flex>
-        </v-layout>
-      </div>
-    </vue-swing>
+            <div class="card-points-container-shape">
+              <h3>{{ card.points }}</h3>
+              <p>Points</p>
+            </div>
+          </div>
+          
+        </v-row>
+      </vue-swing>
+    </v-col>
 </template>
 
 <script lang="ts">
@@ -152,8 +154,8 @@ export default class CardDeck extends Vue {
         // Case 1a: Deck greater than 2.
         if (this.cards.length >= 2) {
             renderableCardsCandidates = [
-                this.cards[(this.slidingWindowIndex + 1) % this.cards.length],
                 this.cards[this.slidingWindowIndex],
+                this.cards[(this.slidingWindowIndex + 1) % this.cards.length],
             ];
         } else if (this.cards.length == 1) {
             renderableCardsCandidates = [
@@ -205,119 +207,68 @@ enum CardHint {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+h1, p {
+  color: black;
+}
+
+.swinggable-card-deck {
+  position: relative;
+}
+
 .card {
-    background-color: #fff;
-    border-radius: 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    position: absolute;
-    height: inherit;
-    width: inherit;
-    padding: 1em;
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding-left: 9%;
+  padding-right: 9%;
+  padding-top: 9%;
 }
 
-.card-selected-hint {
-  background-color: green;
+/* This is the next card. */
+.card:first-child {
+  position: absolute;
 }
 
-.card-selected-hint::after {
-  content: "CARD SELECTED";
-}
-
-.card-skipped-hint {
-  background-color: red;
-}
-
-.card-skipped-hint::after {
-  content: "CARD SKIPPED";
-}
-
-@media only screen and (max-width: 320px) {
-    .card-description {
-        height:60%;
-        font-size: smaller;
-    }
-}
-
-.card-details {
-    height: 60%;
-    font-family: 'Franklin Gothic Book', 'Arial', Arial, sans-serif;
-    padding-left: 7%;
-    padding-right: 7%
+/* This is the grabbable card */
+.card:last-child {
+  /* background: red; */
 }
 
 .card-title {
-    text-align: center;
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;    
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-}
-
-.card-data {
-    height: 60%;
-    font-size: smaller;
-}
-
-.card-content {
-    height: inherit;
+  width: 100%;
+  height: 4em;
+  text-align: center;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;    
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
 .card-description {
-    text-align: left;
-}
-
-.card-meta {
-    bottom: 0;
-    width: inherit;
-    align-items: baseline;
-    justify-content: center;
-    flex-direction: column;
-}
-
-.card-meta:before {
-    border-top: 0.09em dashed lightgray;
-    content: "";
-    display: block;
-    margin: 0 auto; 
-    width: 33%;
+  text-align: left;
+  margin-bottom: 0;
+  height: 15em;
 }
 
 .card-category {
-    text-transform: uppercase;
-    text-align: center;
-    margin-top: 1em;
-    margin-bottom: 1.5em;
-    font-family: 'Franklin Gothic Demi', 'Arial Black', Arial, sans-serif;
-    letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 1.5em;
+  font-family: 'Franklin Gothic Demi', 'Arial Black', Arial, sans-serif;
+  letter-spacing: 0.1em;
+  font-size: 0.98em;
 }
 
-.card-points-container-shape {
-    width: 80px;
-    text-align: center;
-    left: calc(50% - 40px);
-    bottom: 0;
-    position: absolute;
-    color: white;
-    padding-top: 0.5em;
-    border-top:black;
-    border-top-left-radius: 50%;
-    border-top-right-radius: 50%;
+.card-category::before {
+    content: "";
+    width: 70%;
+    display: block;
+    margin: 1.5em auto; 
+    border-top: 0.1em dashed lightgray;
 }
 
-.card-points-container-shape p {
-    text-transform: uppercase;
-    font-family: 'Franklin Gothic Book', 'Arial Narrow', Arial, sans-serif;
-    font-size: 0.75em;
-}
-
-h2 {
-    font-size: 0.9em;
-}
-
-.card-points-container-shape h3 {
-    font-size: 1.5em;
-    font-family: 'Franklin Gothic Demi', 'Arial Black', Arial, sans-serif;
+.points { 
+  width: 100%;
 }
 
 .points-1 h2 {
@@ -345,12 +296,32 @@ h2 {
 }
 
 .points-4 h2 {
-    color: rgba(239, 83, 63, 1)
+  color: rgba(239, 83, 63, 1)
 }
 
 .points-4 > .card-points-container-shape {
-    background-color: rgba(239, 83, 63, 1)
+  background-color: rgba(239, 83, 63, 1)
 }
 
-</style>
+.card-points-container-shape {
+  width: 80px;
+  text-align: center;
+  color: white;
+  padding-top: 0.5em;
+  margin-left: calc(50% - 40px);
+  border-top:black;
+  height: 75px;
+  border-top-left-radius: 50%;
+  border-top-right-radius: 50%;
+}
 
+.card-points-container-shape > p {
+  color: #fff;
+  text-transform: uppercase;
+  font-family: 'Franklin Gothic Demi', 'Arial Black', Arial, sans-serif;
+  letter-spacing: 0.1em;
+  font-size: 0.70em;
+  text-align: center;
+  padding-top: 0.7em;
+}
+</style>

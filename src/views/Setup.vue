@@ -1,71 +1,28 @@
 <template>
-  <v-content class="pb-0 viewport">
-    <v-container fluid>
-      <v-layout
-        column
-        align-center
+  <PlayerNameSetup 
+    v-if="player.playerId !== undefined 
+      && roomId !== undefined 
+      && player.name == null"
+      
+    :roomId="roomId"
+  />
+
+  <v-app v-else style="background: #0bf; color: #fff">
+    <v-content>
+      <v-container
+        fill-height
+        fluid
       >
-        <PlayerNameSetup 
-          :roomId="roomId"
-          v-if="player.playerId !== undefined 
-            && roomId !== undefined 
-            && player.name == null"
+        <CardDeck
+          :onDeckEmpty="onDeckEmpty"
+          :onCardGuessed="onCardSelected"
+          :cards="cards"
         />
+      </v-container>
+    </v-content>
 
-        <div v-if="isFinishedCardSelection">
-          <ul id="players" v-if="player.playerId !== undefined && roomId !== undefined">
-            <v-row>
-              <v-col>
-                <h2>Team 1</h2>
-                <p
-                  v-for="playerData in playersTeam1"
-                  :key="playerData.name"
-                  :class="{ playerReady: playerData.hasSubmittedCards, playerWaiting: !playerData.hasSubmittedCards }"
-                >
-                  {{ playerData.player.name }}
-                </p>
-              </v-col>
-
-              <v-col>
-                <h2>Team 2</h2>
-                <p
-                  v-for="playerData in playersTeam2"
-                  :key="playerData.name"
-                  :class="{ playerReady: playerData.hasSubmittedCards, playerWaiting: !playerData.hasSubmittedCards }"
-                >
-                  {{ playerData.player.name }}
-                </p>
-              </v-col>
-            </v-row>
-          </ul>
-
-          <Footer />
-        </div>
-      </v-layout>
-
-      <v-layout
-        v-if="shouldShowDeck"
-        column align-center
-      >
-        <div class="pb-5">
-          <h3>Choose {{ this.NUMBER_OF_CARDS_TO_SELECT - this.selectedCardIds.length }} cards</h3>
-        </div>
-          
-        <v-flex 
-          class="card-deck-container"
-        >
-          <CardDeck
-            :onDeckEmpty="onDeckEmpty"
-            :onCardGuessed="onCardSelected"
-            :cards="cards"
-            class="card-deck"
-          />
-        </v-flex>
-
-        <Footer />
-      </v-layout>
-    </v-container>
-  </v-content>
+    <!-- <Footer /> -->
+  </v-app>
 </template>
 
 <script lang="ts">
@@ -147,6 +104,8 @@ export default class Setup extends Vue {
       if (this.roomId !== '' && this.roomId !== undefined) {
         await storeHelpers.joinGame(this.roomId!);
       }
+      window.scrollTo(0, 1);
+
     }
     private playersByTeam(teamId: number): Array<any> {
         if (!this.phase) {
@@ -270,11 +229,6 @@ export default class Setup extends Vue {
 </script>
 
 <style scoped>
-.viewport {
-  position: fixed;
-  height: 100%;
-  width: 100%;
-}
 
 .playerReady {
   font-weight: 900;
@@ -285,15 +239,15 @@ export default class Setup extends Vue {
 }
 
 .card-deck {
-  width: 90vw;
+  max-width: 380px;
   /* height: calc(100vh - 159px);  */
-  height: 481px;
+  /* height: 481px; */
 }
 
 @media only screen and (min-width: 360px) {
   .card-deck {
-    width: 340px;
-    max-height: 351px;
+    /* width: 340px; */
+    /* max-height: 351px; */
   }
 }
 </style>

@@ -1,5 +1,7 @@
 <template>
-  <v-app>
+  <v-app
+    style="background: #0bf; color: #fff"
+  >
     <v-content>
       <v-container
         fill-height
@@ -7,11 +9,13 @@
         <v-row
           justify="center"
           align="center"
+          no-gutters
         >
           <v-col>
             <v-text-field
               outlined
               single-line
+              dark
               v-model="playerName"
               label="Player Name"
               placeholder="Enter Your Name"
