@@ -21,7 +21,16 @@
       </v-container>
     </v-content>
 
-    <!-- <Footer /> -->
+    <Footer>
+      <v-row
+        justify="center"
+        align="center"
+      >
+        <v-col>
+          <v-btn block outlined dark disabled>Choose {{ this.NUMBER_OF_CARDS_TO_SELECT - this.selectedCardIds.length }} cards</v-btn>
+        </v-col>
+      </v-row>
+    </Footer>
   </v-app>
 </template>
 
