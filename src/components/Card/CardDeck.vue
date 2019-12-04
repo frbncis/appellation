@@ -1,6 +1,5 @@
 <template>
     <v-col
-      cols="12"
     >
       <vue-swing
         @throwoutright="_onCardGuessed"
@@ -222,7 +221,6 @@ h1, p {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding-left: 9%;
   padding-right: 9%;
-  padding-top: 9%;
 }
 
 /* This is the next card. */
