@@ -1,5 +1,7 @@
 <template>
     <v-col
+      cols="12"
+      style="height: 100%;"
     >
       <vue-swing
         @throwoutright="_onCardGuessed"
@@ -18,35 +20,41 @@
           justify="center"
           align="stretch"
         >
-          <h1 class="card-title">
-            {{ card.title }}
-          </h1>
-
-          <p class="card-description">
-            {{ card.description }}
-          </p>
-
-          <div
-            :class="{
-              'points': true,
-              'points-1': card.points == 1,
-              'points-2': card.points == 2,
-              'points-3': card.points == 3,
-              'points-4': card.points == 4,
-            }"
+          <v-col 
+            cols="12"
+            class="card-data"
           >
-            <h2
-              class="card-category"
-            >
-              {{ card.category }}
-            </h2>
+            <h1 class="card-title">
+              {{ card.title }}
+            </h1>
 
-            <div class="card-points-container-shape">
-              <h3>{{ card.points }}</h3>
-              <p>Points</p>
+            <div style="height:auto;">
+              <p class="card-description">
+                {{ card.description }}
+              </p>
             </div>
-          </div>
-          
+
+            <div
+              :class="{
+                'points': true,
+                'points-1': card.points == 1,
+                'points-2': card.points == 2,
+                'points-3': card.points == 3,
+                'points-4': card.points == 4,
+              }"
+            >
+              <h2
+                class="card-category"
+              >
+                {{ card.category }}
+              </h2>
+
+              <div class="card-points-container-shape">
+                <h3>{{ card.points }}</h3>
+                <p>Points</p>
+              </div>
+            </div>
+          </v-col>
         </v-row>
       </vue-swing>
     </v-col>
@@ -213,6 +221,16 @@ h1, p {
 
 .swinggable-card-deck {
   position: relative;
+  display: flex;
+  height: 100%;
+}
+
+.card-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0;
 }
 
 .card {
@@ -221,6 +239,8 @@ h1, p {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding-left: 9%;
   padding-right: 9%;
+  height: 100%;
+  width: 100%;
 }
 
 /* This is the next card. */
@@ -235,17 +255,15 @@ h1, p {
 
 .card-title {
   width: 100%;
-  height: 4em;
   text-align: center;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;    
+  padding-top: 1.0em;
+  padding-bottom: 1.5em;    
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
 .card-description {
   text-align: left;
   margin-bottom: 0;
-  height: 15em;
 }
 
 .card-category {

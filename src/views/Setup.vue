@@ -7,17 +7,27 @@
     :roomId="roomId"
   />
 
-  <v-app v-else style="background: #0bf; color: #fff">
+  <v-app v-else style="background: #0bf; color: #fff;">
     <v-content>
       <v-container
-        fill-height
-        fluid
+        style="height: 100%;"
       >
-        <CardDeck
-          :onDeckEmpty="onDeckEmpty"
-          :onCardGuessed="onCardSelected"
-          :cards="cards"
-        />
+        <v-col
+          cols="12"
+          style="height: 100%"
+        >
+          <v-row
+            align="center"
+            justify="center"
+            style="height: 100%;"
+          >
+            <CardDeck
+              :onDeckEmpty="onDeckEmpty"
+              :onCardGuessed="onCardSelected"
+              :cards="cards"
+            />
+          </v-row>
+        </v-col>
       </v-container>
     </v-content>
 
