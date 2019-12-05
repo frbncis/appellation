@@ -240,7 +240,6 @@ h1, p {
   padding-left: 9%;
   padding-right: 9%;
   height: 100%;
-  width: 100%;
 }
 
 /* This is the next card. */
@@ -257,7 +256,6 @@ h1, p {
   width: 100%;
   text-align: center;
   padding-top: 1.0em;
-  padding-bottom: 1.5em;    
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
