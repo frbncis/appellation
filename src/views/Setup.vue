@@ -7,36 +7,12 @@
     :roomId="roomId"
   />
 
-  <v-app v-else style="background: #0bf; color: #fff;">
-    <v-content>
-      <v-container fill-height style="align-items: stretch;">
-        <v-col
-          cols="12"
-        >
-          <v-row
-            style="height: 100%; align-items: stretch;"
-          >
-            <CardDeck
-              :onDeckEmpty="onDeckEmpty"
-              :onCardGuessed="onCardSelected"
-              :cards="cards"
-            />
-          </v-row>
-        </v-col>
-      </v-container>
-    </v-content>
-
-    <Footer>
-      <v-row
-        justify="center"
-        align="center"
-      >
-        <v-col>
-          <v-btn block outlined dark disabled>Choose {{ this.NUMBER_OF_CARDS_TO_SELECT - this.selectedCardIds.length }} cards</v-btn>
-        </v-col>
-      </v-row>
-    </Footer>
-  </v-app>
+  <CardsSetup v-else
+    @deck-emptied="onDeckEmpty"
+    @card-selected="onCardSelected"
+    :cards="cards"
+    :numberCardsToSelect="this.NUMBER_OF_CARDS_TO_SELECT - this.selectedCardIds.length"
+  />
 </template>
 
 <script lang="ts">
@@ -49,6 +25,7 @@ import Footer from '@/components/Footer.vue';
 import Scoreboard from '@/components/Scoreboard.vue';
 import { db } from  '@/components/Firestore.ts';
 import PlayerNameSetup from '@/components/PlayerNameSetup.vue';
+import CardsSetup from '@/components/CardsSetup.vue';
 
 import {collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService.ts';
 
@@ -59,6 +36,7 @@ import store, { storeHelpers } from '../store';
 @Component({
   components: {
     CardDeck,
+    CardsSetup,
     Footer,
     PlayerNameSetup,
   },
@@ -250,18 +228,5 @@ export default class Setup extends Vue {
 
 .playerWaiting {
   font-weight: 100;
-}
-
-.card-deck {
-  max-width: 380px;
-  /* height: calc(100vh - 159px);  */
-  /* height: 481px; */
-}
-
-@media only screen and (min-width: 360px) {
-  .card-deck {
-    /* width: 340px; */
-    /* max-height: 351px; */
-  }
 }
 </style>

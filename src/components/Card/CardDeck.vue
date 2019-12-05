@@ -197,12 +197,12 @@ export default class CardDeck extends Vue {
     }
 
     private _onCardGuessed() {
-        const selectedCard = this.renderableCards[this.renderableCards.length - 1];
+      const selectedCard = this.renderableCards[0];
 
-        if (this.onCardGuessed) {
-            console.log("CardDeck._onCardGuess() - executing callback for onCardGuessed", selectedCard);
-            this.onCardGuessed(<CardData>selectedCard);
-        }
+      if (this.onCardGuessed) {
+        console.log("CardDeck._onCardGuess() - executing callback for onCardGuessed", selectedCard);
+        this.onCardGuessed(<CardData>selectedCard);
+      }
     }
 }
 
