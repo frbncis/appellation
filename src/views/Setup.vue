@@ -9,12 +9,9 @@
 
   <v-app v-else style="background: #0bf; color: #fff;">
     <v-content>
-      <v-container
-        style="height: 100%;"
-      >
+      <v-container fill-height style="align-items: stretch">
         <v-col
           cols="12"
-          style="height: 100%"
         >
           <v-row
             align="center"

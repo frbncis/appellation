@@ -1,7 +1,5 @@
 <template>
   <v-footer
-    app
-    fixed
     color="rgba(36, 36, 36, 1)"
   >
     <v-flex

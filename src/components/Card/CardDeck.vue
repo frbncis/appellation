@@ -1,7 +1,6 @@
 <template>
     <v-col
       cols="12"
-      style="height: 100%;"
     >
       <vue-swing
         @throwoutright="_onCardGuessed"
@@ -222,7 +221,7 @@ h1, p {
 .swinggable-card-deck {
   position: relative;
   display: flex;
-  height: 100%;
+  height: inherit;
 }
 
 .card-data {
@@ -239,7 +238,6 @@ h1, p {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding-left: 9%;
   padding-right: 9%;
-  height: 100%;
 }
 
 /* This is the next card. */
