@@ -221,7 +221,7 @@ h1, p {
 .swinggable-card-deck {
   position: relative;
   display: flex;
-  height: inherit;
+  height: 100%;
 }
 
 .card-data {
@@ -238,6 +238,7 @@ h1, p {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding-left: 9%;
   padding-right: 9%;
+  height:inherit;
 }
 
 /* This is the next card. */

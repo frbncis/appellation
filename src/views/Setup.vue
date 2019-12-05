@@ -9,14 +9,12 @@
 
   <v-app v-else style="background: #0bf; color: #fff;">
     <v-content>
-      <v-container fill-height style="align-items: stretch">
+      <v-container fill-height style="align-items: stretch;">
         <v-col
           cols="12"
         >
           <v-row
-            align="center"
-            justify="center"
-            style="height: 100%;"
+            style="height: 100%; align-items: stretch;"
           >
             <CardDeck
               :onDeckEmpty="onDeckEmpty"
