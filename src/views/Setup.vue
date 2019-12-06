@@ -7,12 +7,23 @@
     :roomId="roomId"
   />
 
-  <CardsSetup v-else
+  <CardsSetup
+    v-else-if="shouldShowDeck"
     @deck-emptied="onDeckEmpty"
     @card-selected="onCardSelected"
     :cards="cards"
     :numberCardsToSelect="this.NUMBER_OF_CARDS_TO_SELECT - this.selectedCardIds.length"
   />
+
+  <TeamSetup
+    v-else-if="!isGameStarted"
+    :playersTeam1="playersTeam1"
+    :playersTeam2="playersTeam2"
+    @switched-teams="onSwitchTeamClick"
+    @start-game="onStartGameClick"
+  />
+
+  <Guessing v-else />
 </template>
 
 <script lang="ts">
@@ -26,6 +37,8 @@ import Scoreboard from '@/components/Scoreboard.vue';
 import { db } from  '@/components/Firestore.ts';
 import PlayerNameSetup from '@/components/PlayerNameSetup.vue';
 import CardsSetup from '@/components/CardsSetup.vue';
+import TeamSetup from '@/components/TeamSetup.vue';
+import Guessing from '@/views/Guessing.vue';
 
 import {collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService.ts';
 
@@ -38,7 +51,9 @@ import store, { storeHelpers } from '../store';
     CardDeck,
     CardsSetup,
     Footer,
+    Guessing,
     PlayerNameSetup,
+    TeamSetup,
   },
 })
 export default class Setup extends Vue {
@@ -80,6 +95,10 @@ export default class Setup extends Vue {
 
     private get player() {
         return storeHelpers.player.data;
+    }
+
+    private get isGameStarted() {
+      return storeHelpers.room.data.gamePhase !== 0;
     }
 
     private switchTeam = storeHelpers.player.switchTeam;

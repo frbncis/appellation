@@ -3,7 +3,8 @@
     color="rgba(36, 36, 36, 1)"
   >
     <v-flex
-      class="pb-2 pt-2"
+      id="footer-buttons"
+      class="pb-2"
     >
       <slot></slot>
     </v-flex>
@@ -17,6 +18,8 @@ import { Component, Vue } from 'vue-property-decorator';
 export default class Footer extends Vue {}
 </script>
 
-<style scoped>
-
+<style>
+#footer-buttons button {
+  margin-top: 12px;
+}
 </style>

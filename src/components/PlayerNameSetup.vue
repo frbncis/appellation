@@ -26,31 +26,17 @@
     </v-content>
 
     <Footer>
-      <v-row
-        justify="center"
-        align="center"
-      >
-        <v-col>
-          <v-btn
-            block
-            outlined
-            dark
-            :loading="nameConfirmClicked"
-            @click="onNameConfirmClicked"
-          >
-            That's what they call me
-          </v-btn>
-
-          <v-btn
-            block
-            outlined
-            dark
-            @click="() => this.$router.go(-1)"
-          >
-            Get me out of here!
-          </v-btn>
-        </v-col>
-      </v-row>
+      <v-col>
+        <v-btn
+          block
+          outlined
+          dark
+          :loading="nameConfirmClicked"
+          @click="onNameConfirmClicked"
+        >
+          That's what they call me
+        </v-btn>
+      </v-col>
     </Footer>
   </v-app>
 </template>
@@ -81,7 +67,7 @@ export default class PlayerNameSetup extends Vue {
   public async onNameConfirmClicked() {
     this.nameConfirmClicked = true;
 
-    if (this.roomId && this.playerName != '') {
+    if (this.roomId && this.playerName !== '') {
       const playerId = await storeHelpers.createPlayer(
         this.roomId,
         this.playerName,

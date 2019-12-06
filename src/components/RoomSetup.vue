@@ -62,9 +62,7 @@
         </v-btn>
       </v-flex>
 
-      <v-flex
-        class="pt-3"
-      >
+      <v-flex>
         <v-btn
           block
           outlined
