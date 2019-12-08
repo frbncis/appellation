@@ -127,6 +127,10 @@ export const storeHelpers = {
     });
   },
 
+  isInPile(cardPile: Array<number>, cardIndex: number): boolean {
+    return cardPile.findIndex(value => value == cardIndex) > -1;
+  },
+
   async drawSelectionCards() {
     console.log('store.actions.drawSelectionCards');
     const candidateCards = new Array<number>(10).fill(0);
@@ -138,11 +142,7 @@ export const storeHelpers = {
         const j = getRandomIntInclusive(0, Cards.length - 1);
         x += 1;
 
-        if (this.room.data.discard.findIndex(value => value == j) > -1) {
-          continue;
-        } else if (candidateCards.findIndex(value => value == j) > -1) {
-          continue;
-        } else {
+        if (!this.isInPile(this.room.data.discard, j) && !this.isInPile(candidateCards, j)) {
           candidateCards[i] = <any>j;
           break;
         }
