@@ -72,7 +72,7 @@ export default class Setup extends Vue {
     private joinGameClicked: boolean = false;
 
     private get shouldShowDeck() {
-      return !this.isFinishedCardSelection && this.player !== null && this.player.name;
+      return this.selectedCardIds.length < this.NUMBER_OF_CARDS_TO_SELECT;
     }
 
     private get isFinishedCardSelection(): boolean {
@@ -229,8 +229,11 @@ export default class Setup extends Vue {
 
     private async onCardSelected(selectedCard: CardData) {
       console.log("Card selected");
-        
-      if (this.selectedCardIds.push(selectedCard.id) == this.NUMBER_OF_CARDS_TO_SELECT) {
+      
+      const cardsSelectedCount = this.selectedCardIds.push(selectedCard.id);
+
+      console.log(`${cardsSelectedCount} cards selected.`);
+      if (cardsSelectedCount == this.NUMBER_OF_CARDS_TO_SELECT) {
         console.log("Done card selection.");
 
         await storeHelpers.submitSelectionCards(this.selectedCardIds);
