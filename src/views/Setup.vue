@@ -9,10 +9,6 @@
 
   <CardsSetup
     v-else-if="shouldShowDeck"
-    @deck-emptied="onDeckEmpty"
-    @card-selected="onCardSelected"
-    :cards="cards"
-    :numberCardsToSelect="this.NUMBER_OF_CARDS_TO_SELECT - this.selectedCardIds.length"
   />
 
   <TeamSetup
@@ -36,7 +32,7 @@ import Footer from '@/components/Footer.vue';
 import Scoreboard from '@/components/Scoreboard.vue';
 import { db } from  '@/components/Firestore.ts';
 import PlayerNameSetup from '@/components/PlayerNameSetup.vue';
-import CardsSetup from '@/components/CardsSetup.vue';
+import CardsSetup from '@/views/CardsSetup.vue';
 import TeamSetup from '@/components/TeamSetup.vue';
 import Guessing from '@/views/Guessing.vue';
 
@@ -59,8 +55,6 @@ import store, { storeHelpers } from '../store';
 export default class Setup extends Vue {
     @Prop() private roomId?: string | null;
 
-    private NUMBER_OF_CARDS_TO_SELECT: number = 5;
-
     private roomIdTextField: string = '';
     
     private playerName: string = '';
@@ -72,7 +66,7 @@ export default class Setup extends Vue {
     private joinGameClicked: boolean = false;
 
     private get shouldShowDeck() {
-      return this.selectedCardIds.length < this.NUMBER_OF_CARDS_TO_SELECT;
+      return !this.isFinishedCardSelection && this.player !== null && this.player.name;
     }
 
     private get isFinishedCardSelection(): boolean {
@@ -146,45 +140,6 @@ export default class Setup extends Vue {
       return this.phase.filter(playerPhaseData => playerPhaseData.hasSubmittedCards).length == this.phase.length;
     }
 
-    private allCards = <Array<CardData>>JSON.parse(JSON.stringify(Cards));
-
-    private get cards(): Array<any> {
-
-        const cardKeyedById = this.allCards.map((card, index) => {
-            return {
-                id: index,
-                ...card
-            };
-        });
-        
-        const candidateCards = cardKeyedById.filter((card: CardData) => {
-            // console.log("Setup.cards() - filtering card ID " + card.id);
-
-            if (storeHelpers.player.data.decks.selection.includes(card.id)) {
-                // console.log(`Setup.cards() - player has card ID ${card.id} in selection deck`);
-
-                if (this.selectedCardIds.includes(card.id)) {
-                    // console.log(`Setup.cards() - player has already selected card ID ${card.id}, skipping`);
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-        });
-        
-        console.log(`Setup.cards() - returning ${candidateCards.length} cards.`);
-
-        return candidateCards;
-    }
-
-    private selectedCardIds: Array<number> = [];
-
-    public onDeckEmpty() {
-        return;
-    }
-
     public async onCreateGameClick() {
       this.createGameClicked = true;
 
@@ -225,19 +180,6 @@ export default class Setup extends Vue {
         console.log('Start game button clicked.');
         this.isGameStarting = true;
         await storeHelpers.startGame();
-    }
-
-    private async onCardSelected(selectedCard: CardData) {
-      console.log("Card selected");
-      
-      const cardsSelectedCount = this.selectedCardIds.push(selectedCard.id);
-
-      console.log(`${cardsSelectedCount} cards selected.`);
-      if (cardsSelectedCount == this.NUMBER_OF_CARDS_TO_SELECT) {
-        console.log("Done card selection.");
-
-        await storeHelpers.submitSelectionCards(this.selectedCardIds);
-      }
     }
 }
 </script>

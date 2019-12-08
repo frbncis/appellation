@@ -1,5 +1,12 @@
 <template>
-    <v-content class="pb-0 viewport">
+  <v-app
+    style="background: #0bf; color: #fff"
+  >
+    <v-content>
+      <v-col
+        cols="12"
+        style="height: 100%; padding: 0; display: flex; flex-direction: column;"
+      >
       <Scoreboard
         :scores="scores"
         :activeTeam="activeTeam"
@@ -9,63 +16,57 @@
         @timerTick="onTimerTick"
       />
 
-      <div v-if="isPlayerTurn">
-        <v-container fluid>
-          <v-layout
-            column align-center
-          >
-            <v-flex class="card-deck-container" v-if="playerGuessesAllowed">
-              <CardDeck
-                :onCardGuessed="onCardGuessed"
-                :cards="cards"
-                class="card-deck"
-              />
+      <CardDeckContainer
+        v-if="playerGuessesAllowed"
+        @deck-emptied="endTurn"
+        @card-selected="onCardGuessed"
+        :cards="cards"
+        style="height: inheirit;"
+      />
+      
+      <v-container
+        v-else
+      >
+        <v-col>
+          <h1>Round {{ activeRound }}</h1>
+          <h3>{{ rounds[activeRound] ? rounds[activeRound] : 'Make up your own rules.' }}</h3>
+        </v-col>
+      </v-container>
 
-              <v-footer
-                app
-              >
-                <v-progress-linear
-                  :value="progress" />
-              </v-footer>
-            </v-flex>
-
-            <v-flex v-else>
-              <h1>Round {{ activeRound }}</h1>
-              <h3>{{ rounds[activeRound] ? rounds[activeRound] : 'Make up your own rules.' }}</h3>
-
-              <v-footer
-                app
-              >
-                <Button text="Start Round" @click="startTurn" />
-              </v-footer>
-            </v-flex>
-          </v-layout>
-        </v-container>
-
-      </div>
-
-      <div v-else>
-        <h3>Let's go {{ activePlayerName }}!</h3>
-      </div>
+      <!-- <v-container v-else>
+        <div>
+          <h3>Let's go {{ activePlayerName }}!</h3>
+        </div>
+      </v-container> -->
+      </v-col>
     </v-content>
-
+       
+    <Footer
+      v-if="!playerGuessesAllowed"
+    >
+      <v-col>
+      <Button text="Start Round" @click="startTurn" />
+      </v-col>
+    </Footer>
+  </v-app>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import { mapState, mapActions, mapGetters } from 'vuex';
-import CardDeck, { CardData } from '@/components/Card/CardDeck.vue';
+import { CardData } from '@/components/Card/CardDeck.vue';
 import Cards from '@/data/Cards';
 import ProgressBar from '@/components/ProgressBar.vue';
 import Button from '@/components/Button.vue';
 import Footer from '@/components/Footer.vue';
 import Scoreboard from '@/components/Scoreboard.vue';
 import { storeHelpers } from '../store';
+import CardDeckContainer from '@/components/CardDeckContainer.vue';
 
 @Component({
   components: {
     Button,
-    CardDeck,
+    CardDeckContainer,
     Footer,
     ProgressBar,
     Scoreboard,
@@ -75,7 +76,7 @@ export default class Guessing extends Vue {
   /**
    * The maximum amount of time in seconds for a turn.
    */
-  private readonly TIMER_START_VALUE = 60;
+  private readonly TIMER_START_VALUE = 1000;
 
   /**
    * The timer's current value.
@@ -201,10 +202,19 @@ export default class Guessing extends Vue {
 </script>
 
 <style scoped>
+.view-content__wrap {
+  display: flex;
+}
+
 .viewport {
   position: fixed;
   height: 100%;
   width: 100%;
+}
+
+.card-deck-container {
+  height: 100%;
+  align-items: stretch;
 }
 
 .active-team {

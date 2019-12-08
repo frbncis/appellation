@@ -1,34 +1,23 @@
 <template>
-  <v-app style="background: #0bf; color: #fff;">
-    <v-content>
-      <v-container fill-height style="align-items: stretch;">
-        <v-col
-          cols="12"
-        >
-          <v-row
-            style="height: 100%; align-items: stretch;"
-          >
-            <CardDeck
-              :onDeckEmpty="onDeckEmpty"
-              :onCardGuessed="onCardSelected"
-              :cards="cards"
-            />
-          </v-row>
-        </v-col>
-      </v-container>
-    </v-content>
-
-    <Footer>
+  <v-container
+    fill-height
+    style="align-items: stretch;"
+  >
+    <v-col
+      cols="12"
+      style="display:flex;"
+    >
       <v-row
-        justify="center"
-        align="center"
+        style="height: 100%; align-items: stretch;"
       >
-        <v-col>
-          <v-btn block outlined dark disabled>Choose {{ this.numberCardsToSelect }} cards</v-btn>
-        </v-col>
+        <CardDeck
+          :onDeckEmpty="onDeckEmpty"
+          :onCardGuessed="onCardSelected"
+          :cards="cards"
+        />
       </v-row>
-    </Footer>
-  </v-app>
+    </v-col>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -55,9 +44,8 @@ import store, { storeHelpers } from '../store';
     PlayerNameSetup,
   },
 })
-export default class CardsSetup extends Vue {
+export default class CardDeckContainer extends Vue {
   @Prop() private cards?: Array<number>;
-  @Prop() private numberCardsToSelect?: number;
 
   private onDeckEmpty() {
     this.$emit('deck-emptied');
