@@ -9,9 +9,12 @@ import firebase from 'firebase';
 import { PlayerState } from './player';
 
 export const getRandomIntInclusive = (min: number, max: number) => {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  let _min = min;
+  let _max = max;
+
+  _min = Math.ceil(_min);
+  _max = Math.floor(_max);
+  return Math.floor(Math.random() * (_max - _min + 1)) + min;
 };
 
 interface Cards extends Array<number> {
@@ -35,11 +38,22 @@ export class RoomState extends RoomStateCards {
 
     public createdAt: Date = new Date();
 
+    public turnStarted?: number | null = null;
+
     public currentTeamTurnId?: number = -1;
 
-    public currentPlayerId?: string = '';
+    public currentPlayer: PlayerState = {
+      playerId: null,
+      name: null,
+      roomId: null,
+      room: null,
+      teamId: 0,
+      decks: {
+        selection: [],
+      },
+    };
 
-    public currentPlayerName?: string = '';
+    public currentPlayerId?: string = '';
 
     public previousPlayerId?: string = '';
 
@@ -82,17 +96,6 @@ export class RoomModule extends FirestoreVuexModule {
      */
     public phase: Array<any> = [];
 
-    public currentPlayer?: PlayerState = {
-      playerId: null,
-      name: null,
-      roomId: null,
-      room: new RoomState(),
-      teamId: -1,
-      decks: {
-        selection: [],
-      },
-    };
-
     private get document() {
       if (!this.data.roomId) {
         throw new Error('Room ID not set.');
@@ -114,19 +117,6 @@ export class RoomModule extends FirestoreVuexModule {
 
       const roomDocument = db.collection('rooms').doc(roomId);
       await bindFirestoreRef('data', roomDocument);
-
-      await this.bindCurrentPlayerReference(this.data.currentPlayerId!);
-    }
-
-    @FirestoreAction
-    public bindCurrentPlayerReference(playerId: string) {
-      console.log('Binding current player reference', playerId);
-
-      const { bindFirestoreRef } = this.context;
-
-      const currentPlayerDocument = collections.player(this.data.roomId!, playerId);
-
-      return bindFirestoreRef('currentPlayer', currentPlayerDocument);
     }
 
     @FirestoreAction
@@ -256,7 +246,17 @@ export class RoomModule extends FirestoreVuexModule {
 
       let turnData: { previousPlayerId: string, currentPlayerId: string, currentTeamTurnId: number } | null = null;
 
-      if (this.data.players.length == 1) {
+      // No active player, this is the first turn.
+      if (this.data.currentPlayerId === "") {
+        // turnSequence is indexed by team IDs.
+        const firstPlayerId = this.data.turnSequence[1][0];
+
+        turnData = {
+          previousPlayerId: firstPlayerId,
+          currentPlayerId: firstPlayerId,
+          currentTeamTurnId: 0,
+        };
+      } else if (this.data.players.length == 1) {
         const { currentPlayerId } = this.data;
         const currentPlayerTeamId = this.data.currentTeamTurnId;
         turnData = {
@@ -288,9 +288,10 @@ export class RoomModule extends FirestoreVuexModule {
         };
       }
 
-      await this.update(turnData);
-
-      return await this.bindCurrentPlayerReference(turnData.currentPlayerId);
+      await this.update({
+        ...turnData,
+        currentPlayer: <any>collections.player(this.data.roomId!, turnData.currentPlayerId!)
+      });
     }
 
     @Action

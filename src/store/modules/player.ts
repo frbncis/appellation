@@ -14,7 +14,7 @@ export interface PlayerState {
   playerId: string | null,
   name: string | null,
   roomId: string | null,
-  room?: RoomState,
+  room?: RoomState | null,
   teamId: number,
   decks: PlayerDeck
 }
@@ -132,17 +132,24 @@ export class PlayerModule extends FirestoreVuexModule {
 
   @Action
   public async ensureCurrentPhaseDataExists(payload: { roomId: string, playerId: string, phase: GamePhase }) {
-    // TODO: This should do a check to see if the data actually exists before writing to it
-    // since this does a full replace.
     if (payload.phase == GamePhase.Setup) {
-      await collections.phase(
+      const document = await collections.phase(
         payload.roomId,
         GamePhase.Setup,
-      ).doc(payload.playerId).set({
-        playerId: payload.playerId,
-        player: collections.player(payload.roomId, payload.playerId),
-        hasSubmittedCards: false,
+      ).doc(payload.playerId);
+
+      const documentExists = await document.get()
+      .then(snapshot => {
+        return snapshot.exists
       });
+
+      if (!documentExists) {
+        document.set({
+          playerId: payload.playerId,
+          player: collections.player(payload.roomId, payload.playerId),
+          hasSubmittedCards: false,
+        });
+      }
     }
   }
 

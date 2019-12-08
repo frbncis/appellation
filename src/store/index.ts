@@ -57,10 +57,8 @@ export const storeHelpers = {
     console.log('Generating turn sequences...');
     await this.room.generateTurnSequences();
 
-    const firstPlayerId = this.room.data.turnSequence[1][0];
-
-    console.log('Updating room data...');
-    await this.room.update({ currentTeamTurnId: 1, currentPlayerId: firstPlayerId });
+    console.log('Setting room turn data...');
+    await this.room.setNextPlayer();
 
     console.log('Setting cards to be played with');
     await this.room.update({ activeRemainingCards: this.room.data.selectedCards });
@@ -72,10 +70,16 @@ export const storeHelpers = {
       roomId: this.room.data.roomId!,
       phase: GamePhase.Guessing,
     });
+
+    await this.room.bindPhaseReference({
+      roomId: this.room.data.roomId!,
+      phase: GamePhase.Guessing,
+    });
   },
 
   async endTurn() {
     console.log('storeHelpers.endTurn() called');
+    await this.room.update({ turnStarted: 0 });
 
     if (this.room.data.activeRemainingCards.length > 0) {
       console.log('There are cards in the draw pile, setting next player.');
@@ -84,6 +88,10 @@ export const storeHelpers = {
       console.log('End of round.');
       await this.room.setNextRound();
     }
+  },
+
+  async turnStarted() {
+    this.room.update({ turnStarted: Date.now() });
   },
 
   async loadUser() {

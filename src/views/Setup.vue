@@ -1,23 +1,27 @@
 <template>
-  <PlayerNameSetup 
-    v-if="player.playerId !== undefined 
-      && roomId !== undefined 
-      && player.name == null"
-      
-    :roomId="roomId"
-  />
+  <div
+    v-if="isSetupPhase"
+  >
+    <PlayerNameSetup 
+      v-if="player.playerId !== undefined 
+        && roomId !== undefined 
+        && player.name == null"
+        
+      :roomId="roomId"
+    />
 
-  <CardsSetup
-    v-else-if="shouldShowDeck"
-  />
+    <CardsSetup
+      v-else-if="shouldShowDeck"
+    />
 
-  <TeamSetup
-    v-else-if="!isGameStarted"
-    :playersTeam1="playersTeam1"
-    :playersTeam2="playersTeam2"
-    @switched-teams="onSwitchTeamClick"
-    @start-game="onStartGameClick"
-  />
+    <TeamSetup
+      v-else
+      :playersTeam1="playersTeam1"
+      :playersTeam2="playersTeam2"
+      @switched-teams="onSwitchTeamClick"
+      @start-game="onStartGameClick"
+    />
+  </div>
 
   <Guessing v-else />
 </template>
@@ -91,8 +95,8 @@ export default class Setup extends Vue {
         return storeHelpers.player.data;
     }
 
-    private get isGameStarted() {
-      return storeHelpers.room.data.gamePhase !== 0;
+    private get isSetupPhase() {
+      return storeHelpers.room.data.gamePhase === 0;
     }
 
     private switchTeam = storeHelpers.player.switchTeam;
@@ -118,17 +122,16 @@ export default class Setup extends Vue {
         }
 
         return this.phase.filter(playerPhaseData => {
-            console.log(playerPhaseData);
+          console.log(playerPhaseData);
 
-            if (playerPhaseData)
+          if (playerPhaseData) {
+            if (playerPhaseData.player)
             {
-                if (playerPhaseData.player)
-                {
-                    return playerPhaseData.player.teamId == teamId;
-                }
+                return playerPhaseData.player.teamId == teamId;
             }
+          }
 
-            return false;
+          return false;
         })
     }
 

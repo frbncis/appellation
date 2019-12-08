@@ -11,45 +11,49 @@
           display: flex;
           flex-direction: column;"
       >
-      <Scoreboard
-        :scores="scores"
-        :activeTeam="activeTeam"
-        :isRoundActive="playerGuessesAllowed"
-        :timerInitialValue="TIMER_START_VALUE"
-        :timeRemainingSeconds="timeRemainingSeconds"
-        @timerTick="onTimerTick"
-      />
+        <Scoreboard
+          :scores="scores"
+          :activeTeam="activeTeam"
+          :isRoundActive="isRoundActive"
+          :timerInitialValue="TIMER_START_VALUE"
+          :timeRemainingSeconds="timeRemainingSeconds"
+          @timerTick="onTimerTick"
+        />
 
-      <CardDeckContainer
-        v-if="playerGuessesAllowed"
-        @deck-emptied="endTurn"
-        @card-selected="onCardGuessed"
-        :cards="cards"
-        style="height: inheirit; padding-top: 0"
-      />
-      
-      <v-container
-        v-else
-      >
-        <v-col>
-          <h1>Round {{ activeRound }}</h1>
-          <h3>{{ rounds[activeRound] ? rounds[activeRound] : 'Make up your own rules.' }}</h3>
-        </v-col>
-      </v-container>
+        <v-row
+          v-if="isPlayerTurn"
+        >
+          <v-col>
+            <CardDeckContainer
+              v-if="playerGuessesAllowed"
+              @deck-emptied="endTurn"
+              @card-selected="onCardGuessed"
+              :cards="cards"
+              style="height: inheirit; padding-top: 0"
+            />
+            
+            <v-container
+              v-else
+            >
+              <v-col>
+                <h1>Round {{ activeRound }}</h1>
+                <h3>{{ rounds[activeRound] ? rounds[activeRound] : 'Make up your own rules.' }}</h3>
+              </v-col>
+            </v-container>
+          </v-col>
+        </v-row>
 
-      <!-- <v-container v-else>
-        <div>
-          <h3>Let's go {{ activePlayerName }}!</h3>
-        </div>
-      </v-container> -->
+        <v-container v-else>
+          <h2>Let's go {{ activePlayerName }}!</h2>
+        </v-container>
       </v-col>
     </v-content>
        
     <Footer
-      v-if="!playerGuessesAllowed"
+      v-if="isPlayerTurn && !playerGuessesAllowed"
     >
       <v-col>
-      <Button text="Start Round" @click="startTurn" />
+        <Button text="Start Round" @click="startTurn" />
       </v-col>
     </Footer>
   </v-app>
@@ -82,10 +86,24 @@ export default class Guessing extends Vue {
    */
   private readonly TIMER_START_VALUE = 60;
 
+  private timeRemainingField?: number = this.TIMER_START_VALUE;
+
   /**
    * The timer's current value.
    */
-  private timeRemainingSeconds = this.TIMER_START_VALUE;
+  private get timeRemainingSeconds() {
+    if (storeHelpers.room.data.turnStarted !== 0) {
+      const calculatedRemainingTime = Math.floor((storeHelpers.room.data.turnStarted! + this.TIMER_START_VALUE * 1000 - Date.now().valueOf()) / 1000);
+
+      if (calculatedRemainingTime >= 0) {
+        this.timeRemainingField = calculatedRemainingTime;
+      } else {
+        this.timeRemainingField = 0;
+      }
+    }
+
+    return this.timeRemainingField;
+  }
 
   public roundActive = false;
 
@@ -131,12 +149,35 @@ export default class Guessing extends Vue {
   }
 
   public get activePlayerName() {
-    if (storeHelpers.room.currentPlayer) return storeHelpers.room.currentPlayer.name;
-    return '';
+    if (storeHelpers.room.data.currentPlayer) {
+      return storeHelpers.room.data.currentPlayer.name;
+    } else {
+      return "Ｗｉｌｄ ＭＩＳＳＩＮＧＮＯ．ａｐｐｅａｒｅｄ!" +
+        "" +
+        "      ▞▚▟▛▚" + "\n" +
+        "      ▞▗▝▗▜" +
+        "      ▙▖▞▝▜" +
+        "      ▝▖▝▗▘" +
+        "      ▞▚▗▚▖" +
+        "      ▜▞▛▘▝" +
+        "  ▙▙▗▟▖▘▞▖▜▞" +
+        "  ▞▙▟▛▙█▞▝▙▛" +
+        "  ▝▟▞█▘▞█▖▙▝" +
+        "  ▛▖▞▜▙▞▚▜▙█" +
+        "  ▗▜▝▛▘▝▟▘▞▙" +
+        "  ▗▜▝▘▘▝▗▚▟▞" +
+        "  ▜▘▞▚▚▞▜█▛▚" +
+        "  ▝▚▝▝▝▙▜▟▘▞" +
+        "  ▞▛▝▞▘▘▙▚▛█";
+    }
   }
 
   get playerGuessesAllowed(): boolean {
     return this.roundActive == true && this.hasTimeRemaining == true && this.cards.length > 0;
+  }
+
+  get isRoundActive(): boolean {
+    return storeHelpers.room.data.turnStarted !== 0;
   }
 
   get showStartButton(): boolean {
@@ -158,9 +199,11 @@ export default class Guessing extends Vue {
     return cards.filter(card => card !== null);
   }
 
-  private startTurn() {
+  private async startTurn() {
     this.roundActive = true;
-    this.timeRemainingSeconds = this.TIMER_START_VALUE;
+
+    if (this.isPlayerTurn)
+      await storeHelpers.turnStarted();
   }
 
   private async endTurn() {
@@ -169,9 +212,9 @@ export default class Guessing extends Vue {
   }
 
   private onTimerTick() {
-    this.timeRemainingSeconds = this.timeRemainingSeconds - 1;
+    this.timeRemainingField = this.timeRemainingField! - 1;
 
-    if (this.timeRemainingSeconds <= 0) {
+    if (this.timeRemainingField <= 0 && this.isPlayerTurn) {
       this.endTurn();
     }
   }
