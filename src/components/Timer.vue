@@ -37,7 +37,7 @@ export default class Timer extends Vue {
       } if (this.timeRemainingSeconds! < 20) {
         return 'warning';
       }
-      return 'primary';
+      return 'white';
     }
 
     public mounted() {

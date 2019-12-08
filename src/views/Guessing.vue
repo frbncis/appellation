@@ -137,7 +137,7 @@ export default class Guessing extends Vue {
   }
 
   private get hasTimeRemaining() {
-    return this.timeRemainingSeconds > 0;
+    return this.timeRemainingField! > 0;
   }
 
   public get cardIds(): Array<number> {
@@ -196,7 +196,7 @@ export default class Guessing extends Vue {
 
     const cards = storeHelpers.room.data.activeRemainingCards.map((cardId: number) => cardModels[cardId]);
 
-    return cards.filter(card => card !== null);
+    return this.shuffle(cards.filter(card => card !== null));
   }
 
   private async startTurn() {
