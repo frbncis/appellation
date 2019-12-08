@@ -5,7 +5,7 @@
   >
     <v-col
       cols="12"
-      style="display:flex;"
+      style="display:flex;  padding-top: 0; padding-bottom: 0;"
     >
       <v-row
         style="height: 100%; align-items: stretch;"

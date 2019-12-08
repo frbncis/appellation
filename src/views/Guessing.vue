@@ -5,7 +5,11 @@
     <v-content>
       <v-col
         cols="12"
-        style="height: 100%; padding: 0; display: flex; flex-direction: column;"
+        style="
+          height: 100%; 
+          padding: 0;
+          display: flex;
+          flex-direction: column;"
       >
       <Scoreboard
         :scores="scores"
@@ -21,7 +25,7 @@
         @deck-emptied="endTurn"
         @card-selected="onCardGuessed"
         :cards="cards"
-        style="height: inheirit;"
+        style="height: inheirit; padding-top: 0"
       />
       
       <v-container
@@ -76,7 +80,7 @@ export default class Guessing extends Vue {
   /**
    * The maximum amount of time in seconds for a turn.
    */
-  private readonly TIMER_START_VALUE = 1000;
+  private readonly TIMER_START_VALUE = 60;
 
   /**
    * The timer's current value.
