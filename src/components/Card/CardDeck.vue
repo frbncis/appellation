@@ -290,11 +290,7 @@ h1, p {
   }
 
   .card-category::before {
-      content: "";
-      width: 70%;
-      display: block;
-      margin: 1vh auto; 
-      /* border-top: 0 !important; */
+    display: none !important;
   }
 }
 
