@@ -50,7 +50,7 @@
 
               <div class="card-points-container-shape">
                 <h3>{{ card.points }}</h3>
-                <p>Points</p>
+                <p class="points-text">Points</p>
               </div>
             </div>
           </v-col>
@@ -261,6 +261,41 @@ h1, p {
 .card-description {
   text-align: left;
   margin-bottom: 0;
+}
+
+/* iPhone 7 */
+@media only screen 
+  and (min-device-width: 320px) 
+  and (max-device-width: 480px)
+  and (-webkit-min-device-pixel-ratio: 2)
+  and (orientation: portrait) {
+  
+  .card-title {
+    font-size: 4vh !important;
+  }
+
+  .points-text {
+    display: none;
+  }
+
+  .card-points-container-shape {
+    height: 40px !important;
+    border-top-left-radius: 80px !important;
+    border-top-right-radius: 80px !important;
+  }
+
+  .card-category {
+    margin-bottom: 0vh;
+    font-size: 2.5vh !important;
+  }
+
+  .card-category::before {
+      content: "";
+      width: 70%;
+      display: block;
+      margin: 1vh auto; 
+      /* border-top: 0 !important; */
+  }
 }
 
 .card-category {
