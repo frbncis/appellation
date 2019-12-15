@@ -198,6 +198,15 @@ export default class CardDeck extends Vue {
 
     private _onCardGuessed() {
       const selectedCard = this.renderableCards[0];
+      const nextCard = this.renderableCards[1];
+
+      // Recalculate the sliding window index for the next card
+      // once it has been removed.
+      const nextDeck = this.cards!.filter(card => {
+        return card.id !== selectedCard.id;
+      });
+
+      this.slidingWindowIndexField = nextDeck.indexOf(nextCard);
 
       if (this.onCardGuessed) {
         console.log("CardDeck._onCardGuess() - executing callback for onCardGuessed", selectedCard);
