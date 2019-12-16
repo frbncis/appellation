@@ -247,7 +247,7 @@ export class RoomModule extends FirestoreVuexModule {
       let turnData: { previousPlayerId: string, currentPlayerId: string, currentTeamTurnId: number } | null = null;
 
       // No active player, this is the first turn.
-      if (this.data.currentPlayerId === "") {
+      if (this.data.currentPlayerId === '') {
         // turnSequence is indexed by team IDs.
         const firstPlayerId = this.data.turnSequence[1][0];
 
@@ -290,7 +290,7 @@ export class RoomModule extends FirestoreVuexModule {
 
       await this.update({
         ...turnData,
-        currentPlayer: <any>collections.player(this.data.roomId!, turnData.currentPlayerId!)
+        currentPlayer: <any>collections.player(this.data.roomId!, turnData.currentPlayerId!),
       });
     }
 

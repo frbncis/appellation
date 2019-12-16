@@ -22,18 +22,18 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import { mapState, mapActions, mapGetters } from 'vuex';
 import CardDeck, { CardData } from '@/components/Card/CardDeck.vue';
 import Cards from '@/data/Cards';
 import ProgressBar from '@/components/ProgressBar.vue';
 import Button from '@/components/Button.vue';
 import Footer from '@/components/Footer.vue';
 import Scoreboard from '@/components/Scoreboard.vue';
-import { db } from  '@/components/Firestore.ts';
+import { db } from '@/components/Firestore.ts';
 import PlayerNameSetup from '@/components/PlayerNameSetup.vue';
 
-import {collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService.ts';
+import { collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService.ts';
 
-import { mapState, mapActions, mapGetters } from 'vuex'
 import { PlayerDeck } from '@/store/modules/player';
 import store, { storeHelpers } from '../store';
 

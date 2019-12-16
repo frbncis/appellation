@@ -6,7 +6,7 @@
       <v-col
         cols="12"
         style="
-          height: 100%; 
+          height: 100%;
           padding: 0;
           display: flex;
           flex-direction: column;"
@@ -31,7 +31,7 @@
               :cards="cards"
               style="height: inheirit; padding-top: 0"
             />
-            
+
             <v-container
               v-else
             >
@@ -48,7 +48,7 @@
         </v-container>
       </v-col>
     </v-content>
-       
+
     <Footer
       v-if="isPlayerTurn && !playerGuessesAllowed"
     >
@@ -151,25 +151,24 @@ export default class Guessing extends Vue {
   public get activePlayerName() {
     if (storeHelpers.room.data.currentPlayer) {
       return storeHelpers.room.data.currentPlayer.name;
-    } else {
-      return "Ｗｉｌｄ ＭＩＳＳＩＮＧＮＯ．ａｐｐｅａｒｅｄ!" +
-        "" +
-        "      ▞▚▟▛▚" + "\n" +
-        "      ▞▗▝▗▜" +
-        "      ▙▖▞▝▜" +
-        "      ▝▖▝▗▘" +
-        "      ▞▚▗▚▖" +
-        "      ▜▞▛▘▝" +
-        "  ▙▙▗▟▖▘▞▖▜▞" +
-        "  ▞▙▟▛▙█▞▝▙▛" +
-        "  ▝▟▞█▘▞█▖▙▝" +
-        "  ▛▖▞▜▙▞▚▜▙█" +
-        "  ▗▜▝▛▘▝▟▘▞▙" +
-        "  ▗▜▝▘▘▝▗▚▟▞" +
-        "  ▜▘▞▚▚▞▜█▛▚" +
-        "  ▝▚▝▝▝▙▜▟▘▞" +
-        "  ▞▛▝▞▘▘▙▚▛█";
     }
+    return 'Ｗｉｌｄ ＭＩＳＳＩＮＧＮＯ．ａｐｐｅａｒｅｄ!'
+        + ''
+        + '      ▞▚▟▛▚' + '\n'
+        + '      ▞▗▝▗▜'
+        + '      ▙▖▞▝▜'
+        + '      ▝▖▝▗▘'
+        + '      ▞▚▗▚▖'
+        + '      ▜▞▛▘▝'
+        + '  ▙▙▗▟▖▘▞▖▜▞'
+        + '  ▞▙▟▛▙█▞▝▙▛'
+        + '  ▝▟▞█▘▞█▖▙▝'
+        + '  ▛▖▞▜▙▞▚▜▙█'
+        + '  ▗▜▝▛▘▝▟▘▞▙'
+        + '  ▗▜▝▘▘▝▗▚▟▞'
+        + '  ▜▘▞▚▚▞▜█▛▚'
+        + '  ▝▚▝▝▝▙▜▟▘▞'
+        + '  ▞▛▝▞▘▘▙▚▛█';
   }
 
   get playerGuessesAllowed(): boolean {
@@ -202,8 +201,7 @@ export default class Guessing extends Vue {
   private async startTurn() {
     this.roundActive = true;
 
-    if (this.isPlayerTurn)
-      await storeHelpers.turnStarted();
+    if (this.isPlayerTurn) await storeHelpers.turnStarted();
   }
 
   private async endTurn() {

@@ -139,9 +139,7 @@ export class PlayerModule extends FirestoreVuexModule {
       ).doc(payload.playerId);
 
       const documentExists = await document.get()
-      .then(snapshot => {
-        return snapshot.exists
-      });
+        .then(snapshot => snapshot.exists);
 
       if (!documentExists) {
         document.set({

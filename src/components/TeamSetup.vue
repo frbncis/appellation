@@ -70,10 +70,11 @@ import Footer from '@/components/Footer.vue';
 @Component({
   components: {
     Footer,
-  }
+  },
 })
 export default class TeamSetup extends Vue {
   @Prop() public playersTeam1?: Array<any>;
+
   @Prop() public playersTeam2?: Array<any>;
 }
 </script>

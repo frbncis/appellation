@@ -2,11 +2,11 @@
   <div
     v-if="isSetupPhase"
   >
-    <PlayerNameSetup 
-      v-if="player.playerId !== undefined 
-        && roomId !== undefined 
+    <PlayerNameSetup
+      v-if="player.playerId !== undefined
+        && roomId !== undefined
         && player.name == null"
-        
+
       :roomId="roomId"
     />
 
@@ -28,21 +28,21 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import { mapState, mapActions, mapGetters } from 'vuex';
 import CardDeck, { CardData } from '@/components/Card/CardDeck.vue';
 import Cards from '@/data/Cards';
 import ProgressBar from '@/components/ProgressBar.vue';
 import Button from '@/components/Button.vue';
 import Footer from '@/components/Footer.vue';
 import Scoreboard from '@/components/Scoreboard.vue';
-import { db } from  '@/components/Firestore.ts';
+import { db } from '@/components/Firestore.ts';
 import PlayerNameSetup from '@/components/PlayerNameSetup.vue';
 import CardsSetup from '@/views/CardsSetup.vue';
 import TeamSetup from '@/components/TeamSetup.vue';
 import Guessing from '@/views/Guessing.vue';
 
-import {collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService.ts';
+import { collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService.ts';
 
-import { mapState, mapActions, mapGetters } from 'vuex'
 import { PlayerDeck } from '@/store/modules/player';
 import store, { storeHelpers } from '../store';
 
@@ -60,7 +60,7 @@ export default class Setup extends Vue {
     @Prop() private roomId?: string | null;
 
     private roomIdTextField: string = '';
-    
+
     private playerName: string = '';
 
     private isGameStarting: boolean = false;
@@ -74,25 +74,25 @@ export default class Setup extends Vue {
     }
 
     private get isFinishedCardSelection(): boolean {
-        if (!this.phase) {
-            return false;
-        }
+      if (!this.phase) {
+        return false;
+      }
 
-        const playerData = this.phase.find(playerPhaseData => playerPhaseData.playerId == this.player.playerId);
+      const playerData = this.phase.find(playerPhaseData => playerPhaseData.playerId == this.player.playerId);
 
-        if(!playerData) {
-            return false;
-        }
+      if (!playerData) {
+        return false;
+      }
 
-        return playerData.hasSubmittedCards;
+      return playerData.hasSubmittedCards;
     }
 
     private get phase(): Array<SetupPhaseData> {
-        return storeHelpers.room.phase;
+      return storeHelpers.room.phase;
     }
 
     private get player() {
-        return storeHelpers.player.data;
+      return storeHelpers.player.data;
     }
 
     private get isSetupPhase() {
@@ -102,11 +102,11 @@ export default class Setup extends Vue {
     private switchTeam = storeHelpers.player.switchTeam;
 
     private get playersTeam1(): Array<any> {
-        return this.playersByTeam(1);
+      return this.playersByTeam(1);
     }
 
     private get playersTeam2(): Array<any> {
-        return this.playersByTeam(2);
+      return this.playersByTeam(2);
     }
 
     public async created() {
@@ -114,25 +114,24 @@ export default class Setup extends Vue {
         await storeHelpers.joinGame(this.roomId!);
       }
       window.scrollTo(0, 1);
-
     }
+
     private playersByTeam(teamId: number): Array<any> {
-        if (!this.phase) {
-            return [];
+      if (!this.phase) {
+        return [];
+      }
+
+      return this.phase.filter((playerPhaseData) => {
+        console.log(playerPhaseData);
+
+        if (playerPhaseData) {
+          if (playerPhaseData.player) {
+            return playerPhaseData.player.teamId == teamId;
+          }
         }
 
-        return this.phase.filter(playerPhaseData => {
-          console.log(playerPhaseData);
-
-          if (playerPhaseData) {
-            if (playerPhaseData.player)
-            {
-                return playerPhaseData.player.teamId == teamId;
-            }
-          }
-
-          return false;
-        })
+        return false;
+      });
     }
 
     private get playersReady(): boolean {
@@ -160,29 +159,28 @@ export default class Setup extends Vue {
     }
 
     public async onSetPlayerNameClick() {
-        if (this.roomId && this.playerName != '') {
-            const playerId = await storeHelpers.createPlayer(
-                this.roomId,
-                this.playerName
-            );
+      if (this.roomId && this.playerName != '') {
+        const playerId = await storeHelpers.createPlayer(
+          this.roomId,
+          this.playerName,
+        );
 
-            await storeHelpers.becomePlayer(this.roomId, playerId);
+        await storeHelpers.becomePlayer(this.roomId, playerId);
 
-            await storeHelpers.drawSelectionCards();
-            
-        } else {
-            throw new Error("No room ID")
-        }
+        await storeHelpers.drawSelectionCards();
+      } else {
+        throw new Error('No room ID');
+      }
     }
 
     public async onSwitchTeamClick() {
-        await this.switchTeam();
+      await this.switchTeam();
     }
 
     public async onStartGameClick() {
-        console.log('Start game button clicked.');
-        this.isGameStarting = true;
-        await storeHelpers.startGame();
+      console.log('Start game button clicked.');
+      this.isGameStarting = true;
+      await storeHelpers.startGame();
     }
 }
 </script>
