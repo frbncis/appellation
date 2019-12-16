@@ -19,6 +19,14 @@
           justify="center"
           align="stretch"
         >
+          <div class="swipe-hint swipe-skip-hint" style="display: none;">
+            <v-icon color="#00B4EF" size="100">replay</v-icon>
+          </div>
+
+          <div class="swipe-hint swipe-guess-hint" style="display: none;">
+            <v-icon color="rgba(76, 189, 159, 1)" size="100">checkmark</v-icon>
+          </div>
+
           <v-col 
             cols="12"
             class="card-data"
@@ -130,19 +138,30 @@ export default class CardDeck extends Vue {
       this.setCardHints(cardMovement.target, CardHint.None)
     }
 
-    private setCardHints(cardDivElement: HTMLDivElement, hint: CardHint) {
+    private setCardHints(card: HTMLDivElement, hint: CardHint) {
+      const show = 'block';
+      const hide = 'none';
+
+      const skipHint = '.swipe-skip-hint';
+      const guessHint = '.swipe-guess-hint';
+
+      const setHintVisibility = (card: HTMLDivElement, hintSelector: string, hintState: string) => {
+        (<HTMLDivElement>(card.querySelector(hintSelector)!)).style.display = hintState;
+      };
+
       switch (hint) {
         case CardHint.Guessed:
-          cardDivElement.classList.remove('card-skipped-hint');
-          cardDivElement.classList.add('card-selected-hint');
+          setHintVisibility(card, guessHint, show);
+
           break;
         case CardHint.Skipped:
-          cardDivElement.classList.remove('card-selected-hint');
-          cardDivElement.classList.add('card-skipped-hint');          
+          setHintVisibility(card, skipHint, show);
+          
           break;
         case CardHint.None:
-          cardDivElement.classList.remove('card-selected-hint');
-          cardDivElement.classList.remove('card-skipped-hint');
+          setHintVisibility(card, skipHint, hide);
+          setHintVisibility(card, guessHint, hide);
+
       }
     }
 
@@ -248,6 +267,30 @@ h1, p {
   padding-left: 9%;
   padding-right: 9%;
   height:inherit;
+}
+
+.swipe-hint {
+  position: absolute;
+  text-transform: uppercase;
+  font-weight: bold;
+  margin: 1em 1em 0 0;
+  padding: 0.12em 0.25em 0.12em 0.25em;
+
+  -webkit-mask-image: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/8399/grunge.png');
+  -webkit-mask-size: 944px 604px;
+  mix-blend-mode: multiply;
+  font-size: 2em;
+  top: 25%;
+}
+
+.swipe-skip-hint {
+  right: 0;
+  color: #00B4EF;
+}
+
+.swipe-guess-hint {
+  left: 0;
+  color: #00B4EF;
 }
 
 /* This is the next card. */
