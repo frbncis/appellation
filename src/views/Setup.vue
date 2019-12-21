@@ -35,7 +35,7 @@ import ProgressBar from '@/components/ProgressBar.vue';
 import Button from '@/components/Button.vue';
 import Footer from '@/components/Footer.vue';
 import Scoreboard from '@/components/Scoreboard.vue';
-import { db } from '@/components/Firestore';
+import db from '@/components/Firestore';
 import PlayerNameSetup from '@/components/PlayerNameSetup.vue';
 import CardsSetup from '@/views/CardsSetup.vue';
 import TeamSetup from '@/components/TeamSetup.vue';

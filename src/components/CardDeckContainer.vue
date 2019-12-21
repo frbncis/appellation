@@ -29,7 +29,7 @@ import ProgressBar from '@/components/ProgressBar.vue';
 import Button from '@/components/Button.vue';
 import Footer from '@/components/Footer.vue';
 import Scoreboard from '@/components/Scoreboard.vue';
-import { db } from '@/components/Firestore';
+import db from '@/components/Firestore';
 import PlayerNameSetup from '@/components/PlayerNameSetup.vue';
 
 import { collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService';

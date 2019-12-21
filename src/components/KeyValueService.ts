@@ -1,5 +1,5 @@
 
-import { db } from './Firestore';
+import db from './Firestore';
 
 export const collections = {
   room(roomId: string) { return db.collection('rooms').doc(roomId); },

@@ -9,7 +9,7 @@ declare module 'firebase' {
 }
 
 /**
- * Updates the top level properties with the provided data. 
+ * Updates the top level properties with the provided data.
  * Note that the values provided in patchData
  * will replace the value stored in the database completely.
  */

@@ -27,7 +27,7 @@ import ProgressBar from "@/components/ProgressBar.vue";
 import Button from "@/components/Button.vue";
 import Footer from "@/components/Footer.vue";
 import Scoreboard from "@/components/Scoreboard.vue";
-import { db } from "@/components/Firestore";
+import db from "@/components/Firestore";
 import PlayerNameSetup from "@/components/PlayerNameSetup.vue";
 import CardDeckContainer from "@/components/CardDeckContainer.vue";
 import SetupPageContent from "@/components/SetupPageContent.vue";

@@ -3,7 +3,7 @@ import {
 } from 'vuex-module-decorators';
 import firebase from 'firebase';
 import { GamePhase, collections, SetupPhaseData } from '@/components/KeyValueService';
-import { db } from '@/components/Firestore';
+import db from '@/components/Firestore';
 import './firebaseExtensions';
 import { FirestoreAction, FirestoreVuexModule } from './FirebaseAction';
 import { PlayerState } from './player';
@@ -249,7 +249,7 @@ export class RoomModule extends FirestoreVuexModule {
     public async setNextPlayer() {
       console.log('RoomModule.setNextPlayer() - called.');
 
-      let turnData: { 
+      let turnData: {
         previousPlayerId: string,
         currentPlayerId: string,
         currentTeamTurnId: number
@@ -284,6 +284,7 @@ export class RoomModule extends FirestoreVuexModule {
         let nextPlayerId;
 
         if (!previousPlayerId) {
+          /* eslint-disable-next-line */
           nextPlayerId = nextTeamSequence[0];
         } else {
           const previousPlayerIndex = nextTeamSequence.indexOf(previousPlayerId);

@@ -86,7 +86,7 @@ import { mapState, mapActions, mapGetters } from 'vuex';
 import ProgressBar from '@/components/ProgressBar.vue';
 import Button from '@/components/Button.vue';
 import Footer from '@/components/Footer.vue';
-import { db } from '@/components/Firestore';
+import db from '@/components/Firestore';
 
 import { collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService';
 
