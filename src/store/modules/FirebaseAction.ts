@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import {
   Action as Act, ActionContext, Module as Mod, Payload,
 } from 'vuex';
