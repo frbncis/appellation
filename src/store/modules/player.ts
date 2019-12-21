@@ -1,10 +1,10 @@
 import {
-  Module, VuexModule, Action, Mutation,
+  Module, Action, Mutation,
 } from 'vuex-module-decorators';
 import firebase from 'firebase';
 import { collections, GamePhase } from '@/components/KeyValueService';
 import { FirestoreAction, FirestoreVuexModule } from './FirebaseAction';
-import { RoomState } from './room';
+import { RoomState } from "./RoomState";
 
 export interface PlayerDeck {
     selection: Array<number>,
