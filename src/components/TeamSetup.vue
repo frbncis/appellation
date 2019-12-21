@@ -2,7 +2,7 @@
   <v-app
     style="background: #0bf; color: #fff"
   >
-    <v-content>
+    <SetupPageContent>
       <v-container
         fill-height
         align="baseline"
@@ -31,7 +31,7 @@
           </div>
         </v-row>
       </v-container>
-    </v-content>
+    </SetupPageContent>
 
     <Footer>
       <v-row
@@ -67,9 +67,12 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 import Button from '@/components/Button.vue';
 import Footer from '@/components/Footer.vue';
 
+import SetupPageContent from '@/components/SetupPageContent.vue';
+
 @Component({
   components: {
     Footer,
+    SetupPageContent,
   },
 })
 export default class TeamSetup extends Vue {

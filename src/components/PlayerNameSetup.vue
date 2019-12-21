@@ -2,7 +2,7 @@
   <v-app
     style="background: #0bf; color: #fff"
   >
-    <v-content>
+    <SetupPageContent>
       <v-container
         fill-height
       >
@@ -23,7 +23,7 @@
           </v-col>
         </v-row>
       </v-container>
-    </v-content>
+    </SetupPageContent>
 
     <Footer>
       <v-col>
@@ -45,12 +45,14 @@
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import Button from '@/components/Button.vue';
 import Footer from '@/components/Footer.vue';
+import SetupPageContent from '@/components/SetupPageContent.vue';
 
 import { storeHelpers } from '@/store';
 
 @Component({
   components: {
     Footer,
+    SetupPageContent,
   },
 })
 export default class PlayerNameSetup extends Vue {

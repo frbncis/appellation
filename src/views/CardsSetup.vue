@@ -1,13 +1,13 @@
 <template>
   <v-app style="background: #0bf; color: #fff;">
-    <v-content>
+    <SetupPageContent>
       <CardDeckContainer 
         @deck-emptied="onDeckEmpty"
         @card-selected="onCardSelected"
         :cards="cards"
         :numberCardsToSelect="numberCardsToSelect"
       />
-    </v-content>
+    </SetupPageContent>
 
     <Footer>
       <v-row
@@ -33,6 +33,7 @@ import Scoreboard from '@/components/Scoreboard.vue';
 import { db } from  '@/components/Firestore.ts';
 import PlayerNameSetup from '@/components/PlayerNameSetup.vue';
 import CardDeckContainer from '@/components/CardDeckContainer.vue';
+import SetupPageContent from '@/components/SetupPageContent.vue';
 
 import {collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService.ts';
 
@@ -45,6 +46,7 @@ import store, { storeHelpers } from '../store';
     CardDeckContainer,
     Footer,
     PlayerNameSetup,
+    SetupPageContent,
   },
 })
 export default class CardsSetup extends Vue {
