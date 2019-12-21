@@ -21,7 +21,7 @@
         class="swinggable-card-deck"
       >
         <v-row
-          v-for="card in renderableCards"
+          v-for="card in vueSwingReversedRenderableCards"
           :key="card.renderKey"
           class="card"
           justify="center"
@@ -223,6 +223,23 @@ export default class CardDeck extends Vue {
         });
 
         return renderableCards;
+    }
+
+    /**
+     * Returns the array of cards for rendering with VueSwing without modifying
+     * the original array.
+     * 
+     * VueSwing places the 0th array element at the bottom of the stack,
+     * however our logic requires that the 0th element be the top card.
+     */
+    private get vueSwingReversedRenderableCards() {
+      const reversedArray = [];
+
+      for(let i = this.renderableCards.length - 1; i >= 0; i -= 1) {
+          reversedArray.push(this.renderableCards[i]);
+      }
+
+      return reversedArray;
     }
 
     private swingConfig = {
