@@ -1,5 +1,5 @@
 import { GamePhase } from '@/components/KeyValueService';
-import { PlayerState } from './player';
+import { PlayerState } from "./PlayerState";
 import { Cards } from "./Cards";
 import { Sequences } from "./Sequences";
 import { RoomStateCards } from "./RoomStateCards";

@@ -8,7 +8,7 @@ import firebase from 'firebase';
 import { GamePhase, SetupPhaseData } from '@/components/KeyValueService';
 
 import { RoomModule, getRandomIntInclusive } from './modules/room';
-import { PlayerModule } from './modules/player';
+import PlayerModule from './modules/player';
 import Cards from '@/data/Cards';
 
 Vue.use(Vuex);

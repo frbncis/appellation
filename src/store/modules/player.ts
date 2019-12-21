@@ -5,24 +5,17 @@ import firebase from 'firebase';
 import { collections, GamePhase } from '@/components/KeyValueService';
 import { FirestoreAction, FirestoreVuexModule } from './FirebaseAction';
 import { RoomState } from './RoomState';
+import { PlayerState } from './PlayerState';
+
+const moduleName = 'player';
 
 export interface PlayerDeck {
     selection: Array<number>,
 }
 
-export interface PlayerState {
-  playerId: string | null,
-  name: string | null,
-  roomId: string | null,
-  room?: RoomState | null,
-  teamId: number,
-  decks: PlayerDeck
-}
-
-
-@Module({ name: PlayerModule.ModuleName, namespaced: true })
-export class PlayerModule extends FirestoreVuexModule {
-  static ModuleName: string = 'player';
+@Module({ name: moduleName, namespaced: true })
+export default class PlayerModule extends FirestoreVuexModule {
+  static ModuleName: string = moduleName
 
   public data: PlayerState = {
     playerId: null,
@@ -132,7 +125,7 @@ export class PlayerModule extends FirestoreVuexModule {
 
   @Action
   public async ensureCurrentPhaseDataExists(
-    payload: { roomId: string, playerId: string, phase: GamePhase }
+    payload: { roomId: string, playerId: string, phase: GamePhase },
   ) {
     if (payload.phase === GamePhase.Setup) {
       const document = await collections.phase(

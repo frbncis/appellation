@@ -59,7 +59,7 @@ export default class Timer extends Vue {
         if (this.timeRemainingSeconds! <= 10) {
           this.shouldScaleUp = !this.shouldScaleUp;
 
-          setTimeout(() => this.shouldScaleUp = !this.shouldScaleUp, 100);
+          setTimeout(this.toggleTimeScaling, 100);
         }
 
         if (this.timeRemainingSeconds! <= 0) {
@@ -70,6 +70,10 @@ export default class Timer extends Vue {
           }
         }
       }
+    }
+
+    private toggleTimeScaling() {
+      this.shouldScaleUp = !this.shouldScaleUp;
     }
 
     private stopTimer() {
