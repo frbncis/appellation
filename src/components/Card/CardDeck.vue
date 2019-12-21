@@ -2,6 +2,14 @@
     <v-col
       cols="12"
     >
+      <div class="swipe-hint swipe-skip-hint" :style="{display: 'none', right: `${-HINT_SIZE}px`}">
+        <v-icon color="#00B4EF" :size="HINT_SIZE">clear</v-icon>
+      </div>
+
+      <div class="swipe-hint swipe-guess-hint" :style="{display: 'none', left: `${-HINT_SIZE}px`}">
+        <v-icon color="rgba(76, 189, 159, 1)" :size="HINT_SIZE">check</v-icon>
+      </div>
+      
       <vue-swing
         @throwoutright="_onCardGuessed"
         @throwoutleft="_onCardSkipped"
@@ -19,14 +27,6 @@
           justify="center"
           align="stretch"
         >
-          <div class="swipe-hint swipe-skip-hint" style="display: none;">
-            <v-icon color="#00B4EF" size="100">replay</v-icon>
-          </div>
-
-          <div class="swipe-hint swipe-guess-hint" style="display: none;">
-            <v-icon color="rgba(76, 189, 159, 1)" size="100">checkmark</v-icon>
-          </div>
-
           <v-col 
             cols="12"
             class="card-data"
@@ -71,6 +71,7 @@
 import VNode from 'vue';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import VueSwing from 'vue-swing';
+import vendorPrefix from 'vendor-prefix';
 
 export interface CardData {
     id : number;
@@ -104,6 +105,8 @@ export default class CardDeck extends Vue {
 
     private cardMovementState = {}
 
+    private HINT_SIZE = 100;
+
     /**
      * Backing field for the getter slidingWindowIndex
      */
@@ -121,6 +124,8 @@ export default class CardDeck extends Vue {
       const movedDirection = cardMovement.throwDirection;
       const movedConfidence = cardMovement.throwOutConfidence;
 
+      const offset = cardMovement.offset;
+
       let hint: CardHint = CardHint.None;
 
       if (movedDirection == VueSwing.Direction.RIGHT && movedConfidence == 1) {
@@ -131,37 +136,56 @@ export default class CardDeck extends Vue {
         hint = CardHint.None;
       }
 
-      this.setCardHints(movedCardDiv, hint);
+      this.setCardHints(movedCardDiv, hint, Math.abs(offset));
+      this.scaleNextCard(offset);
+    }
+
+    private scaleNextCard(offset: number) {
+      const nextCardElement = (<HTMLDivElement>(window.document.querySelector('.card:first-child')!));
+
+      const initialScaleFactor = 0.95;
+
+      const scaleFactor = Math.min(Math.abs(offset) / (document.documentElement.clientWidth) * 0.05 + initialScaleFactor, 1);
+
+      nextCardElement.style[vendorPrefix('transform')] = `scale(${scaleFactor})`
     }
     
     public onCardMovementStopped(cardMovement: any) {
-      this.setCardHints(cardMovement.target, CardHint.None)
+      this.setCardHints(cardMovement.target, CardHint.None, 0)
     }
 
-    private setCardHints(card: HTMLDivElement, hint: CardHint) {
+    private setCardHints(card: HTMLDivElement, hint: CardHint, cardDisplacementX: number) {
       const show = 'block';
       const hide = 'none';
 
       const skipHint = '.swipe-skip-hint';
       const guessHint = '.swipe-guess-hint';
 
-      const setHintVisibility = (card: HTMLDivElement, hintSelector: string, hintState: string) => {
-        (<HTMLDivElement>(card.querySelector(hintSelector)!)).style.display = hintState;
+      const setHintStyling = (card: HTMLDivElement, hintSelector: string, hintState: string, transformFactor: number, slideFromLeft: boolean) => {
+        const hintElement = (<HTMLDivElement>(window.document.querySelector(hintSelector)!));
+        hintElement.style.display = hintState;
+
+        let coordinateX = transformFactor;
+        const maxCoordinateX = document.documentElement.clientWidth / 2.5;
+        coordinateX = coordinateX > maxCoordinateX ? maxCoordinateX : coordinateX;
+
+        const scaleFactor = coordinateX / 150;
+
+        hintElement.style[vendorPrefix('transform')] = `translate3d(0, 0, 0) translate(${slideFromLeft ? '-' : ''}${coordinateX}px, 0px) scale(${scaleFactor})`;
       };
 
       switch (hint) {
         case CardHint.Guessed:
-          setHintVisibility(card, guessHint, show);
+          setHintStyling(card, guessHint, show, cardDisplacementX, false);
 
           break;
         case CardHint.Skipped:
-          setHintVisibility(card, skipHint, show);
+          setHintStyling(card, skipHint, show, cardDisplacementX, true);
           
           break;
         case CardHint.None:
-          setHintVisibility(card, skipHint, hide);
-          setHintVisibility(card, guessHint, hide);
-
+          setHintStyling(card, skipHint, hide, cardDisplacementX, false);
+          setHintStyling(card, guessHint, hide, cardDisplacementX, false);
       }
     }
 
@@ -201,13 +225,18 @@ export default class CardDeck extends Vue {
 
     private swingConfig = {
         throwOutConfidence: (xOffset: number, yOffset: number, element: HTMLElement) => {
-            const xConfidence = Math.min(Math.abs(xOffset) / (0.30 * element.offsetWidth), 1);
+            const xConfidence = Math.min(Math.abs(xOffset) / (0.15 * element.offsetWidth), 1);
             return xConfidence;
         },
         allowedDirections: [
             VueSwing.Direction.LEFT,
             VueSwing.Direction.RIGHT,
         ],
+        transform: (element: HTMLElement, coordinateX: number, coordinateY: number, rotation: number) => {
+          const cardAngle = 0.1 * coordinateX;
+
+          element.style[vendorPrefix('transform')] = 'translate3d(0, 0, 0) translate(' + coordinateX + 'px, ' + 0 + 'px) rotate(' + cardAngle + 'deg)';
+        },
     }
 
     private _onCardSkipped() {
@@ -271,36 +300,36 @@ h1, p {
 
 .swipe-hint {
   position: absolute;
-  text-transform: uppercase;
-  font-weight: bold;
-  margin: 1em 1em 0 0;
-  padding: 0.12em 0.25em 0.12em 0.25em;
 
-  -webkit-mask-image: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/8399/grunge.png');
-  -webkit-mask-size: 944px 604px;
-  mix-blend-mode: multiply;
-  font-size: 2em;
-  top: 25%;
+  top: 50%;
+  z-index: 100;
+  border-radius: 100%;
+  background-color: white;
+  transform: scale(0);
 }
 
 .swipe-skip-hint {
   right: 0;
   color: #00B4EF;
+  border: 6px solid #00B4EF;
 }
 
 .swipe-guess-hint {
   left: 0;
-  color: #00B4EF;
+  color: rgba(76, 189, 159, 1);
+  border: 6px solid rgba(76, 189, 159, 1);
 }
 
 /* This is the next card. */
 .card:first-child {
   position: absolute;
+  transform:scale(0.95);
 }
 
 /* This is the grabbable card */
 .card:last-child {
   /* background: red; */
+  transform:scale(1);
 }
 
 .card-title {
