@@ -1,3 +1,3 @@
-export interface Sequences {
+export default interface Sequences {
   [key: number]: Array<string>;
 }

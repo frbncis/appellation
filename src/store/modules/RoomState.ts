@@ -1,10 +1,10 @@
 import { GamePhase } from '@/components/KeyValueService';
-import { PlayerState } from "./PlayerState";
-import { Cards } from "./Cards";
-import { Sequences } from "./Sequences";
-import { RoomStateCards } from "./RoomStateCards";
+import PlayerState from "./PlayerState";
+import Cards from './Cards';
+import Sequences from './Sequences';
+import RoomStateCards from './RoomStateCards';
 
-export class RoomState extends RoomStateCards {
+export default class RoomState extends RoomStateCards {
   public roomId?: string = '';
 
   public isBound: boolean = false;

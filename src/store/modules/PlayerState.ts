@@ -1,7 +1,7 @@
-import { RoomState } from './RoomState';
+import RoomState from './RoomState';
 import { PlayerDeck } from './player';
 
-export interface PlayerState {
+export default interface PlayerState {
   playerId: string | null;
   name: string | null;
   roomId: string | null;

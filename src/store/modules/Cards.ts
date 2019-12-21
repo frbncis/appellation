@@ -1,2 +1,2 @@
-export interface Cards extends Array<number> {
+export default interface Cards extends Array<number> {
 }

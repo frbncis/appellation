@@ -4,8 +4,8 @@ import {
 import firebase from 'firebase';
 import { collections, GamePhase } from '@/components/KeyValueService';
 import { FirestoreAction, FirestoreVuexModule } from './FirebaseAction';
-import { RoomState } from './RoomState';
-import { PlayerState } from './PlayerState';
+import RoomState from './RoomState';
+import PlayerState from './PlayerState';
 
 const moduleName = 'player';
 

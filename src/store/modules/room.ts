@@ -6,9 +6,9 @@ import { GamePhase, collections, SetupPhaseData } from '@/components/KeyValueSer
 import db from '@/components/Firestore';
 import './firebaseExtensions';
 import { FirestoreAction, FirestoreVuexModule } from './FirebaseAction';
-import { RoomState } from './RoomState';
-import { RoomStateCards } from './RoomStateCards';
-import { Sequences } from './Sequences';
+import RoomState from './RoomState';
+import RoomStateCards from './RoomStateCards';
+import Sequences from './Sequences';
 
 export const getRandomIntInclusive = (min: number, max: number) => {
   let currentMin = min;
