@@ -215,7 +215,9 @@ export default class CardDeck extends Vue {
         const renderableCards = renderableCardsCandidates.map((card: CardData) => {
             const view = <CardDataView>card;
 
-            view.renderKey = this.renderKey++;
+            view.renderKey = this.renderKey;
+
+            this.renderKey += 1;
 
             return view;
         });

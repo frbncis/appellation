@@ -4,7 +4,7 @@ import {
 import firebase from 'firebase';
 import { collections, GamePhase } from '@/components/KeyValueService';
 import { FirestoreAction, FirestoreVuexModule } from './FirebaseAction';
-import { RoomState } from "./RoomState";
+import { RoomState } from './RoomState';
 
 export interface PlayerDeck {
     selection: Array<number>,
