@@ -145,7 +145,7 @@ export const storeHelpers = {
 
     let x = 0;
 
-    for (let i = 0; i < candidateCards.length; i++) {
+    for (let i = 0; i < candidateCards.length; i += 1) {
       while (x !== 100) {
         const j = getRandomIntInclusive(0, Cards.length - 1);
         x += 1;

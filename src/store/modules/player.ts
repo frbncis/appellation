@@ -54,9 +54,9 @@ export class PlayerModule extends FirestoreVuexModule {
       const teamId = p.get('teamId');
 
       if (teamId === 1) {
-        team1PlayerCount++;
+        team1PlayerCount += 1;
       } else {
-        team2PlayerCount++;
+        team2PlayerCount += 1;
       }
     });
 
