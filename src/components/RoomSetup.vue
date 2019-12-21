@@ -9,7 +9,9 @@
         >
           <v-col cols="12">
             <h1 class="display-3 font-weight-black">Unmonikers</h1>
-            <p class="subtitle-1 font-weight-bold">A dumb party game that respects your intelligence.</p>
+            <p class="subtitle-1 font-weight-bold">
+              A dumb party game that respects your intelligence.
+            </p>
           </v-col>
         </v-row>
 
@@ -19,7 +21,9 @@
           no-gutters
         >
           <v-col cols="12">
-            <p class="overline">Enter the room code to join your buddies, or click on Create Game.</p>
+            <p class="overline">
+              Enter the room code to join your buddies, or click on Create Game.
+            </p>
             <v-text-field
               full-width
               outlined
@@ -82,9 +86,9 @@ import { mapState, mapActions, mapGetters } from 'vuex';
 import ProgressBar from '@/components/ProgressBar.vue';
 import Button from '@/components/Button.vue';
 import Footer from '@/components/Footer.vue';
-import { db } from '@/components/Firestore.ts';
+import { db } from '@/components/Firestore';
 
-import { collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService.ts';
+import { collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService';
 
 import store, { storeHelpers } from '../store';
 
@@ -101,14 +105,14 @@ export default class RoomSetup extends Vue {
     private joinGameClicked: boolean = false;
 
     public get canJoinGame() {
-      if (this.roomIdTextField == '') {
+      if (this.roomIdTextField === '') {
         return false;
       }
       return true;
     }
 
     public get canCreateGame() {
-      if (this.roomIdTextField == '') {
+      if (this.roomIdTextField === '') {
         return false;
       }
       return true;

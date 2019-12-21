@@ -1,7 +1,5 @@
 <template>
-  <v-app
-    style="background: #0bf; color: #fff"
-  >
+  <v-app style="background: #0bf; color: #fff">
     <v-content>
       <v-col
         cols="12"
@@ -20,9 +18,7 @@
           @timerTick="onTimerTick"
         />
 
-        <v-row
-          v-if="isPlayerTurn"
-        >
+        <v-row v-if="isPlayerTurn">
           <v-col>
             <CardDeckContainer
               v-if="playerGuessesAllowed"
@@ -32,9 +28,7 @@
               style="height: inheirit; padding-top: 0"
             />
 
-            <v-container
-              v-else
-            >
+            <v-container v-else>
               <v-col>
                 <h1>Round {{ activeRound }}</h1>
                 <h3>{{ rounds[activeRound] ? rounds[activeRound] : 'Make up your own rules.' }}</h3>
@@ -49,9 +43,7 @@
       </v-col>
     </v-content>
 
-    <Footer
-      v-if="isPlayerTurn && !playerGuessesAllowed"
-    >
+    <Footer v-if="isPlayerTurn && !playerGuessesAllowed">
       <v-col>
         <Button text="Start Round" @click="startTurn" />
       </v-col>
@@ -93,7 +85,11 @@ export default class Guessing extends Vue {
    */
   private get timeRemainingSeconds() {
     if (storeHelpers.room.data.turnStarted !== 0) {
-      const calculatedRemainingTime = Math.floor((storeHelpers.room.data.turnStarted! + this.TIMER_START_VALUE * 1000 - Date.now().valueOf()) / 1000);
+      const turnEndTime = storeHelpers.room.data.turnStarted! + this.TIMER_START_VALUE * 1000;
+
+      const calculatedRemainingTime = Math.floor(
+        (turnEndTime - Date.now().valueOf()) / 1000,
+      );
 
       if (calculatedRemainingTime >= 0) {
         this.timeRemainingField = calculatedRemainingTime;
@@ -111,7 +107,7 @@ export default class Guessing extends Vue {
     1: 'Use any words, sounds, or gestures except the name itself.',
     2: 'Use only one word.',
     3: 'Just charades - sound effects are OK.',
-  }
+  };
 
   private get activeTeam() {
     return storeHelpers.room.data.currentTeamTurnId;
@@ -122,7 +118,10 @@ export default class Guessing extends Vue {
   }
 
   private get cardsGuessed() {
-    return storeHelpers.room.data.selectedCards.length - storeHelpers.room.data.activeRemainingCards.length;
+    return (
+      storeHelpers.room.data.selectedCards.length
+      - storeHelpers.room.data.activeRemainingCards.length
+    );
   }
 
   private get cardsTotal() {
@@ -145,34 +144,44 @@ export default class Guessing extends Vue {
   }
 
   public get isPlayerTurn() {
-    return storeHelpers.room.data.currentPlayerId === storeHelpers.player.data.playerId;
+    return (
+      storeHelpers.room.data.currentPlayerId
+      === storeHelpers.player.data.playerId
+    );
   }
 
   public get activePlayerName() {
     if (storeHelpers.room.data.currentPlayer) {
       return storeHelpers.room.data.currentPlayer.name;
     }
-    return 'Ｗｉｌｄ ＭＩＳＳＩＮＧＮＯ．ａｐｐｅａｒｅｄ!'
-        + ''
-        + '      ▞▚▟▛▚' + '\n'
-        + '      ▞▗▝▗▜'
-        + '      ▙▖▞▝▜'
-        + '      ▝▖▝▗▘'
-        + '      ▞▚▗▚▖'
-        + '      ▜▞▛▘▝'
-        + '  ▙▙▗▟▖▘▞▖▜▞'
-        + '  ▞▙▟▛▙█▞▝▙▛'
-        + '  ▝▟▞█▘▞█▖▙▝'
-        + '  ▛▖▞▜▙▞▚▜▙█'
-        + '  ▗▜▝▛▘▝▟▘▞▙'
-        + '  ▗▜▝▘▘▝▗▚▟▞'
-        + '  ▜▘▞▚▚▞▜█▛▚'
-        + '  ▝▚▝▝▝▙▜▟▘▞'
-        + '  ▞▛▝▞▘▘▙▚▛█';
+    return (
+      'Ｗｉｌｄ ＭＩＳＳＩＮＧＮＯ．ａｐｐｅａｒｅｄ!'
+      + ''
+      + '      ▞▚▟▛▚'
+      + '\n'
+      + '      ▞▗▝▗▜'
+      + '      ▙▖▞▝▜'
+      + '      ▝▖▝▗▘'
+      + '      ▞▚▗▚▖'
+      + '      ▜▞▛▘▝'
+      + '  ▙▙▗▟▖▘▞▖▜▞'
+      + '  ▞▙▟▛▙█▞▝▙▛'
+      + '  ▝▟▞█▘▞█▖▙▝'
+      + '  ▛▖▞▜▙▞▚▜▙█'
+      + '  ▗▜▝▛▘▝▟▘▞▙'
+      + '  ▗▜▝▘▘▝▗▚▟▞'
+      + '  ▜▘▞▚▚▞▜█▛▚'
+      + '  ▝▚▝▝▝▙▜▟▘▞'
+      + '  ▞▛▝▞▘▘▙▚▛█'
+    );
   }
 
   get playerGuessesAllowed(): boolean {
-    return this.roundActive == true && this.hasTimeRemaining == true && this.cards.length > 0;
+    return (
+      this.roundActive === true
+      && this.hasTimeRemaining === true
+      && this.cards.length > 0
+    );
   }
 
   get isRoundActive(): boolean {
@@ -184,16 +193,20 @@ export default class Guessing extends Vue {
   }
 
   get progress() {
-    return this.cardsGuessed / this.cardsTotal * 100;
+    return (this.cardsGuessed / this.cardsTotal) * 100;
   }
 
   private get cards() {
-    const cardModels: Array<CardData> = (JSON.parse(JSON.stringify(Cards)) as Array<CardData>).map((cardModel, index) => ({
+    const cardModels: Array<CardData> = (JSON.parse(
+      JSON.stringify(Cards),
+    ) as Array<CardData>).map((cardModel, index) => ({
       id: index,
       ...cardModel,
     }));
 
-    const cards = storeHelpers.room.data.activeRemainingCards.map((cardId: number) => cardModels[cardId]);
+    const cards = storeHelpers.room.data.activeRemainingCards.map(
+      (cardId: number) => cardModels[cardId],
+    );
 
     return this.shuffle(cards.filter(card => card !== null));
   }
@@ -220,14 +233,24 @@ export default class Guessing extends Vue {
   private async onCardGuessed(guessedCard: any) {
     console.log('Guessing.onCardGuessed() called', guessedCard);
 
-    console.log(`Guessing.onCardGuessed() - removing card ID ${guessedCard.id}`);
+    console.log(
+      `Guessing.onCardGuessed() - removing card ID ${guessedCard.id}`,
+    );
 
-    await storeHelpers.room.setDrawDeck(this.cardIds.filter(cardId => cardId !== guessedCard.id));
+    await storeHelpers.room.setDrawDeck(
+      this.cardIds.filter(cardId => cardId !== guessedCard.id),
+    );
 
-    console.log('Guessing.onCardGuessed() - active deck update done.', this.cardIds);
-    await storeHelpers.room.increaseScore({ teamId: this.activeTeam!, pointsEarned: guessedCard.points });
+    console.log(
+      'Guessing.onCardGuessed() - active deck update done.',
+      this.cardIds,
+    );
+    await storeHelpers.room.increaseScore({
+      teamId: this.activeTeam!,
+      pointsEarned: guessedCard.points,
+    });
 
-    if (this.cards.length == 0) {
+    if (this.cards.length === 0) {
       await this.endTurn();
     }
   }
@@ -284,7 +307,7 @@ export default class Guessing extends Vue {
 }
 
 .game-header div {
-  flex-basis: 100%
+  flex-basis: 100%;
 }
 
 .game-footer {
@@ -292,10 +315,9 @@ export default class Guessing extends Vue {
   margin-right: auto;
   margin-left: auto;
   width: 95%;
-  bottom:0;
+  bottom: 0;
   left: 2.5%;
   position: fixed;
   margin-bottom: 1em;
 }
-
 </style>

@@ -136,7 +136,7 @@ export const storeHelpers = {
   },
 
   isInPile(cardPile: Array<number>, cardIndex: number): boolean {
-    return cardPile.findIndex(value => value == cardIndex) > -1;
+    return cardPile.findIndex(value => value === cardIndex) > -1;
   },
 
   async drawSelectionCards() {

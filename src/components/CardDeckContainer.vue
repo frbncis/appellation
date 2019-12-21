@@ -29,10 +29,10 @@ import ProgressBar from '@/components/ProgressBar.vue';
 import Button from '@/components/Button.vue';
 import Footer from '@/components/Footer.vue';
 import Scoreboard from '@/components/Scoreboard.vue';
-import { db } from '@/components/Firestore.ts';
+import { db } from '@/components/Firestore';
 import PlayerNameSetup from '@/components/PlayerNameSetup.vue';
 
-import { collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService.ts';
+import { collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService';
 
 import { PlayerDeck } from '@/store/modules/player';
 import store, { storeHelpers } from '../store';

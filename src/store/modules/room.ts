@@ -256,7 +256,7 @@ export class RoomModule extends FirestoreVuexModule {
           currentPlayerId: firstPlayerId,
           currentTeamTurnId: 0,
         };
-      } else if (this.data.players.length == 1) {
+      } else if (this.data.players.length === 1) {
         const { currentPlayerId } = this.data;
         const currentPlayerTeamId = this.data.currentTeamTurnId;
         turnData = {

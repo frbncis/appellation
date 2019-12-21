@@ -8,17 +8,17 @@ import { firestore } from 'firebase';
 import { FirestoreOptions } from '@posva/vuefire-core/dist/packages/@posva/vuefire-core/src';
 
 interface FirestoreActionContext<S, R> extends ActionContext<S, R> {
-    bindFirestoreRef(key: string, ref: firestore.Query | firestore.CollectionReference, options?: FirestoreOptions): Promise<firestore.DocumentData[]>;
-    bindFirestoreRef(key: string, ref: firestore.DocumentReference, options?: FirestoreOptions): Promise<firestore.DocumentData>;
-    unbindFirestoreRef(key: string): void;
+  bindFirestoreRef(key: string, ref: firestore.Query | firestore.CollectionReference, options?: FirestoreOptions): Promise<firestore.DocumentData[]>;
+  bindFirestoreRef(key: string, ref: firestore.DocumentReference, options?: FirestoreOptions): Promise<firestore.DocumentData>;
+  unbindFirestoreRef(key: string): void;
 }
 
 export class FirestoreVuexModule<S = ThisType<any>, R = any> extends VuexModule<S, R> {
-    context!: FirestoreActionContext<S, R>;
+  context!: FirestoreActionContext<S, R>;
 
-    constructor(m: any) {
-      super(m);
-    }
+  constructor(m: any) {
+    super(m);
+  }
 }
 
 function firestoreActionDecoratorFactory<T>(params?: ActionDecoratorParams): MethodDecorator {
@@ -52,7 +52,7 @@ function firestoreActionDecoratorFactory<T>(params?: ActionDecoratorParams): Met
           : new Error(
             `${new Error(`Could not perform action ${key.toString()}`).stack
             }\n${
-              e.stack}`,
+            e.stack}`,
           );
       }
     };

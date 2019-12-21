@@ -5,7 +5,7 @@
     <PlayerNameSetup
       v-if="player.playerId !== undefined
         && roomId !== undefined
-        && player.name == null"
+        && player.name === null"
 
       :roomId="roomId"
     />
@@ -35,13 +35,13 @@ import ProgressBar from '@/components/ProgressBar.vue';
 import Button from '@/components/Button.vue';
 import Footer from '@/components/Footer.vue';
 import Scoreboard from '@/components/Scoreboard.vue';
-import { db } from '@/components/Firestore.ts';
+import { db } from '@/components/Firestore';
 import PlayerNameSetup from '@/components/PlayerNameSetup.vue';
 import CardsSetup from '@/views/CardsSetup.vue';
 import TeamSetup from '@/components/TeamSetup.vue';
 import Guessing from '@/views/Guessing.vue';
 
-import { collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService.ts';
+import { collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService';
 
 import { PlayerDeck } from '@/store/modules/player';
 import store, { storeHelpers } from '../store';
@@ -78,7 +78,7 @@ export default class Setup extends Vue {
         return false;
       }
 
-      const playerData = this.phase.find(playerPhaseData => playerPhaseData.playerId == this.player.playerId);
+      const playerData = this.phase.find(playerPhaseData => playerPhaseData.playerId === this.player.playerId);
 
       if (!playerData) {
         return false;
@@ -126,7 +126,7 @@ export default class Setup extends Vue {
 
         if (playerPhaseData) {
           if (playerPhaseData.player) {
-            return playerPhaseData.player.teamId == teamId;
+            return playerPhaseData.player.teamId === teamId;
           }
         }
 
@@ -139,7 +139,7 @@ export default class Setup extends Vue {
         return false;
       }
 
-      return this.phase.filter(playerPhaseData => playerPhaseData.hasSubmittedCards).length == this.phase.length;
+      return this.phase.filter(playerPhaseData => playerPhaseData.hasSubmittedCards).length === this.phase.length;
     }
 
     public async onCreateGameClick() {
@@ -159,7 +159,7 @@ export default class Setup extends Vue {
     }
 
     public async onSetPlayerNameClick() {
-      if (this.roomId && this.playerName != '') {
+      if (this.roomId && this.playerName !== '') {
         const playerId = await storeHelpers.createPlayer(
           this.roomId,
           this.playerName,

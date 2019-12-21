@@ -16,6 +16,7 @@ module.exports = {
     {
       files: '**/*.ts',
       rules: {
+        'class-methods-use-this': 'off',
         'no-useless-constructor': 'off',
         '@typescript-eslint/no-useless-constructor': 'error',
       },

@@ -44,10 +44,10 @@
             <div
               :class="{
                 'points': true,
-                'points-1': card.points == 1,
-                'points-2': card.points == 2,
-                'points-3': card.points == 3,
-                'points-4': card.points == 4,
+                'points-1': card.points === 1,
+                'points-2': card.points === 2,
+                'points-3': card.points === 3,
+                'points-4': card.points === 4,
               }"
             >
               <h2
@@ -128,9 +128,9 @@ export default class CardDeck extends Vue {
 
       let hint: CardHint = CardHint.None;
 
-      if (movedDirection == VueSwing.Direction.RIGHT && movedConfidence == 1) {
+      if (movedDirection === VueSwing.Direction.RIGHT && movedConfidence === 1) {
         hint = CardHint.Guessed;
-      } else if (movedDirection == VueSwing.Direction.LEFT && movedConfidence == 1) {
+      } else if (movedDirection === VueSwing.Direction.LEFT && movedConfidence === 1) {
         hint = CardHint.Skipped;
       } else {
         hint = CardHint.None;
@@ -192,7 +192,7 @@ export default class CardDeck extends Vue {
     get renderableCards(): Array<CardDataView> {
         console.log("Getting renderableCards");
 
-        if (!this.cards || this.cards.length == 0) {
+        if (!this.cards || this.cards.length === 0) {
             console.log(`CardDeck.renderableCards - got no cards.`);
             return [];
         }
@@ -206,7 +206,7 @@ export default class CardDeck extends Vue {
                 this.cards[this.slidingWindowIndex],
                 this.cards[(this.slidingWindowIndex + 1) % this.cards.length],
             ];
-        } else if (this.cards.length == 1) {
+        } else if (this.cards.length === 1) {
             renderableCardsCandidates = [
                 this.cards[this.slidingWindowIndex]
             ];

@@ -53,7 +53,7 @@ export class PlayerModule extends FirestoreVuexModule {
     (await collections.players(roomId).get()).forEach(async (p) => {
       const teamId = p.get('teamId');
 
-      if (teamId == 1) {
+      if (teamId === 1) {
         team1PlayerCount++;
       } else {
         team2PlayerCount++;
@@ -62,7 +62,7 @@ export class PlayerModule extends FirestoreVuexModule {
 
     let assignedTeamId;
 
-    if (team1PlayerCount == 0 && team2PlayerCount == 0) {
+    if (team1PlayerCount === 0 && team2PlayerCount === 0) {
       assignedTeamId = 1;
     } else {
       assignedTeamId = team1PlayerCount < team2PlayerCount ? 1 : 2;
@@ -111,7 +111,7 @@ export class PlayerModule extends FirestoreVuexModule {
   public async switchTeam() {
     const currentTeamId = this.data.teamId;
 
-    const newTeamId = currentTeamId == 1 ? 2 : 1;
+    const newTeamId = currentTeamId === 1 ? 2 : 1;
 
     return collections.player(
       this.data.roomId!,
@@ -132,7 +132,7 @@ export class PlayerModule extends FirestoreVuexModule {
 
   @Action
   public async ensureCurrentPhaseDataExists(payload: { roomId: string, playerId: string, phase: GamePhase }) {
-    if (payload.phase == GamePhase.Setup) {
+    if (payload.phase === GamePhase.Setup) {
       const document = await collections.phase(
         payload.roomId,
         GamePhase.Setup,
