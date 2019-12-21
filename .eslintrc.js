@@ -9,6 +9,7 @@ module.exports = {
     '@vue/typescript',
   ],
   rules: {
+    'class-methods-use-this': 'off',
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
   },
@@ -16,7 +17,6 @@ module.exports = {
     {
       files: '**/*.ts',
       rules: {
-        'class-methods-use-this': 'off',
         'no-useless-constructor': 'off',
         '@typescript-eslint/no-useless-constructor': 'error',
       },

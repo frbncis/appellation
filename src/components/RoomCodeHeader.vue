@@ -13,7 +13,6 @@ import { storeHelpers } from '../store';
   components: {},
 })
 export default class RoomCodeHeader extends Vue {
-  // eslint-disable-next-line class-methods-use-this
   private get roomId(): string {
     return storeHelpers.room.data.roomId || '??';
   }
