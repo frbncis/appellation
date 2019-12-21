@@ -151,29 +151,14 @@ export default class Guessing extends Vue {
   }
 
   public get activePlayerName() {
+    let name;
     if (storeHelpers.room.data.currentPlayer) {
-      return storeHelpers.room.data.currentPlayer.name;
+      name = storeHelpers.room.data.currentPlayer.name!;
+    } else {
+      name = 'Unknown Player';
     }
-    return (
-      'Ｗｉｌｄ ＭＩＳＳＩＮＧＮＯ．ａｐｐｅａｒｅｄ!'
-      + ''
-      + '      ▞▚▟▛▚'
-      + '\n'
-      + '      ▞▗▝▗▜'
-      + '      ▙▖▞▝▜'
-      + '      ▝▖▝▗▘'
-      + '      ▞▚▗▚▖'
-      + '      ▜▞▛▘▝'
-      + '  ▙▙▗▟▖▘▞▖▜▞'
-      + '  ▞▙▟▛▙█▞▝▙▛'
-      + '  ▝▟▞█▘▞█▖▙▝'
-      + '  ▛▖▞▜▙▞▚▜▙█'
-      + '  ▗▜▝▛▘▝▟▘▞▙'
-      + '  ▗▜▝▘▘▝▗▚▟▞'
-      + '  ▜▘▞▚▚▞▜█▛▚'
-      + '  ▝▚▝▝▝▙▜▟▘▞'
-      + '  ▞▛▝▞▘▘▙▚▛█'
-    );
+
+    return name;
   }
 
   get playerGuessesAllowed(): boolean {
@@ -208,7 +193,7 @@ export default class Guessing extends Vue {
       (cardId: number) => cardModels[cardId],
     );
 
-    return this.shuffle(cards.filter(card => card !== null));
+    return cards.filter(card => card !== null);
   }
 
   private async startTurn() {
@@ -253,18 +238,6 @@ export default class Guessing extends Vue {
     if (this.cards.length === 0) {
       await this.endTurn();
     }
-  }
-
-  /**
-   * Shuffles array in place. ES6 version
-   * @param {Array} a items An array containing the items.
-   */
-  private shuffle(a: Array<any>) {
-    for (let i = a.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
   }
 }
 </script>

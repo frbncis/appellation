@@ -82,7 +82,12 @@ export const storeHelpers = {
     await this.room.update({ turnStarted: 0 });
 
     if (this.room.data.activeRemainingCards.length > 0) {
-      console.log('There are cards in the draw pile, setting next player.');
+      console.log('There are cards in the draw pile, shuffling cards and setting next player.');
+      
+      await this.room.update({
+        activeRemainingCards: this.shuffle(this.room.data.selectedCards)
+      });
+
       await this.room.setNextPlayer();
     } else {
       console.log('End of round.');
@@ -168,6 +173,17 @@ export const storeHelpers = {
   async submitSelectionCards(cards: Array<number>) {
     await this.player.submitSelectionCards();
     await this.room.addToDeck({ cards, deck: 'selectedCards' });
+  },
+  /**
+   * Shuffles array in place. ES6 version
+   * @param {Array} a items An array containing the items.
+   */
+  shuffle(a: Array<any>) {
+    for (let i = a.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
   },
 };
 

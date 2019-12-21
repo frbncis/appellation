@@ -280,8 +280,10 @@ export class RoomModule extends FirestoreVuexModule {
       // Set the next player.
       const update2 = this.setNextPlayer();
 
-      await update1;
-      await update2;
+      await Promise.all([
+        update1,
+        update2
+      ]);
     }
 
     @Action
