@@ -131,7 +131,9 @@ export class PlayerModule extends FirestoreVuexModule {
   }
 
   @Action
-  public async ensureCurrentPhaseDataExists(payload: { roomId: string, playerId: string, phase: GamePhase }) {
+  public async ensureCurrentPhaseDataExists(
+    payload: { roomId: string, playerId: string, phase: GamePhase }
+  ) {
     if (payload.phase === GamePhase.Setup) {
       const document = await collections.phase(
         payload.roomId,

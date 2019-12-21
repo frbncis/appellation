@@ -7,6 +7,8 @@ import db from '@/components/Firestore';
 import './firebaseExtensions';
 import { FirestoreAction, FirestoreVuexModule } from './FirebaseAction';
 import { RoomState } from './RoomState';
+import { RoomStateCards } from './RoomStateCards';
+import { Sequences } from './Sequences';
 
 export const getRandomIntInclusive = (min: number, max: number) => {
   let currentMin = min;
@@ -16,24 +18,6 @@ export const getRandomIntInclusive = (min: number, max: number) => {
   currentMax = Math.floor(currentMax);
   return Math.floor(Math.random() * (currentMax - currentMin + 1)) + min;
 };
-
-export interface Cards extends Array<number> {
-
-}
-
-export class RoomStateCards {
-  public selectedCards: Cards = [];
-
-  public activeRemainingCards: Cards = [];
-
-  public activeGuessedCards: Cards = [];
-
-  public discard: Cards = [];
-}
-
-export interface Sequences {
-  [key: number]: Array<string>
-}
 
 @Module({ name: 'room', namespaced: true })
 export class RoomModule extends FirestoreVuexModule {

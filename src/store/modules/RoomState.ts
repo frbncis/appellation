@@ -1,6 +1,8 @@
 import { GamePhase } from '@/components/KeyValueService';
 import { PlayerState } from './player';
-import { RoomStateCards, Sequences, Cards } from './room';
+import { Cards } from "./Cards";
+import { Sequences } from "./Sequences";
+import { RoomStateCards } from "./RoomStateCards";
 
 export class RoomState extends RoomStateCards {
   public roomId?: string = '';
@@ -47,7 +49,7 @@ export class RoomState extends RoomStateCards {
     super();
     Object.assign(this, init);
   }
-  
+
   public getDeck(deckName: string): Cards {
     return (<any>this)[deckName];
   }
