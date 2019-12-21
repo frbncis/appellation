@@ -13,7 +13,10 @@
             <p
               v-for="playerData in playersTeam1"
               :key="playerData.name"
-              :class="{ playerReady: playerData.hasSubmittedCards, playerWaiting: !playerData.hasSubmittedCards }"
+              :class="{
+                playerReady: playerData.hasSubmittedCards,
+                playerWaiting: !playerData.hasSubmittedCards,
+              }"
             >
               {{ playerData.player.name }}
             </p>
@@ -24,7 +27,10 @@
             <p
               v-for="playerData in playersTeam2"
               :key="playerData.name"
-              :class="{ playerReady: playerData.hasSubmittedCards, playerWaiting: !playerData.hasSubmittedCards }"
+              :class="{
+                playerReady: playerData.hasSubmittedCards,
+                playerWaiting: !playerData.hasSubmittedCards
+              }"
             >
               {{ playerData.player.name }}
             </p>

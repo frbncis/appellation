@@ -78,7 +78,9 @@ export default class Setup extends Vue {
         return false;
       }
 
-      const playerData = this.phase.find(playerPhaseData => playerPhaseData.playerId === this.player.playerId);
+      const playerData = this.phase.find(
+        playerPhaseData => playerPhaseData.playerId === this.player.playerId,
+      );
 
       if (!playerData) {
         return false;
@@ -139,7 +141,9 @@ export default class Setup extends Vue {
         return false;
       }
 
-      const numberPlayersReady = this.phase.filter(playerPhaseData => playerPhaseData.hasSubmittedCards).length;
+      const numberPlayersReady = this.phase.filter(
+        playerPhaseData => playerPhaseData.hasSubmittedCards,
+      ).length;
 
       return numberPlayersReady === this.phase.length;
     }

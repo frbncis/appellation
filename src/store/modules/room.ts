@@ -1,20 +1,20 @@
 import {
-  Module, VuexModule, Mutation, Action,
+  Module, Mutation, Action,
 } from 'vuex-module-decorators';
+import firebase from 'firebase';
 import { GamePhase, collections, SetupPhaseData } from '@/components/KeyValueService';
 import { db } from '@/components/Firestore';
 import './firebaseExtensions';
 import { FirestoreAction, FirestoreVuexModule } from './FirebaseAction';
-import firebase from 'firebase';
 import { PlayerState } from './player';
 
 export const getRandomIntInclusive = (min: number, max: number) => {
-  let _min = min;
-  let _max = max;
+  let currentMin = min;
+  let currentMax = max;
 
-  _min = Math.ceil(_min);
-  _max = Math.floor(_max);
-  return Math.floor(Math.random() * (_max - _min + 1)) + min;
+  currentMin = Math.ceil(currentMin);
+  currentMax = Math.floor(currentMax);
+  return Math.floor(Math.random() * (currentMax - currentMin + 1)) + min;
 };
 
 interface Cards extends Array<number> {
@@ -140,10 +140,10 @@ export class RoomModule extends FirestoreVuexModule {
       const room = new RoomState({
         roomId,
         isBound: true,
-        selectedCards: new Array<number>(),
-        activeRemainingCards: new Array<number>(),
-        activeGuessedCards: new Array<number>(),
-        discard: new Array<number>(),
+        selectedCards: [],
+        activeRemainingCards: [],
+        activeGuessedCards: [],
+        discard: [],
         players: [],
       });
 
@@ -204,6 +204,8 @@ export class RoomModule extends FirestoreVuexModule {
      */
     @Action
     public async incrementActiveTeamPoint() {
+      let scoreUpdate: Partial<RoomState> = {};
+
       if (!this.data.roomId) {
         throw new Error('Room ID was not set in the state store.');
       }
@@ -213,9 +215,12 @@ export class RoomModule extends FirestoreVuexModule {
       }
 
       if (this.data.currentTeamTurnId === 1) {
-        return collections.room(this.data.roomId).update(<Partial<RoomState>>{ scoreTeam1: this.data.scoreTeam1 + 1 });
+        scoreUpdate = { scoreTeam1: this.data.scoreTeam1 + 1 };
+      } else {
+        scoreUpdate = { scoreTeam2: this.data.scoreTeam2 + 1 };
       }
-      return collections.room(this.data.roomId).update(<Partial<RoomState>>{ scoreTeam2: this.data.scoreTeam2 + 1 });
+
+      return collections.room(this.data.roomId).update(scoreUpdate);
     }
 
     @Action
@@ -244,7 +249,13 @@ export class RoomModule extends FirestoreVuexModule {
     public async setNextPlayer() {
       console.log('RoomModule.setNextPlayer() - called.');
 
-      let turnData: { previousPlayerId: string, currentPlayerId: string, currentTeamTurnId: number } | null = null;
+      let turnData: { 
+        previousPlayerId: string,
+        currentPlayerId: string,
+        currentTeamTurnId: number
+      } | null;
+
+      turnData = null;
 
       // No active player, this is the first turn.
       if (this.data.currentPlayerId === '') {
@@ -295,25 +306,25 @@ export class RoomModule extends FirestoreVuexModule {
     }
 
     @Action
-    public async setScores(payload: { 1: number, 2: number }) {
+    public setScores(payload: { 1: number, 2: number }) {
       console.log('RoomModule.setScores() called', payload);
 
-      return await this.document.update(<Partial<RoomStateCards>>{
+      return this.document.update(<Partial<RoomStateCards>>{
         scoreTeam1: payload[1],
         scoreTeam2: payload[2],
       });
     }
 
     @Action
-    public async increaseScore(payload: { teamId: number, pointsEarned: number}) {
+    public increaseScore(payload: { teamId: number, pointsEarned: number}) {
       console.log('RoomModule.increaseScore() called.', payload);
 
       if (payload.teamId === 1) {
-        return await this.document.update(<Partial<RoomStateCards>>{
+        return this.document.update(<Partial<RoomStateCards>>{
           scoreTeam1: this.data.scoreTeam1 + payload.pointsEarned,
         });
       }
-      return await this.document.update(<Partial<RoomStateCards>>{
+      return this.document.update(<Partial<RoomStateCards>>{
         scoreTeam2: this.data.scoreTeam2 + payload.pointsEarned,
       });
     }
