@@ -139,7 +139,9 @@ export default class Setup extends Vue {
         return false;
       }
 
-      return this.phase.filter(playerPhaseData => playerPhaseData.hasSubmittedCards).length === this.phase.length;
+      const numberPlayersReady = this.phase.filter(playerPhaseData => playerPhaseData.hasSubmittedCards).length;
+
+      return numberPlayersReady === this.phase.length;
     }
 
     public async onCreateGameClick() {
