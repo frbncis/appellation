@@ -85,7 +85,7 @@ export const storeHelpers = {
       console.log('There are cards in the draw pile, shuffling cards and setting next player.');
       
       await this.room.update({
-        activeRemainingCards: this.shuffle(this.room.data.selectedCards)
+        activeRemainingCards: this.shuffle(this.room.data.activeRemainingCards)
       });
 
       await this.room.setNextPlayer();

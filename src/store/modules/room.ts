@@ -178,7 +178,7 @@ export class RoomModule extends FirestoreVuexModule {
     }
 
     @Action
-    public async setNextPlayer() {
+    public async setNextPlayer(nextTeamId: number | null = null) {
       console.log('RoomModule.setNextPlayer() - called.');
 
       let turnData: {
@@ -188,6 +188,12 @@ export class RoomModule extends FirestoreVuexModule {
       } | null;
 
       turnData = null;
+
+      const { previousPlayerId, currentPlayerId, currentTeamTurnId } = this.data;
+
+      if (nextTeamId === null) {
+        nextTeamId = currentTeamTurnId === 1 ? 2 : 1;
+      }
 
       // No active player, this is the first turn.
       if (this.data.currentPlayerId === '') {
@@ -201,16 +207,15 @@ export class RoomModule extends FirestoreVuexModule {
         };
       } else if (this.data.players.length === 1) {
         const { currentPlayerId } = this.data;
+
         const currentPlayerTeamId = this.data.currentTeamTurnId;
+
         turnData = {
           previousPlayerId: currentPlayerId!,
           currentPlayerId: currentPlayerId!,
           currentTeamTurnId: currentPlayerTeamId!,
         };
       } else {
-        const { previousPlayerId, currentPlayerId, currentTeamTurnId } = this.data;
-
-        const nextTeamId = currentTeamTurnId === 1 ? 2 : 1;
         const nextTeamSequence = this.data.turnSequence[nextTeamId];
 
         let nextPlayerId;
@@ -277,8 +282,11 @@ export class RoomModule extends FirestoreVuexModule {
         activeRemainingCards,
       });
 
+      const nextTeamId = this.data.scoreTeam1 > this.data.scoreTeam2 ? 2 : 1;
+      console.log(`Setting next player on team ${nextTeamId}`);
+
       // Set the next player.
-      const update2 = this.setNextPlayer();
+      const update2 = this.setNextPlayer(nextTeamId);
 
       await Promise.all([
         update1,
