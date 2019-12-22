@@ -38,7 +38,10 @@
         </v-row>
 
         <v-container v-else>
-          <h2>Let's go {{ activePlayerName }}!</h2>
+          <v-col>
+            <h1>Round {{ activeRound }}</h1>
+            <h3>Let's go {{ activePlayerName }}!</h3>
+          </v-col>
         </v-container>
       </v-col>
     </v-content>
