@@ -297,4 +297,8 @@ export default class Guessing extends Vue {
   position: fixed;
   margin-bottom: 1em;
 }
+
+body {
+  overflow: hidden;
+}
 </style>

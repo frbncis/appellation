@@ -200,4 +200,8 @@ export default class Setup extends Vue {
 .playerWaiting {
   font-weight: 100;
 }
+
+body {
+  overflow: hidden;
+}
 </style>

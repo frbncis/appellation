@@ -59,5 +59,4 @@ export default class App extends Vue {
   min-height: calc(var(--vh, 1vh) * 100) !important;
   max-height: calc(var(--vh, 1vh) * 100) !important;
 }
-
 </style>
