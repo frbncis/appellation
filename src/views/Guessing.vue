@@ -40,6 +40,7 @@
         <v-container v-else>
           <v-col>
             <h1>Round {{ activeRound }}</h1>
+            <h3>{{ rounds[activeRound] ? rounds[activeRound] : 'Make up your own rules.' }}</h3>
             <h3>Let's go {{ activePlayerName }}!</h3>
           </v-col>
         </v-container>
