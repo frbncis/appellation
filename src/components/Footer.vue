@@ -1,12 +1,13 @@
 <template>
-    <!-- <div class="footer">
+  <v-footer
+    color="rgba(36, 36, 36, 1)"
+  >
+    <v-flex
+      id="footer-buttons"
+      class="pb-2"
+    >
       <slot></slot>
-    </div> -->
-
-  <v-footer>
-    <slot></slot>
-    <v-spacer></v-spacer>
-    <!-- <div>&copy; {{ new Date().getFullYear() }}</div> -->
+    </v-flex>
   </v-footer>
 </template>
 
@@ -17,8 +18,8 @@ import { Component, Vue } from 'vue-property-decorator';
 export default class Footer extends Vue {}
 </script>
 
-<style scoped>
-.footer {
-  margin-bottom: 1em;
+<style>
+#footer-buttons button {
+  margin-top: 12px;
 }
 </style>

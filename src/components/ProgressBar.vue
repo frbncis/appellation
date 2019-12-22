@@ -1,7 +1,7 @@
 <template>
-    <div class="progress-bar">
-        <span :style="{ width: progressWidth }" />
-    </div>
+  <div class="progress-bar">
+    <span :style="{ width: progressWidth }" />
+  </div>
 </template>
 
 <script lang="ts">
@@ -17,23 +17,23 @@ export default class ProgressBar extends Vue {
     return '0%';
   }
 
-    @Prop() private progress?: number;
+  @Prop() private progress?: number;
 }
 </script>
 
 <style scoped>
 .progress-bar {
-	height: 0.25em;  /* Can be anything */
-	position: relative;
-	/* background: #555; */
-	/* -moz-border-radius: 25px; */
-	/* -webkit-border-radius: 25px; */
-	/* border-radius: 25px; */
-	/* padding: 10px; */
-	/* box-shadow: inset 0 -1px 1px rgba(255,255,255,0.3); */
+  height: 0.25em; /* Can be anything */
+  position: relative;
+  /* background: #555; */
+  /* -moz-border-radius: 25px; */
+  /* -webkit-border-radius: 25px; */
+  /* border-radius: 25px; */
+  /* padding: 10px; */
+  /* box-shadow: inset 0 -1px 1px rgba(255,255,255,0.3); */
 }
 
-.progress-bar  > span {
+.progress-bar > span {
   display: block;
   height: 100%;
   /* border-top-right-radius: 8px; */

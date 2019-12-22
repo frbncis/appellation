@@ -1,242 +1,207 @@
 <template>
-    <v-content class="pb-0 viewport">
-      <v-container fluid>
-        <v-layout
-          column align-center
-        >
-          <v-flex>
-            <div v-if="roomId == undefined">
-                <v-btn @click="onCreateGameClick">Create Game</v-btn>
-                <v-text-field
-                    v-model="roomIdTextField"
-                    label="Room ID"
-                    placeholder="asdfg"
-                />
-                <v-btn @click="onJoinGameClick">Join Game</v-btn>
-            </div>
-            <div v-else>
-                <p>Room: {{ roomId }}</p>
-            </div>
+  <div
+    v-if="isSetupPhase"
+  >
+    <PlayerNameSetup
+      v-if="player.playerId !== undefined
+        && roomId !== undefined
+        && player.name === null"
 
-            <div v-if="player.playerId == undefined && roomId != undefined">
-                <v-text-field
-                    v-model="playerName"
-                    label="Player Name"
-                    placeholder="Adam"
-                ></v-text-field>
-                <v-btn @click="onSetPlayerNameClick">Set Player Name</v-btn>
-            </div>
-            <div v-else>
-                <p>Player ID: {{ player.playerId }}</p>
-                <p>Player Name: {{ player.name }}</p>
-            </div>
+      :roomId="roomId"
+    />
 
-            <ul id="players">
-                <h2>Team 1</h2>
-                <li v-for="playerData in playersTeam1" :key="player.name">
-                    {{ playerData.player.name }}         {{ playerData.hasSubmittedCards ? 'Y': 'N' }}
-                </li>
+    <CardsSetup
+      v-else-if="shouldShowDeck"
+    />
 
-                <h2>Team 2</h2>
-                <li v-for="playerData in playersTeam2" :key="player.name">
-                    {{ playerData.player.name }}         {{ playerData.hasSubmittedCards ? 'Y': 'N' }}
-                </li>
-                <v-btn @click="onSwitchTeamClick">Switch Team</v-btn>
-            </ul>
-          </v-flex>
-        <v-container fluid >
+    <TeamSetup
+      v-else
+      :playersTeam1="playersTeam1"
+      :playersTeam2="playersTeam2"
+      @switched-teams="onSwitchTeamClick"
+      @start-game="onStartGameClick"
+    />
+  </div>
 
-        <v-layout
-          column align-center
-        >
-          <v-flex class="card-deck-container">
-            <CardDeck
-              v-if="!isFinishedCardSelection"
-              :onDeckEmpty="onDeckEmpty"
-              :onCardGuessed="onCardSelected"
-              :cards="cards"
-              class="card-deck"
-            />
-            <h1 v-else-if="!playersReady">Waiting to start game</h1>
-            <v-btn v-else @click="onStartGameClick">Start Game</v-btn>
-          </v-flex>
-
-        </v-layout>
-      </v-container>
-        </v-layout>
-      </v-container>
-    </v-content>
+  <Guessing v-else />
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import { mapState, mapActions, mapGetters } from 'vuex';
 import CardDeck, { CardData } from '@/components/Card/CardDeck.vue';
 import Cards from '@/data/Cards';
 import ProgressBar from '@/components/ProgressBar.vue';
 import Button from '@/components/Button.vue';
 import Footer from '@/components/Footer.vue';
 import Scoreboard from '@/components/Scoreboard.vue';
-import { db } from  '@/components/Firestore.ts';
+import db from '@/components/Firestore';
+import PlayerNameSetup from '@/components/PlayerNameSetup.vue';
+import CardsSetup from '@/views/CardsSetup.vue';
+import TeamSetup from '@/components/TeamSetup.vue';
+import Guessing from '@/views/Guessing.vue';
 
-import {collections, KeyValueService, PlayerData } from '@/components/KeyValueService.ts';
+import { collections, PlayerData, SetupPhaseData } from '@/components/KeyValueService';
 
-import { mapState, mapActions, mapGetters } from 'vuex'
-import player,{ PlayerDeck } from '@/store/modules/player';
+import { PlayerDeck } from '@/store/modules/player';
+import store, { storeHelpers } from '../store';
 
 @Component({
   components: {
     CardDeck,
-  },
-  computed: {
-    ...mapState({
-        deckSelection: state => state.player.decks.selection,
-        phase: state => state.phase,
-        player: state => state.player,
-    }),
-  },
-  methods: {
-    ...mapActions('room', [
-        'bindRoomRef',
-    ]),
-    ...mapActions('player', [
-        'switchTeam',
-    ]),
-    ...mapActions([
-        'createGame',
-        'joinGame',
-        'startGame',
-        'createPlayer',
-        'becomePlayer',
-        'drawSelectionCards',
-        'submitSelectionCards'
-    ])
+    CardsSetup,
+    Footer,
+    Guessing,
+    PlayerNameSetup,
+    TeamSetup,
   },
 })
 export default class Setup extends Vue {
     @Prop() private roomId?: string | null;
 
     private roomIdTextField: string = '';
-    
+
     private playerName: string = '';
 
-    private isFinishedCardSelection: boolean = false;
+    private isGameStarting: boolean = false;
+
+    private createGameClicked: boolean = false;
+
+    private joinGameClicked: boolean = false;
+
+    private get shouldShowDeck() {
+      return !this.isFinishedCardSelection && this.player !== null && this.player.name;
+    }
+
+    private get isFinishedCardSelection(): boolean {
+      if (!this.phase) {
+        return false;
+      }
+
+      const playerData = this.phase.find(
+        playerPhaseData => playerPhaseData.playerId === this.player.playerId,
+      );
+
+      if (!playerData) {
+        return false;
+      }
+
+      return playerData.hasSubmittedCards;
+    }
+
+    private get phase(): Array<SetupPhaseData> {
+      return storeHelpers.room.phase;
+    }
+
+    private get player() {
+      return storeHelpers.player.data;
+    }
+
+    private get isSetupPhase() {
+      return storeHelpers.room.data.gamePhase === 0;
+    }
+
+    private switchTeam = storeHelpers.player.switchTeam;
 
     private get playersTeam1(): Array<any> {
-        return this.playersByTeam(1);
+      return this.playersByTeam(1);
     }
 
     private get playersTeam2(): Array<any> {
-        return this.playersByTeam(2);
+      return this.playersByTeam(2);
+    }
+
+    public async created() {
+      if (this.roomId !== '' && this.roomId !== undefined) {
+        await storeHelpers.joinGame(this.roomId!);
+      }
+      window.scrollTo(0, 1);
     }
 
     private playersByTeam(teamId: number): Array<any> {
-        if (!this.phase) {
-            return [];
+      if (!this.phase) {
+        return [];
+      }
+
+      return this.phase.filter((playerPhaseData) => {
+        console.log(playerPhaseData);
+
+        if (playerPhaseData) {
+          if (playerPhaseData.player) {
+            return playerPhaseData.player.teamId === teamId;
+          }
         }
 
-        return this.phase.filter(playerPhaseData => {
-            console.log(playerPhaseData);
-
-            if (playerPhaseData)
-            {
-                if (playerPhaseData.player)
-                {
-                    return playerPhaseData.player.teamId == teamId;
-                }
-            }
-
-            return false;
-        })
+        return false;
+      });
     }
 
     private get playersReady(): boolean {
-        if (!this.phase) {
-            return false;
-        }
+      if (!this.phase) {
+        return false;
+      }
 
-        return this.phase.filter(playerPhaseData => playerPhaseData.hasSubmittedCards).length == this.phase.length;
-    }
+      const numberPlayersReady = this.phase.filter(
+        playerPhaseData => playerPhaseData.hasSubmittedCards,
+      ).length;
 
-    private get cards(): Array<any> {
-        let allCards = <Array<CardData>>JSON.parse(JSON.stringify(Cards));
-
-        allCards = allCards.map((card, index) => {
-            return {
-                id: index,
-                ...card
-            };
-        });
-        
-        const candidateCards = allCards.filter((card: CardData) => this.deckSelection.includes(card.id) && !this.selectedCardIds.includes(card.id));
-        
-        return candidateCards;
-    }
-
-    private selectedCardIds: Array<number> = [];
-
-    public onDeckEmpty() {
-        return;
+      return numberPlayersReady === this.phase.length;
     }
 
     public async onCreateGameClick() {
-        this.roomId = await this.createGame();
+      this.createGameClicked = true;
 
-        this.$router.push(`/${this.roomId}`);
-        this.joinGame(this.roomId);
+      this.roomId = await storeHelpers.createGame();
+      this.$router.push(`/${this.roomId}`);
+      await storeHelpers.joinGame(this.roomId!);
     }
 
     public async onJoinGameClick() {
-        if (this.roomIdTextField) {
-            this.$router.push(`/${this.roomIdTextField}`);
-        }
+      this.joinGameClicked = true;
+
+      if (this.roomIdTextField) {
+        this.$router.push(`/${this.roomIdTextField}`);
+      }
     }
 
     public async onSetPlayerNameClick() {
-        if (this.roomId) {
-            const playerId = await this.createPlayer({ roomId: this.roomId, playerName: this.playerName });
-            await this.becomePlayer({ roomId: this.roomId, playerId });
-            this.drawSelectionCards();
-        } else {
-            throw new Error("No room ID")
-        }
+      if (this.roomId && this.playerName !== '') {
+        const playerId = await storeHelpers.createPlayer(
+          this.roomId,
+          this.playerName,
+        );
+
+        await storeHelpers.becomePlayer(this.roomId, playerId);
+
+        await storeHelpers.drawSelectionCards();
+      } else {
+        throw new Error('No room ID');
+      }
     }
 
     public async onSwitchTeamClick() {
-        await this.switchTeam();
+      await this.switchTeam();
     }
 
     public async onStartGameClick() {
-        await this.startGame();
-    }
-
-    private async onCardSelected(selectedCard: CardData) {
-        if (this.selectedCardIds.push(selectedCard.id) == 2) {
-            console.log("Done card selection.");
-            this.isFinishedCardSelection = true;
-
-            await this.submitSelectionCards(this.selectedCardIds);
-        }
+      console.log('Start game button clicked.');
+      this.isGameStarting = true;
+      await storeHelpers.startGame();
     }
 }
 </script>
 
 <style scoped>
-.viewport {
-  position: fixed;
-  height: 100%;
-  width: 100%;
+
+.playerReady {
+  font-weight: 900;
 }
 
-.card-deck {
-  width: 90vw;
-  /* height: calc(100vh - 159px);  */
-  height: 481px;
+.playerWaiting {
+  font-weight: 100;
 }
 
-@media only screen and (min-width: 360px) {
-  .card-deck {
-    width: 340px;
-    max-height: 351px;
-  }
+body {
+  overflow: hidden;
 }
 </style>

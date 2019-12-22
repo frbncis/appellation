@@ -11,13 +11,14 @@
     "core-js": "^2.6.5",
     "firebase": "^6.3.5",
     "swing": "^3.1.4",
+    "vendor-prefix": "^0.1.0",
     "vue": "^2.6.10",
     "vue-class-component": "^7.0.2",
     "vue-property-decorator": "^8.1.0",
     "vue-router": "^3.0.3",
     "vue-swing": "^0.0.10",
     "vuefire": "^2.1.2",
-    "vuetify": "^2.0.0",
+    "vuetify": "^2.1.12",
     "vuex": "^3.0.1",
     "vuexfire": "^3.1.2"
   },
@@ -29,6 +30,7 @@
     "@vue/eslint-config-airbnb": "^4.0.0",
     "@vue/eslint-config-typescript": "^4.0.0",
     "babel-eslint": "^10.0.1",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "sass": "^1.17.4",
@@ -36,6 +38,7 @@
     "typescript": "^3.4.3",
     "vue-cli-plugin-vuetify": "^0.6.1",
     "vue-template-compiler": "^2.6.10",
-    "vuetify-loader": "^1.2.2"
+    "vuetify-loader": "^1.2.2",
+    "vuex-module-decorators": "^0.10.1"
   }
 }
