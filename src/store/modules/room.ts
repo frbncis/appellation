@@ -290,7 +290,7 @@ export class RoomModule extends FirestoreVuexModule {
 
       await Promise.all([
         update1,
-        update2
+        update2,
       ]);
     }
 
