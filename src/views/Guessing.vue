@@ -49,7 +49,13 @@
 
     <Footer v-if="isPlayerTurn && !playerGuessesAllowed">
       <v-col>
-        <Button text="Start Round" @click="startTurn" />
+        <Button
+          block
+          outlined
+          dark
+          text="Start Round"
+          @click="startTurn"
+        />
       </v-col>
     </Footer>
   </v-app>
